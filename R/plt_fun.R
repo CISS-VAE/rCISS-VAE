@@ -1,370 +1,246 @@
-## Plot functions go here
-
-#' Plot a beeswarm of silhouette scores
-#'
-#' @param silhouettes Numeric vector of silhouette scores.
-#' @param sample_ids Optional character vector of sample identifiers. If omitted,
-#'   samples will be numbered sequentially.
-#' @return A \code{ggplot} object showing a beeswarm of silhouette scores.
-#' @examples
-#' \dontrun{
-#'   sil <- run_cissvae(df, return_silhouettes = TRUE)$silhouettes
-#'   plot_silhouette_beeswarm(sil)
-#' }
-#' @import ggplot2
-#' @import ggbeeswarm
-#' @export
-plot_silhouette_beeswarm <- function(silhouettes, sample_ids = NULL) {
-  if (!is.numeric(silhouettes)) {
-    stop("`silhouettes` must be a numeric vector.")
-  }
-  if (is.null(sample_ids)) {
-    sample_ids <- seq_along(silhouettes)
-  }
-  if (length(sample_ids) != length(silhouettes)) {
-    stop("Length of `sample_ids` must match length of `silhouettes`.")
-  }
-
-  df <- data.frame(
-    sample     = sample_ids,
-    silhouette = silhouettes,
-    stringsAsFactors = FALSE
-  )
-
-  ggplot2::ggplot(df, ggplot2::aes(x = 1, y = silhouette)) +
-    ggbeeswarm::geom_beeswarm(cex = 1.2) +
-    ggplot2::labs(
-      x     = NULL,
-      y     = "Silhouette score",
-      title = "Beeswarm of silhouette scores"
-    ) +
-    ggplot2::theme_minimal() +
-    ggplot2::theme(
-      axis.text.x  = ggplot2::element_blank(),
-      axis.ticks.x = ggplot2::element_blank()
-    )
-}
-
-## helper function to extract the vae metadata
-#' Extract CISSVAE architecture metadata
-#'
-#' @param py_model A reticulate-imported Python CISSVAE object.
-#' @return A data.frame with one row per layer:
-#'   - phase: "encoder", "latent", "decoder", or "output"  
-#'   - layer_idx: integer index within the phase  
-#'   - type: "shared" or "unshared"  
-#'   - cluster: NA for shared layers; cluster ID for unshared  
-#'   - size: integer number of units  
-#' @export
-extract_cissvae_arch <- function(py_model) {
-  # Encoder ---------------------------------------------------------------
-  hidden_dims   <- as.integer(unlist(reticulate::py_to_r(py_model$hidden_dims)))
-  layer_order_e <- unlist(reticulate::py_to_r(py_model$layer_order_enc))
-  
-  enc_list <- lapply(seq_along(hidden_dims), function(i) {
-    data.frame(
-      phase     = "encoder",
-      layer_idx = i,
-      type      = tolower(layer_order_e[i]),
-      cluster   = if (tolower(layer_order_e[i]) == "shared") NA_integer_ else NA_integer_,
-      size      = hidden_dims[i],
-      stringsAsFactors = FALSE
-    )
-  })
-  # Now fill cluster for unshared: count how many unshared before and assign cluster keys afterward
-  # But since all unshared encoder layers are duplicated per cluster in Python,
-  # we'll just mark them as "unshared" without cluster here.
-  
-  enc_df <- do.call(rbind, enc_list)
-  
-  # Latent ----------------------------------------------------------------
-  latent_dim    <- as.integer(py_model$latent_dim)
-  latent_shared <- as.logical(py_model$latent_shared)
-  
-  if (latent_shared) {
-    lat_df <- data.frame(
-      phase     = "latent",
-      layer_idx = 1L,
-      type      = "shared",
-      cluster   = NA_integer_,
-      size      = latent_dim,
-      stringsAsFactors = FALSE
-    )
-  } else {
-    # one row per cluster
-    num_clust <- as.integer(py_model$num_clusters)
-    lat_df <- data.frame(
-      phase     = "latent",
-      layer_idx = 1L,
-      type      = "unshared",
-      cluster   = seq_len(num_clust) - 1L,
-      size      = latent_dim,
-      stringsAsFactors = FALSE
-    )
-  }
-  
-  # Decoder ----------------------------------------------------------------
-  layer_order_d <- unlist(reticulate::py_to_r(py_model$layer_order_dec))
-  # decoder hidden dims reversed
-  dec_sizes_rev <- rev(hidden_dims)
-  
-  dec_list <- lapply(seq_along(dec_sizes_rev), function(i) {
-    data.frame(
-      phase     = "decoder",
-      layer_idx = i,
-      type      = tolower(layer_order_d[i]),
-      cluster   = if (tolower(layer_order_d[i]) == "shared") NA_integer_ else NA_integer_,
-      size      = dec_sizes_rev[i],
-      stringsAsFactors = FALSE
-    )
-  })
-  dec_df <- do.call(rbind, dec_list)
-  
-  # Output -----------------------------------------------------------------
-  output_shared <- as.logical(py_model$output_shared)
-  input_dim     <- as.integer(py_model$input_dim)
-  
-  if (output_shared) {
-    out_df <- data.frame(
-      phase     = "output",
-      layer_idx = 1L,
-      type      = "shared",
-      cluster   = NA_integer_,
-      size      = input_dim,
-      stringsAsFactors = FALSE
-    )
-  } else {
-    num_clust <- as.integer(py_model$num_clusters)
-    out_df <- data.frame(
-      phase     = "output",
-      layer_idx = 1L,
-      type      = "unshared",
-      cluster   = seq_len(num_clust) - 1L,
-      size      = input_dim,
-      stringsAsFactors = FALSE
-    )
-  }
-  
-  # Combine all
-  architecture <- rbind(enc_df, lat_df, dec_df, out_df)
-  architecture
-}
-
-library(dplyr)
-library(ggplot2)
-library(grid)
+# plt_fun.R
 
 library(ggplot2)
 library(dplyr)
+library(purrr)
+library(grid)    # for arrow()
 
-# Assumes extract_cissvae_arch() as defined earlier.
-
-#' Plot CISSVAE architecture with ggplot2 to mirror the Python figure
+#' Plot CISS-VAE architecture schematic
 #'
-#' @param model A CISSVAE Python object via reticulate.
-#' @param title Optional title.
+#' @param model_or_arch Python CISSVAE object (reticulate) or df from extract_cissvae_arch()
+#' @param title         Optional plot title
+#' @param color_shared   Fill for shared layers
+#' @param color_unshared Fill for unshared layers
+#' @param color_input    Fill override for Input
+#' @param color_latent   Fill override for Latent
+#' @param color_output   Fill override for Output
+#' @param x_gap         Horizontal spacing
+#' @param y_gap         Vertical spacing
+#' @param box_w         Box width
+#' @param box_h         Box height for unshared (shared auto-spans)
 #' @export
-plot_cissvae_arch_gg <- function(model, title = NULL) {
-  # Parameters same as Python
-  x_gap       <- 1
-  cluster_gap <- 1
-  box_w       <- 0.8
-  box_h       <- 0.5
-  
-  # Pull metadata
-  arch <- extract_cissvae_arch(model)
-  n_clusters <- as.integer(model$num_clusters)
-  hidden_dims <- unlist(reticulate::py_to_r(model$hidden_dims))
-  enc_order   <- unlist(reticulate::py_to_r(model$layer_order_enc))
-  dec_order   <- unlist(reticulate::py_to_r(model$layer_order_dec))
-  input_dim   <- as.integer(model$input_dim)
-  
-  # Build a data.frame of every layer box:
-  rows <- list()
-  x <- 1  # start at x=1
-  
-  # Input
-  rows[[length(rows)+1]] <- tibble(
-    phase   = "input",
-    x       = x,
-    y       = 0,
-    label   = paste0("Input\n", input_dim),
-    fill    = "lightgreen",
-    track   = "shared"
+plot_cissvae_arch <- function(model_or_arch,
+                              title         = NULL,
+                              color_shared   = "skyblue",
+                              color_unshared = "lightcoral",
+                              color_input    = "lightgreen",
+                              color_latent   = "gold",
+                              color_output   = "lightgreen",
+                              x_gap          = 2,
+                              y_gap          = 1.5,
+                              box_w          = 0.8,
+                              box_h          = 0.8) {
+  # ─── 1) Get architecture table ──────────────────────────────────────────────
+  if (inherits(model_or_arch, "python.builtin.object")) {
+    arch_df  <- extract_cissvae_arch(model_or_arch)
+    py_model <- model_or_arch
+  } else {
+    stop("Please pass a Python CISSVAE object, not a plain data.frame.")
+  }
+  n_clust   <- as.integer(py_model$num_clusters)
+  input_dim <- as.integer(py_model$input_dim)
+
+  # ─── 2) Build the Input row ────────────────────────────────────────────────
+  input_row <- tibble(
+    phase     = "input",
+    layer_idx = 0L,
+    type      = "shared",
+    cluster   = NA_integer_,
+    size      = input_dim
   )
-  
-  # Encoder
-  x <- x + x_gap
-  shared_i <- 1L
-  unshared_i <- 1L
-  for (i in seq_along(enc_order)) {
-    ty <- enc_order[i]
-    dim <- hidden_dims[i]
-    if (ty == "shared") {
-      rows[[length(rows)+1]] <- tibble(
-        phase = "encoder",
-        x     = x,
-        y     = 0,
-        label = paste0("Enc ", i, "\n", dim),
-        fill  = "skyblue",
-        track = "shared"
-      )
-      shared_i <- shared_i + 1L
+
+  # ─── 3) Expand encoder rows per cluster ───────────────────────────────────
+  enc_raw <- arch_df %>% filter(phase == "encoder")
+  enc_expanded <- map_dfr(seq_len(nrow(enc_raw)), function(i) {
+    r <- enc_raw[i, ]
+    if (r$type == "shared") {
+      r$cluster <- NA_integer_; r
     } else {
-      for (c in seq_len(n_clusters)-1L) {
-        rows[[length(rows)+1]] <- tibble(
-          phase = "encoder",
-          x     = x,
-          y     = (c - (n_clusters-1)/2)*cluster_gap,
-          label = paste0("Enc ", i, "\nC", c, "\n", dim),
-          fill  = "lightcoral",
-          track = paste0("c", c)
-        )
-      }
-      unshared_i <- unshared_i + 1L
+      map_dfr(0:(n_clust-1), function(cl) {
+        r2 <- r; r2$cluster <- cl; r2
+      })
     }
-    x <- x + x_gap
-  }
-  encoder_start <- 2
-  encoder_end   <- x - x_gap
-  
-  # Latent
-  latent_shared <- isTRUE(model$latent_shared)
-  latent_dim <- if (latent_shared) {
-    as.integer(model$latent_dim)
+  })
+
+  # ─── 4) Build latent rows ─────────────────────────────────────────────────
+  lat_raw       <- arch_df %>% filter(phase == "latent")
+  latent_dim    <- as.integer(lat_raw$size[1])
+  latent_shared <- lat_raw$type[1] == "shared"
+  lat_rows <- if (latent_shared) {
+    tibble(phase="latent", layer_idx=1L, type="shared",
+           cluster=NA_integer_, size=latent_dim)
   } else {
-    hidden_dims[1] # any cluster yields same; we'll override label below
+    tibble(phase="latent", layer_idx=1L, type="unshared",
+           cluster=0:(n_clust-1), size=latent_dim)
   }
-  if (latent_shared) {
-    rows[[length(rows)+1]] <- tibble(
-      phase = "latent",
-      x     = x,
-      y     = 0,
-      label = paste0("Latent\nμ/σ²\n", latent_dim),
-      fill  = "gold",
-      track = "shared"
-    )
-  } else {
-    for (c in seq_len(n_clusters)-1L) {
-      rows[[length(rows)+1]] <- tibble(
-        phase = "latent",
-        x     = x,
-        y     = (c - (n_clusters-1)/2)*cluster_gap,
-        label = paste0("Latent\nC", c, "\nμ/σ²\n", latent_dim),
-        fill  = "gold",
-        track = paste0("c", c)
-      )
-    }
-  }
-  x <- x + x_gap
-  
-  # Decoder
-  decoder_start <- x
-  for (i in seq_along(dec_order)) {
-    ty  <- dec_order[i]
-    dim <- hidden_dims[length(hidden_dims)-i+1]
-    if (ty == "shared") {
-      rows[[length(rows)+1]] <- tibble(
-        phase = "decoder",
-        x     = x,
-        y     = 0,
-        label = paste0("Dec ", i, "\n", dim),
-        fill  = "skyblue",
-        track = "shared"
-      )
+
+  # ─── 5) Expand decoder rows per cluster ───────────────────────────────────
+  dec_raw <- arch_df %>% filter(phase == "decoder")
+  dec_expanded <- map_dfr(seq_len(nrow(dec_raw)), function(i) {
+    r <- dec_raw[i, ]
+    if (r$type == "shared") {
+      r$cluster <- NA_integer_; r
     } else {
-      for (c in seq_len(n_clusters)-1L) {
-        rows[[length(rows)+1]] <- tibble(
-          phase = "decoder",
-          x     = x,
-          y     = (c - (n_clusters-1)/2)*cluster_gap,
-          label = paste0("Dec ", i, "\nC", c, "\n", dim),
-          fill  = "lightcoral",
-          track = paste0("c", c)
-        )
-      }
+      map_dfr(0:(n_clust-1), function(cl) {
+        r2 <- r; r2$cluster <- cl; r2
+      })
     }
-    x <- x + x_gap
-  }
-  decoder_end <- x - x_gap
-  
-  # Output
-  out_shared <- isTRUE(model$output_shared)
-  if (out_shared) {
-    rows[[length(rows)+1]] <- tibble(
-      phase = "output",
-      x     = x,
-      y     = 0,
-      label = paste0("Output\n", input_dim),
-      fill  = "lightgreen",
-      track = "shared"
-    )
+  })
+
+  # ─── 6) Build output rows ─────────────────────────────────────────────────
+  out_raw       <- arch_df %>% filter(phase == "output") %>% slice(1)
+  out_dim       <- as.integer(out_raw$size)
+  output_shared <- out_raw$type == "shared"
+  out_rows <- if (output_shared) {
+    tibble(phase="output", layer_idx=1L, type="shared",
+           cluster=NA_integer_, size=out_dim)
   } else {
-    for (c in seq_len(n_clusters)-1L) {
-      rows[[length(rows)+1]] <- tibble(
-        phase = "output",
-        x     = x,
-        y     = (c - (n_clusters-1)/2)*cluster_gap,
-        label = paste0("Output\nC", c, "\n", input_dim),
-        fill  = "lightgreen",
-        track = paste0("c", c)
-      )
-    }
+    tibble(phase="output", layer_idx=1L, type="unshared",
+           cluster=0:(n_clust-1), size=out_dim)
   }
-  
-  df <- bind_rows(rows)
-  
-  # Build arrows
-  arrows <- df %>%
-    arrange(x) %>%
-    group_by(track) %>%
-    mutate(xend = lead(x), yend = lead(y)) %>%
-    filter(!is.na(xend)) %>%
-    ungroup()
-  
-  # Section frames
-  sections <- tribble(
-    ~phase,    ~xmin,    ~xmax,
-    "encoder", encoder_start - box_w, encoder_end + box_w,
-    "decoder", decoder_start - box_w, decoder_end + box_w
+
+  # ─── 7) Combine and ensure numeric layer_idx ───────────────────────────────
+  all_df <- bind_rows(input_row,
+                      enc_expanded,
+                      lat_rows,
+                      dec_expanded,
+                      out_rows) %>%
+    mutate(layer_idx = as.integer(layer_idx))
+
+  # ─── 8) Compute x, y coordinates ──────────────────────────────────────────
+  phase_order  <- c("input","encoder","latent","decoder","output")
+  phase_counts <- all_df %>%
+    group_by(phase) %>%
+    summarise(max_idx = max(layer_idx, na.rm=TRUE)) %>%
+    ungroup() %>%
+    mutate(phase = factor(phase, levels = phase_order)) %>%
+    arrange(phase)
+
+  offsets <- setNames(
+    cumsum(c(0, (phase_counts$max_idx[-nrow(phase_counts)] + 1) * x_gap)),
+    phase_counts$phase
   )
-  
-  # Plot
+
+  all_df <- all_df %>%
+    mutate(
+      x = offsets[phase] + (layer_idx - 1) * x_gap,
+      y = ifelse(
+        type=="shared", 0,
+        (cluster - (n_clust - 1)/2) * y_gap
+      )
+    )
+
+  # ─── 9) Arrow helpers ─────────────────────────────────────────────────────
+  connect_phase <- function(df_from, df_to) {
+    # for each row f in df_from, connect to matching rows in df_to
+    map_dfr(seq_len(nrow(df_from)), function(i) {
+      f <- df_from[i, ]
+      to <- if (f$type == "shared") {
+        df_to
+      } else {
+        df_to %>%
+          filter(
+            type=="shared" |
+            (type=="unshared" & cluster==f$cluster)
+          )
+      }
+      if (nrow(to)==0) return(NULL)
+      data.frame(
+        x    = rep(f$x + box_w/2, nrow(to)),
+        y    = rep(f$y,        nrow(to)),
+        xend = to$x - box_w/2,
+        yend = to$y
+      )
+    })
+  }
+
+  connect_seq <- function(df_phase) {
+    inds <- sort(unique(df_phase$layer_idx))
+    # skip last index
+    map_dfr(inds[-length(inds)], function(i) {
+      connect_phase(
+        df_phase %>% filter(layer_idx == i),
+        df_phase %>% filter(layer_idx == i+1)
+      )
+    })
+  }
+
+  # ─── 1️⃣0️⃣ Build every arrow segment ───────────────────────────────────────
+  df_in  <- all_df %>% filter(phase == "input")
+  df_enc <- all_df %>% filter(phase == "encoder")
+  df_lat <- all_df %>% filter(phase == "latent")
+  df_dec <- all_df %>% filter(phase == "decoder")
+  df_out <- all_df %>% filter(phase == "output")
+
+  arrows <- bind_rows(
+    connect_phase(df_in,  df_enc   %>% filter(layer_idx==1)),
+    connect_seq(df_enc),
+    connect_phase(df_enc   %>% filter(layer_idx==max(layer_idx)), df_lat),
+    connect_phase(df_lat, df_dec   %>% filter(layer_idx==1)),
+    connect_seq(df_dec),
+    connect_phase(df_dec   %>% filter(layer_idx==max(layer_idx)), df_out)
+  )
+
+  # ─── 1️⃣1️⃣ Plot ──────────────────────────────────────────────────────────
   p <- ggplot() +
-    # section boxes
-    geom_rect(data=sections,
-              aes(xmin=xmin, xmax=xmax, ymin=-Inf, ymax=Inf),
-              fill=NA, color="gray50", linetype="dashed") +
-    # boxes
-    geom_rect(data=df,
-              aes(xmin=x-box_w/2, xmax=x+box_w/2,
-                  ymin=y-box_h/2, ymax=y+box_h/2,
-                  fill=fill),
-              color="black") +
-    geom_text(data=df,
-              aes(x=x, y=y, label=label),
-              size=3) +
-    # arrows
-    geom_segment(data=arrows,
-                 aes(x=x+box_w/2, y=y,
-                     xend=xend-box_w/2, yend=yend),
-                 arrow=arrow(length=unit(0.15,"cm")), size=0.5) +
-    # axis
-    scale_fill_identity() +
-    scale_x_continuous(breaks=c(1,
-                                mean(c(encoder_start,encoder_end)),
-                                x - x_gap - 1,  # latent center
-                                mean(c(decoder_start,decoder_end)),
-                                x),
-                       labels=c("input","encoder","latent","decoder","output"),
-                       expand=expansion(add=0.5)) +
-    scale_y_continuous(expand=expansion(add=1)) +
-    labs(x=NULL,y=NULL, title=title) +
-    theme_minimal() +
-    theme(panel.grid=element_blank(),
-          axis.text.y=element_blank(),
-          axis.ticks=element_blank())
-  
-  print(p)
-  invisible(p)
+    # dashed outlines for encoder & decoder
+    lapply(c("encoder","decoder"), function(ph) {
+      d <- all_df %>% filter(phase==ph)
+      annotate("rect",
+               xmin = min(d$x)-box_w/2-0.2,
+               xmax = max(d$x)+box_w/2+0.2,
+               ymin = min(d$y)-box_h/2-0.2,
+               ymax = max(d$y)+box_h/2+0.2,
+               fill     = NA,
+               color    = "gray50",
+               linetype = "dashed",
+               size     = 0.8)
+    }) +
+    geom_rect(
+      data = all_df,
+      aes(xmin = x - box_w/2, xmax = x + box_w/2,
+          ymin = y - box_h/2, ymax = y + box_h/2,
+          fill = type),
+      color = "black", size = 0.8
+    ) +
+    geom_text(
+      data = all_df,
+      aes(x=x, y=y,
+          label = case_when(
+            phase=="input"   ~ paste0("Input\n", size),
+            phase=="encoder" ~ paste0("Enc ", layer_idx,
+                                     ifelse(type=="unshared",
+                                            paste0("\nC",cluster), ""),
+                                     "\n", size),
+            phase=="latent"  ~ ifelse(type=="shared",
+                                     paste0("Latent\nμ/σ²\n", size),
+                                     paste0("Latent C",cluster,"\nμ/σ²\n", size)),
+            phase=="decoder" ~ paste0("Dec ", layer_idx,
+                                     ifelse(type=="unshared",
+                                            paste0("\nC",cluster), ""),
+                                     "\n", size),
+            TRUE             ~ ifelse(type=="shared",
+                                     paste0("Output\n", size),
+                                     paste0("Output C",cluster, "\n", size))
+          )
+      ),
+      size=3, fontface="bold", lineheight=0.9
+    ) +
+    geom_segment(
+      data        = arrows,
+      aes(x=x, y=y, xend=xend, yend=yend),
+      arrow       = arrow(length = unit(0.15, "inches")),
+      size        = 0.8,
+      inherit.aes = FALSE
+    ) +
+    scale_fill_manual(
+      values = c(shared=color_shared, unshared=color_unshared)
+    ) +
+    coord_equal() +
+    theme_void() +
+    theme(legend.position="none")
+
+  if (!is.null(title)) p <- p + ggtitle(title)
+  p
 }
+

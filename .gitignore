@@ -55,3 +55,6 @@ ign_*
 .DS_Store
 .quarto
 rCISSVAE.Rproj
+
+*.sqlite3
+.nfs0000000002533a4a00004e73

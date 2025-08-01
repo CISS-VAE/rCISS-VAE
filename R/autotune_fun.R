@@ -34,13 +34,13 @@ autotune_cissvae <- function(
   lr                = c(1e-4, 1e-3),
   decay_factor      = c(0.9, 0.999),
   beta              = 0.01,
-  num_epochs        = 1000,
+  num_epochs        = 10,
   batch_size        = 64,
   num_shared_encode = c(0, 1, 3),
   num_shared_decode = c(0, 1, 3),
   refit_patience    = 2,
   refit_loops       = 100,
-  epochs_per_loop   = 1000,
+  epochs_per_loop   = 10,
   reset_lr_refit    = c(TRUE, FALSE)
 ) {
   # ── 1) Coerce to integers ────────────────────────────────────────────────
@@ -109,11 +109,16 @@ autotune_cissvae <- function(
     reset_lr_refit    = r_to_py(reset_lr_refit)
   )
 
+  if (verbose) print("Built search space")
+
   # ── 6) Build ClusterDataset ──────────────────────────────────────────────
+  ## make sure that if missing clusters, all clusters is 0
   if (missing(clusters)) stop("`clusters` is required for autotune.")
   data_py     <- np$array(mat)
   clusters_py <- np$array(as.integer(clusters))
   train_ds_py <- CD_mod(data_py, clusters_py)
+
+  if (verbose) print("Built cluster dataset")
 
   # ── 7) Assemble autotune args & run ─────────────────────────────────────
   args_py <- list(
@@ -132,20 +137,25 @@ autotune_cissvae <- function(
   ) %>% keep(~ !is.null(.x))
 
   out_py      <- do.call(autotune, args_py)
-  best_imp_py <- out_py[[1]]
-  best_mod_py <- out_py[[2]]
-  study_py    <- out_py[[3]]
-  results_py  <- out_py[[4]]
+
+  if (verbose) print("Ran autotune")
+  
+  out_list <- py_to_r(out_py)    # now an R list of length 4
+  best_imp_py <- out_list[[1]]
+  best_mod_py <- out_list[[2]]
+  study_py    <- out_list[[3]]
+  results_py  <- out_list[[4]]
+  
 
   # ── 8) Convert back to R ─────────────────────────────────────────────────
-  imp_df <- as.data.frame(py_to_r(best_imp_py), stringsAsFactors = FALSE)
+  imp_df <- as.data.frame(best_imp_py, stringsAsFactors = FALSE)
   colnames(imp_df) <- colnames(mat)
   rownames(imp_df) <- rownames(mat)
   if (!is.null(index_vals)) {
     imp_df[[index_col]] <- index_vals
     imp_df <- imp_df[, c(index_col, setdiff(names(imp_df), index_col))]
   }
-  results_df <- as.data.frame(py_to_r(results_py), stringsAsFactors = FALSE)
+  results_df <- as.data.frame(results_py, stringsAsFactors = FALSE)
 
   list(
     imputed = imp_df,

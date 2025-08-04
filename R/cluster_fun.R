@@ -29,7 +29,7 @@ cluster_on_missing <- function(
 
   # 1) import pandas and the helper function
   pd_mod      <- reticulate::import("pandas", convert = FALSE)
-  helpers_mod <- reticulate::import("ciss_vae.utils.helpers", convert = FALSE)
+  helpers_mod <- reticulate::import("ciss_vae.utils.run_cissvae", convert = FALSE)
   cluster_fn  <- helpers_mod$cluster_on_missing
 
   # 2) convert R data → pandas DataFrame

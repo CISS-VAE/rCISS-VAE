@@ -80,8 +80,8 @@ library(rcissvae)
 reticulate::use_virtualenv("./.venv", required = TRUE)
 
 
-df_missing = read_csv("ign_data/df_missing.csv") %>% rename( "index" = `...1`)
-clusters = read_csv("ign_data/clusters.csv")
+df_missing = read_csv("data/df_missing.csv") %>% rename( "index" = `...1`)
+clusters = read_csv("data/clusters.csv")
 
 dat = run_cissvae(
   data = df_missing,
@@ -123,8 +123,8 @@ library(reticulate)
 
 reticulate::use_virtualenv("./.venv", required = TRUE)
 
-df_missing = read_csv("ign_data/df_missing.csv") %>% rename( "index" = `...1`)
-clusters = read_csv("ign_data/clusters.csv")
+df_missing = read_csv("data/df_missing.csv") %>% rename( "index" = `...1`)
+clusters = read_csv("data/clusters.csv")
 
 aut = autotune_cissvae (
   data = df_missing,

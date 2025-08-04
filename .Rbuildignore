@@ -1,3 +1,4 @@
 ^rCISSVAE\.Rproj$
 ^\.Rproj\.user$
 ^ign_.*[.]R$
+^\.venv(/|$)

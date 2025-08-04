@@ -11,7 +11,8 @@ Depends: R (>= 4.2.0)
 Imports: 
     reticulate,
     basilisk,
-    methods
+    methods,
+    ggplot2
 Suggests: 
     testthat (>= 3.0.0),
     knitr,

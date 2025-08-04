@@ -1,9 +1,9 @@
 #' Create or re-create the Python virtual environment
 #'
-#' This helper lives inside your package and can be called by users after
-#' `library(yourpkg)`. It will:
+#' This helper lives inside the package and can be called by users after
+#' `library(rcissvae)`. It will:
 #'  - Look for a Python interpreter in several ways
-#'  - Optionally install Miniconda if none is found
+#'  - Optionally install standalone Python if none is found
 #'  - Create a venv at `envpath` (if missing)
 #'  - Install the requested PyPI packages
 #'
@@ -13,21 +13,21 @@
 #'   2. `system2("which", "python", stdout = TRUE, stderr = FALSE)`  
 #'   3. `reticulate::py_discover_config()`  
 #' @param packages Character vector of PyPI packages to install. Defaults to `c("torch","numpy")`.  
-#' @param install_miniconda Logical; if `TRUE` and no other Python is found, installs Miniconda via reticulate. Defaults to `FALSE`.  
+#' @param install_python Logical; if `TRUE` and no other Python is found, installs standalone Python via reticulate. Defaults to `FALSE`.  
 #' @return Invisibly returns `envpath`.  
 #' @export
 setup_python_env <- function(
   envpath,
   python = NULL,
   packages = c("torch", "numpy"),
-  install_miniconda = FALSE
+  install_python = FALSE
 ) {
   # 1. If the user passed a python path, check it right away
   if (!is.null(python) && nzchar(Sys.which(python))) {
     python_bin <- python
   } else {
     python_bin <- NULL
-    
+
     # 2. Try Sys.which for python3 and python
     for (exe in c("python3", "python")) {
       path_exe <- Sys.which(exe)
@@ -36,7 +36,7 @@ setup_python_env <- function(
         break
       }
     }
-    
+
     # 3. Try system2("which", "python") for shell PATH
     if (is.null(python_bin)) {
       which_out <- tryCatch(
@@ -47,7 +47,7 @@ setup_python_env <- function(
         python_bin <- which_out[1]
       }
     }
-    
+
     # 4. Try reticulate discovery
     if (is.null(python_bin)) {
       cfg <- try(reticulate::py_discover_config(TRUE), silent = TRUE)
@@ -56,25 +56,24 @@ setup_python_env <- function(
       }
     }
   }
-  
-  # 5. Optionally install Miniconda if still no python
-  if (is.null(python_bin) && install_miniconda) {
-    message("No Python found—installing Miniconda via reticulate…")
-    reticulate::install_miniconda()
-    python_bin <- reticulate::miniconda_python()
+
+  # 5. Optionally install standalone Python if still no interpreter
+  if (is.null(python_bin) && install_python) {
+    message("No Python found—installing standalone Python via reticulate…")
+    python_bin <- reticulate::install_python()
   }
-  
+
   # 6. Final check
   if (is.null(python_bin) || !nzchar(Sys.which(basename(python_bin)))) {
     stop(
       "Could not locate a Python interpreter.\n",
       "Please install Python, or call:\n",
-      "  setup_python_env(envpath, install_miniconda = TRUE)\n",
+      "  setup_python_env(envpath, install_python = TRUE)\n",
       "Or explicitly pass your python path:\n",
       "  setup_python_env(envpath, python = '/usr/local/bin/python3')"
     )
   }
-  
+
   # 7. Create virtualenv if missing
   if (!reticulate::virtualenv_exists(envpath)) {
     message("Creating Python virtual environment at: ", envpath)
@@ -82,10 +81,10 @@ setup_python_env <- function(
   } else {
     message("Virtual environment already exists at: ", envpath)
   }
-  
+
   # 8. Install requested packages
   message("Installing Python packages: ", paste(packages, collapse = ", "))
   reticulate::virtualenv_install(envpath, packages = packages)
-  
+
   invisible(envpath)
 }

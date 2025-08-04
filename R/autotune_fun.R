@@ -34,13 +34,13 @@ autotune_cissvae <- function(
   lr                = c(1e-4, 1e-3),
   decay_factor      = c(0.9, 0.999),
   beta              = 0.01,
-  num_epochs        = 10,
-  batch_size        = 64,
+  num_epochs        = 500,
+  batch_size        = 4000,
   num_shared_encode = c(0, 1, 3),
   num_shared_decode = c(0, 1, 3),
   refit_patience    = 2,
   refit_loops       = 100,
-  epochs_per_loop   = 10,
+  epochs_per_loop   = 500,
   reset_lr_refit    = c(TRUE, FALSE)
 ) {
   # ── 1) Coerce to integers ────────────────────────────────────────────────
@@ -58,21 +58,21 @@ autotune_cissvae <- function(
   epochs_per_loop   <- as.integer(epochs_per_loop)
 
   # ── 2) Validate & filter shared‐layer choices ───────────────────────────
-  min_nhl <- min(num_hidden_layers)
-  # encoder
-  dropped_enc <- setdiff(num_shared_encode, num_shared_encode[num_shared_encode <= min_nhl])
-  if (length(dropped_enc)) {
-    warning("Dropping num_shared_encode > min(num_hidden_layers): ", paste(dropped_enc, collapse = ", "))
-    num_shared_encode <- num_shared_encode[num_shared_encode <= min_nhl]
-  }
-  # decoder
-  dropped_dec <- setdiff(num_shared_decode, num_shared_decode[num_shared_decode <= min_nhl])
-  if (length(dropped_dec)) {
-    warning("Dropping num_shared_decode > min(num_hidden_layers): ", paste(dropped_dec, collapse = ", "))
-    num_shared_decode <- num_shared_decode[num_shared_decode <= min_nhl]
-  }
-  if (length(num_shared_encode)==0) stop("No valid num_shared_encode ≤ min(num_hidden_layers).")
-  if (length(num_shared_decode)==0) stop("No valid num_shared_decode ≤ min(num_hidden_layers).")
+  # min_nhl <- min(num_hidden_layers)
+  # # encoder
+  # dropped_enc <- setdiff(num_shared_encode, num_shared_encode[num_shared_encode <= min_nhl])
+  # if (length(dropped_enc)) {
+  #   warning("Dropping num_shared_encode > min(num_hidden_layers): ", paste(dropped_enc, collapse = ", "))
+  #   num_shared_encode <- num_shared_encode[num_shared_encode <= min_nhl]
+  # }
+  # # decoder
+  # dropped_dec <- setdiff(num_shared_decode, num_shared_decode[num_shared_decode <= min_nhl])
+  # if (length(dropped_dec)) {
+  #   warning("Dropping num_shared_decode > min(num_hidden_layers): ", paste(dropped_dec, collapse = ", "))
+  #   num_shared_decode <- num_shared_decode[num_shared_decode <= min_nhl]
+  # }
+  # if (length(num_shared_encode)==0) stop("No valid num_shared_encode ≤ min(num_hidden_layers).")
+  # if (length(num_shared_decode)==0) stop("No valid num_shared_decode ≤ min(num_hidden_layers).")
 
   # ── 3) Handle index_col ─────────────────────────────────────────────────
   if (!is.null(index_col)) {

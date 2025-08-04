@@ -1,0 +1,172 @@
+---
+title: "rCISSVAE Vignette"
+author: "Dani V"
+date: "2025-08-04"
+lightbox: auto
+format:
+   html:
+    toc: true
+    code-fold: true
+    code-copy: true
+execute:
+  echo: true
+  warning: false
+  error: false
+  freeze: auto
+  eval: true
+  fig-dpi: 600
+---
+
+## Installing package
+
+Install devtools or remotes if not already installed: 
+
+```{r}
+install.packages("remotes")
+# or
+install.packages("devtools")
+
+```
+
+The rCISSVAE package can be installed with:
+
+```{r}
+remotes::install_github("CISS-VAE/rCISS-VAE")
+# or
+devtools::install_github("CISS-VAE/rCISS-VAE")
+
+```
+
+## Ensuring correct virtual environment for reticulate
+
+This package uses `reticulate` to interface with the python version of the package `ciss-vae`. 
+
+Therefore, it is necessary to make sure that you have a venv or conda environment set up that has the `ciss-vae` package installed. 
+
+If you are comfortable creating an environment and installing the package, great! Then all you need to do is tell reticulate where to point. 
+
+**For Venv**
+```{r}
+reticulate::use_virtualenv("./.venv", required = TRUE)
+
+```
+
+**For conda**
+
+```{r}
+reticulate::use_condaenv("myenv", required = TRUE)
+```
+
+### Virtual environment helper function
+
+If you do not want to manually create the virtual environment, a helper function is being developed. 
+
+## Quickstart
+
+Once reticulate is pointing to the virtual environment containing the `ciss_vae` python package, you can either use the `run_cissvae` function or the `autotune_cissvae` function. 
+
+If you know what hyperparameters you want to use for the model, use the `run_cissvae` function. 
+
+### Run Cissvae
+Your data should be in a DataFrame format with optional index. If you already have clusters you want to use, they should be in a separate vector from the dataframe. If you do not have clusters to begin with, set 'clusters' in `run_cissvae()` to NULL. 
+
+Optionally, you can set 'return_model' to TRUE to include the model as part of the return object. This allows you to use `plot_cissvae_arch()` to plot your model architecture. 
+
+```{r}
+library(tidyverse)
+library(reticulate)
+library(rcissvae)
+
+reticulate::use_virtualenv("./.venv", required = TRUE)
+
+
+df_missing = read_csv("ign_data/df_missing.csv") %>% rename( "index" = `...1`)
+clusters = read_csv("ign_data/clusters.csv")
+
+dat = run_cissvae(
+  data = df_missing,
+  index_col = "index",
+  clusters = clusters$clusters,
+  epochs = 500,
+  return_silhouettes=TRUE,
+  verbose=TRUE,
+  return_model = TRUE,
+  layer_order_enc = c("unshared", "shared", "unshared"),
+  layer_order_dec = c("shared", "unshared", "shared")
+)
+
+## retrieve results
+imputed_df = dat$imputed
+silhouette = dat$slhouettes ## if return_silhouettes = TRUE
+
+## optional
+plot_cissvae_arch(dat$model, title = "CISSVAE model") ## if return_model == TRUE
+```
+
+## Autotune
+
+If you want to perform hyperparameter tuning, you can use the `autotune_cissvae()` function. 
+
+This function wraps the cluster dataset creation, search space creation and running the autotune into one function so there are a lot of parameters to be set. 
+
+For the SearchSpace args, 
+Types of parameters:  
+- reticulate::tuple(min, max, step) -\> creates a range   
+- \c(a, b, c\) -\> select value from list
+- x -\> set param as non-tunable    
+
+
+```{r}
+library(tidyverse)
+library(reticulate)
+#library(rcissvae)
+
+reticulate::use_virtualenv("./.venv", required = TRUE)
+
+df_missing = read_csv("ign_data/df_missing.csv") %>% rename( "index" = `...1`)
+clusters = read_csv("ign_data/clusters.csv")
+
+aut = autotune_cissvae (
+  data = df_missing,
+  index_col              = "index",
+  clusters = clusters$clusters,
+  save_model_path        = NULL,
+  save_search_space_path = NULL,
+  n_trials               = 2, ## number of autotune trials to run
+  study_name             = "vae_autotune", ## name of optuna study
+  device_preference      = "cuda",
+  show_progress          = FALSE, ## set TRUE to show progressbar
+  optuna_dashboard_db    = NULL, ## optional sqlite3 database, eg: "sqlite:///db.sqlite3"
+  load_if_exists         = TRUE, ## if TRUE, loads existing study of name 'study_name' if one exists
+  seed                   = 42, 
+  verbose                = FALSE, 
+
+  ## SearchSpace args
+  num_hidden_layers = c(1, 4),  
+  hidden_dims       = c(64, 512),
+  latent_dim        = c(10, 100),
+  latent_shared     = c(TRUE, FALSE),
+  output_shared     = c(TRUE, FALSE),
+  lr                = reticulate::tuple(1e-4, 1e-3),
+  decay_factor      = c(0.9, 0.999),
+  beta              = 0.01,
+  num_epochs        = 10, ## setting this low for demo purposes
+  batch_size        = 4000,
+  num_shared_encode = c(0, 1, 3),
+  num_shared_decode = c(0, 1, 3),
+  refit_patience    = 2,
+  refit_loops       = 10, ## setting this low for demo purposes
+  epochs_per_loop   = 10, ## setting this low for demo purposes
+  reset_lr_refit    = c(TRUE, FALSE)
+)
+
+# Access results:
+imputed   <- aut$imputed
+best_model <- aut$model
+study     <- aut$study
+results   <- aut$results
+
+
+## optional
+plot_cissvae_arch(best_model, title = "Best model from Autotune")
+```

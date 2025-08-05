@@ -34,3 +34,11 @@ formats:
 python:
    install:
    - requirements: docs/requirements.txt
+
+build:
+  commands:
+    # install R dependencies
+    - Rscript -e 'install.packages(c("pkgdown","remotes"), repos="https://cloud.r-project.org")'
+    - Rscript -e 'remotes::install_local(".")'
+    # build pkgdown site into docs/
+    - Rscript -e 'pkgdown::build_site(override = list(destination = "docs"))'

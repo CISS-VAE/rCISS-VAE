@@ -6,17 +6,14 @@ build:
   tools:
     python: "3.12"
   commands:
-    - Rscript -e 'install.packages(c("pkgdown","remotes"), repos="https://cloud.r-project.org")'
-    - Rscript -e 'remotes::install_local(".")'
-    - Rscript -e 'pkgdown::build_site(override = list(destination = "docs"))'
+    - >
+      Rscript -e "install.packages(c('pkgdown','remotes'), repos='https://cloud.r-project.org')"
+    - >
+      Rscript -e "remotes::install_local('.')"
+    - >
+      Rscript -e "pkgdown::build_site(override = list(destination = 'docs'))"
 
-# (Remove the sphinx: block entirely if you're only using pkgdown)
-# sphinx:
-#   configuration: docs/conf.py
-#   # builder: "dirhtml"
-#   # fail_on_warning: true
-
-# If you do need Python requirements:
+# (If you still need Python requirements, keep this; otherwise you can delete it)
 python:
   install:
     - requirements: docs/requirements.txt

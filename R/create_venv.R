@@ -1,90 +1,54 @@
-#' Create or re-create the Python virtual environment
+#' Create or reuse a CISSVAE Python virtual environment
 #'
-#' This helper lives inside the package and can be called by users after
-#' `library(rcissvae)`. It will:
-#'  - Look for a Python interpreter in several ways
-#'  - Optionally install standalone Python if none is found
-#'  - Create a venv at `envpath` (if missing)
-#'  - Install the requested PyPI packages
-#'
-#' @param envpath Path to create/use the virtualenv.
-#' @param python Optional path to the Python binary. If `NULL`, the function tries:
-#'   1. `Sys.which("python3")` and `Sys.which("python")`  
-#'   2. `system2("which", "python", stdout = TRUE, stderr = FALSE)`  
-#'   3. `reticulate::py_discover_config()`  
-#' @param packages Character vector of PyPI packages to install. Defaults to `c("torch","numpy")`.  
-#' @param install_python Logical; if `TRUE` and no other Python is found, installs standalone Python via reticulate. Defaults to `FALSE`.  
-#' @return Invisibly returns `envpath`.  
+#' @param envname Name of the virtual environment to create/use.
+#' @param install_python Logical; if TRUE, install Python if none found.
+#' @param python_version Python version string (major.minor), if you need to install.
 #' @export
-setup_python_env <- function(
-  envpath,
-  python = NULL,
-  packages = c("torch", "numpy"),
-  install_python = FALSE
+create_cissvae_env <- function(
+  envname = "cissvae_environment",
+  install_python = FALSE,
+  python_version = "3.10"
 ) {
-  # 1. If the user passed a python path, check it right away
-  if (!is.null(python) && nzchar(Sys.which(python))) {
-    python_bin <- python
-  } else {
-    python_bin <- NULL
-
-    # 2. Try Sys.which for python3 and python
-    for (exe in c("python3", "python")) {
-      path_exe <- Sys.which(exe)
-      if (nzchar(path_exe)) {
-        python_bin <- exe
-        break
+  # 1. Check for a suitable Python starter (>= requested version)
+  starter <- reticulate::virtualenv_starter(python_version)
+  if (is.null(starter)) {
+    if (install_python) {
+      message("No suitable Python found; installing Python ", python_version)
+      reticulate::install_python(version = python_version)
+      starter <- reticulate::virtualenv_starter(python_version)
+      if (is.null(starter)) {
+        stop("Failed to install Python ", python_version)
       }
-    }
-
-    # 3. Try system2("which", "python") for shell PATH
-    if (is.null(python_bin)) {
-      which_out <- tryCatch(
-        system2("which", "python", stdout = TRUE, stderr = FALSE),
-        error = function(e) character(0)
+    } else {
+      stop(
+        "No Python >= ", python_version,
+        " found. Please install Python or set install_python = TRUE."
       )
-      if (length(which_out) && nzchar(which_out)) {
-        python_bin <- which_out[1]
-      }
-    }
-
-    # 4. Try reticulate discovery
-    if (is.null(python_bin)) {
-      cfg <- try(reticulate::py_discover_config(TRUE), silent = TRUE)
-      if (!inherits(cfg, "try-error") && nzchar(cfg$python)) {
-        python_bin <- cfg$python
-      }
     }
   }
 
-  # 5. Optionally install standalone Python if still no interpreter
-  if (is.null(python_bin) && install_python) {
-    message("No Python found—installing standalone Python via reticulate…")
-    python_bin <- reticulate::install_python()
-  }
-
-  # 6. Final check
-  if (is.null(python_bin) || !nzchar(Sys.which(basename(python_bin)))) {
-    stop(
-      "Could not locate a Python interpreter.\n",
-      "Please install Python, or call:\n",
-      "  setup_python_env(envpath, install_python = TRUE)\n",
-      "Or explicitly pass your python path:\n",
-      "  setup_python_env(envpath, python = '/usr/local/bin/python3')"
+  # 2. Create the virtual environment (or skip if it already exists)
+  if (!envname %in% reticulate::virtualenv_list()) {
+    message("Creating virtualenv '", envname, "' with Python: ", starter)
+    reticulate::virtualenv_create(
+      envname = envname,
+      python  = starter,
+      packages = c("numpy", "pandas", "torch")
     )
-  }
-
-  # 7. Create virtualenv if missing
-  if (!reticulate::virtualenv_exists(envpath)) {
-    message("Creating Python virtual environment at: ", envpath)
-    reticulate::virtualenv_create(envpath, python = python_bin)
   } else {
-    message("Virtual environment already exists at: ", envpath)
+    message("Virtualenv '", envname, "' already exists; skipping creation.")
   }
 
-  # 8. Install requested packages
-  message("Installing Python packages: ", paste(packages, collapse = ", "))
-  reticulate::virtualenv_install(envpath, packages = packages)
+  # 3. Activate and install CISSVAE
+  reticulate::use_virtualenv(envname, required = TRUE)
+  message("Installing 'cissvae' into '", envname, "' from test.pypi.org")
+  reticulate::py_install(
+    packages        = "cissvae",
+    envname         = envname,
+    extra_index_url = "https://test.pypi.org/simple/"
+  )
 
-  invisible(envpath)
+  invisible(NULL)
 }
+
+create_cissvae_env()

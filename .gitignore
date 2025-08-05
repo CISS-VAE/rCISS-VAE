@@ -59,8 +59,8 @@ rCISSVAE.Rproj
 *.sqlite3
 .nfs0000000002533a4a00004e73
 .nfs0000000000905eec00005887
-data/clusters.csv
-data/df_complete.csv
-data/df_missing.csv
+data_raw/clusters.csv
+data_raw/df_complete.csv
+data_raw/df_missing.csv
 
 *.Rcheck

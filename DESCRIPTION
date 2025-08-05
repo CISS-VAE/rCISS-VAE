@@ -2,7 +2,8 @@ Package: rCISSVAE
 Title: Clustering-Informed Shared-Structure Variational Autoencoder (CISS-VAE) for Imputation of Missing Data
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
+    c(  person(given = "Yasin", family = "Khadem Charvadeh", email = "khademy@mskcc.org", role = c("aut")),
+        person(given = "Danielle", family = "Vaithilingam", email = "vaithid1@mskcc.org", role = c("aut", "cre")))
 Description: Implements the Clustering-Informed Shared-Structure Variational 
     Autoencoder (CISS-VAE), a deep learning framework for missing data imputation. 
 License: MIT + file LICENSE
@@ -23,3 +24,4 @@ Config/testthat/edition: 3
 VignetteBuilder: quarto
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+LazyData: true

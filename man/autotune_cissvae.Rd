@@ -27,13 +27,13 @@ autotune_cissvae(
   lr = c(1e-04, 0.001),
   decay_factor = c(0.9, 0.999),
   beta = 0.01,
-  num_epochs = 10,
-  batch_size = 64,
+  num_epochs = 500,
+  batch_size = 4000,
   num_shared_encode = c(0, 1, 3),
   num_shared_decode = c(0, 1, 3),
   refit_patience = 2,
   refit_loops = 100,
-  epochs_per_loop = 10,
+  epochs_per_loop = 500,
   reset_lr_refit = c(TRUE, FALSE)
 )
 }

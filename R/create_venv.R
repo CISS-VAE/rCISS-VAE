@@ -51,4 +51,3 @@ create_cissvae_env <- function(
   invisible(NULL)
 }
 
-create_cissvae_env()

@@ -1,14 +1,26 @@
 #' Create or reuse a CISSVAE Python virtual environment
 #'
-#' @param envname Name of the virtual environment to create/use.
-#' @param install_python Logical; if TRUE, install Python if none found.
-#' @param python_version Python version string (major.minor), if you need to install.
+#' This function will either find an existing virtualenv by name (in
+#' the default location) or at a custom filesystem path, or create it
+#' (and install CISSVAE into it).
+#'
+#' @param envname Name of the virtual environment (when using the default env location).
+#' @param path Character; optional path to the directory in which to create/use the virtualenv.
+#' @param install_python Logical; if TRUE, install Python if none of at least the requested
+#'   version is found on the system.
+#' @param python_version Python version string (major.minor), used when installing Python.
 #' @export
 create_cissvae_env <- function(
-  envname = "cissvae_environment",
+  envname        = "cissvae_environment",
+  path           = NULL,
   install_python = FALSE,
   python_version = "3.10"
 ) {
+  # decide what “env_spec” we pass to reticulate:
+  #  - if the user gave a path, use that (full directory + envname)
+  #  - otherwise use the envname (i.e. default location + name)
+  env_spec <- if (!is.null(path)) file.path(path, envname) else envname
+
   # 1. Check for a suitable Python starter (>= requested version)
   starter <- reticulate::virtualenv_starter(python_version)
   if (is.null(starter)) {
@@ -28,26 +40,39 @@ create_cissvae_env <- function(
   }
 
   # 2. Create the virtual environment (or skip if it already exists)
-  if (!envname %in% reticulate::virtualenv_list()) {
-    message("Creating virtualenv '", envname, "' with Python: ", starter)
+  env_exists <- if (is.null(path)) {
+    # in default location, list known envs by name
+    envname %in% reticulate::virtualenv_list()
+  } else {
+    # if path provided, just check the directory
+    dir.exists(file.path(path, envname))
+  }
+
+  if (!env_exists) {
+    message(
+      "Creating virtualenv '", env_spec, 
+      "' with Python: ", starter
+    )
     reticulate::virtualenv_create(
-      envname = envname,
+      envname = env_spec,
       python  = starter,
       packages = c("numpy", "pandas", "torch")
     )
   } else {
-    message("Virtualenv '", envname, "' already exists; skipping creation.")
+    message(
+      "Virtualenv '", env_spec, 
+      "' already exists; skipping creation."
+    )
   }
 
   # 3. Activate and install CISSVAE
-  reticulate::use_virtualenv(envname, required = TRUE)
-  message("Installing 'cissvae' into '", envname, "' from test.pypi.org")
+  reticulate::use_virtualenv(env_spec, required = TRUE)
+  message("Installing 'cissvae' into '", env_spec, "' from test.pypi.org")
   reticulate::py_install(
     packages        = "cissvae",
-    envname         = envname,
+    envname         = env_spec,
     extra_index_url = "https://test.pypi.org/simple/"
   )
 
   invisible(NULL)
 }
-

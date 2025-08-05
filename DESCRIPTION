@@ -10,7 +10,6 @@ Encoding: UTF-8
 Depends: R (>= 4.2.0)
 Imports: 
     reticulate,
-    basilisk,
     methods,
     ggplot2
 Suggests: 

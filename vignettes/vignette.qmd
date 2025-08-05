@@ -57,9 +57,32 @@ reticulate::use_virtualenv("./.venv", required = TRUE)
 reticulate::use_condaenv("myenv", required = TRUE)
 ```
 
-### Virtual environment helper function
+### Virtual environment helper function 
 
-If you do not want to manually create the virtual environment, a helper function is being developed. 
+If you do not want to manually create the virtual environment, you can use the helper function `create_cissvae_env()` to create a virtual environment in your current working directory. 
+
+```{r}
+create_cissvae_env(
+  envname = "cissvae_environment", ## name of environment
+  install_python = FALSE, ## set to TRUE if you want create_cisssvae_env to install python for you
+  python_version = "3.10" ## set to whatever version you want >=3.10. Python 3.10 or 3.11 recommended
+)
+```
+
+Once the environment is created, activate it using:
+
+```{r}
+reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
+
+# In other words,
+# reticulate::use_virtualenv("./your_environment_name", required = TRUE)
+
+
+```
+
+### (optional) Installing other python packages
+
+If you want to install other python packages (eg seaborn) to your environment, you can use [`reticulate::virtualenv_install()`](https://rstudio.github.io/reticulate/reference/virtualenv-tools.html). 
 
 ## Quickstart
 
@@ -75,13 +98,12 @@ Optionally, you can set 'return_model' to TRUE to include the model as part of t
 ```{r}
 library(tidyverse)
 library(reticulate)
-library(rcissvae)
+library(rCISSVAE)
 
-reticulate::use_virtualenv("./.venv", required = TRUE)
+reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
 
-
-df_missing = read_csv("data/df_missing.csv") %>% rename( "index" = `...1`)
-clusters = read_csv("data/clusters.csv")
+data(df_missing)
+data(clusters)
 
 dat = run_cissvae(
   data = df_missing,
@@ -119,12 +141,12 @@ Types of parameters:
 ```{r}
 library(tidyverse)
 library(reticulate)
-#library(rcissvae)
+library(rCISSVAE)
 
-reticulate::use_virtualenv("./.venv", required = TRUE)
+reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
 
-df_missing = read_csv("data/df_missing.csv") %>% rename( "index" = `...1`)
-clusters = read_csv("data/clusters.csv")
+data(df_missing)
+data(clusters)
 
 aut = autotune_cissvae (
   data = df_missing,

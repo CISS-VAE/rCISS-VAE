@@ -2,3 +2,5 @@
 ^\.Rproj\.user$
 ^ign_.*[.]R$
 ^\.venv(/|$)
+.readthedocs.yaml
+^docs/

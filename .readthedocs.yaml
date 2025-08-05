@@ -1,4 +1,3 @@
-# .readthedocs.yaml
 version: 2
 
 build:
@@ -12,8 +11,3 @@ build:
       Rscript -e "remotes::install_local('.')"
     - >
       Rscript -e "pkgdown::build_site(override = list(destination = 'docs'))"
-
-# (If you still need Python requirements, keep this; otherwise you can delete it)
-python:
-  install:
-    - requirements: docs/requirements.txt

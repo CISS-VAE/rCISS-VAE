@@ -1,0 +1,24 @@
+template:
+  bootstrap: 5
+  bootswatch: flatly
+
+navbar:
+  title: "rCISSVAE"
+  left:
+    - text: "Functions"
+      href: reference/index.html
+    - text: "Articles"
+      menu:
+      - text: "Vignette"
+        href: articles/vignette.html
+    - text: "News"
+      href: news/index.html
+  right:
+    - icon: fa-github
+      href: https://github.com/CISS-VAE/rCISS-VAE
+
+articles:
+- title: "Vignettes"
+  desc: "Package vignettes"
+  contents:
+  - "Vignette"

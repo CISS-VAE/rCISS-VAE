@@ -6,17 +6,23 @@
 \usage{
 create_cissvae_env(
   envname = "cissvae_environment",
+  path = NULL,
   install_python = FALSE,
   python_version = "3.10"
 )
 }
 \arguments{
-\item{envname}{Name of the virtual environment to create/use.}
+\item{envname}{Name of the virtual environment (when using the default env location).}
 
-\item{install_python}{Logical; if TRUE, install Python if none found.}
+\item{path}{Character; optional path to the directory in which to create/use the virtualenv.}
 
-\item{python_version}{Python version string (major.minor), if you need to install.}
+\item{install_python}{Logical; if TRUE, install Python if none of at least the requested
+version is found on the system.}
+
+\item{python_version}{Python version string (major.minor), used when installing Python.}
 }
 \description{
-Create or reuse a CISSVAE Python virtual environment
+This function will either find an existing virtualenv by name (in
+the default location) or at a custom filesystem path, or create it
+(and install CISSVAE into it).
 }

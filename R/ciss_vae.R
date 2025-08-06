@@ -110,7 +110,7 @@ run_cissvae <- function(
   mat <- if (is.data.frame(data)) as.matrix(data) else data
 
   ## 5. Import Python modules
-  py_mod <- reticulate::import("ciss_vae", convert = FALSE)
+  py_mod <- reticulate::import("ciss_vae.utils", convert = FALSE)
 
   ## 6. Prepare clusters argument
   if (!is.null(clusters)) {

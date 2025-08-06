@@ -56,7 +56,7 @@ create_cissvae_env <- function(
     reticulate::virtualenv_create(
       envname = env_spec,
       python  = starter,
-      packages = c("numpy", "pandas", "torch")
+      packages = c("numpy", "pandas", "torch", "tqdm", "matplotlib", "scikit-learn", "optuna")
     )
   } else {
     message(
@@ -67,11 +67,16 @@ create_cissvae_env <- function(
 
   # 3. Activate and install CISSVAE
   reticulate::use_virtualenv(env_spec, required = TRUE)
-  message("Installing 'cissvae' into '", env_spec, "' from test.pypi.org")
-  reticulate::py_install(
-    packages        = "cissvae",
-    envname         = env_spec,
-    extra_index_url = "https://test.pypi.org/simple/"
+  message("Installing 'ciss-vae' into '", env_spec, "' from test.pypi.org")
+  reticulate::virtualenv_install(
+    envname           = env_spec,
+    packages          = "ciss-vae",   # normalized lowercase name
+    ignore_installed  = FALSE,
+    pip_options       = c(
+      "--index-url=https://test.pypi.org/simple/",
+      "--extra-index-url=https://pypi.org/simple/"
+    ),
+    python_version    = python_version
   )
 
   invisible(NULL)

@@ -3,6 +3,7 @@
 export(autotune_cissvae)
 export(cluster_on_missing)
 export(create_cissvae_env)
+export(evaluate_imputation)
 export(extract_cissvae_arch)
 export(plot_cissvae_arch)
 export(run_cissvae)

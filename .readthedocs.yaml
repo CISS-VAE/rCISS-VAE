@@ -4,10 +4,37 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.12"
-  commands:
-    - >
-      Rscript -e "install.packages(c('pkgdown','remotes'), repos='https://cloud.r-project.org')"
-    - >
-      Rscript -e "remotes::install_local('.')"
-    - >
-      Rscript -e "pkgdown::build_site(override = list(destination = 'docs'))"
+  jobs:
+    pre_build:
+      # Install R
+      - sudo apt-get update
+      - sudo apt-get install -y --no-install-recommends software-properties-common dirmngr
+      - wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | sudo tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc
+      - sudo add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/"
+      - sudo apt-get update
+      - sudo apt-get install -y --no-install-recommends r-base r-base-dev
+      
+      # Install system dependencies that R packages commonly need
+      - sudo apt-get install -y --no-install-recommends libcurl4-openssl-dev libssl-dev libxml2-dev libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev
+      
+      # Install Quarto
+      - wget -O quarto.deb https://github.com/quarto-dev/quarto-cli/releases/download/v1.4.549/quarto-1.4.549-linux-amd64.deb
+      - sudo dpkg -i quarto.deb
+      
+    build:
+      # Install R packages
+      - Rscript -e "install.packages(c('pkgdown', 'remotes', 'devtools'), repos='https://cloud.r-project.org', dependencies=TRUE)"
+      
+      # Install package dependencies
+      - Rscript -e "remotes::install_deps('.', dependencies=TRUE)"
+      
+      # Install the package itself
+      - Rscript -e "remotes::install_local('.', force=TRUE)"
+      
+      # Build pkgdown site
+      - Rscript -e "pkgdown::build_site(override = list(destination = '_readthedocs/html'))"
+
+# Specify where the built documentation is located
+sphinx:
+  builder: dirhtml
+  configuration: null

@@ -1,3 +1,5 @@
+url: https://ciss-vae.github.io/rCISS-VAE/
+
 template:
   bootstrap: 5
   bootswatch: flatly
@@ -8,17 +10,10 @@ navbar:
     - text: "Functions"
       href: reference/index.html
     - text: "Articles"
-      menu:
-      - text: "Vignette"
-        href: articles/vignette.html
+      href: articles/index.html
     - text: "News"
       href: news/index.html
   right:
     - icon: fa-github
       href: https://github.com/CISS-VAE/rCISS-VAE
-
-articles:
-- title: "Vignettes"
-  desc: "Package vignettes"
-  contents:
-  - "Vignette"
+      aria-label: "GitHub"

@@ -17,3 +17,8 @@ navbar:
     - icon: fa-github
       href: https://github.com/CISS-VAE/rCISS-VAE
       aria-label: "GitHub"
+
+articles:
+- title: "Vignettes"
+  desc: "Package vignettes"  
+  contents: "vignette"

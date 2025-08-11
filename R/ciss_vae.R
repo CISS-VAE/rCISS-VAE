@@ -7,7 +7,7 @@
 #'
 #' @param data A data.frame or matrix (samples × features), may contain `NA`.
 #' @param index_col Character. Column in `data` to treat as sample ID; removed before training and re-attached. Default `NULL`.
-#' @param val_percent Numeric fraction of non-missing entries to hold out. Default `0.1`.
+#' @param val_proportion Numeric fraction of non-missing entries to hold out. Default `0.1`.
 #' @param replacement_value Numeric fill value for masked entries. Default `0.0`.
 #' @param columns_ignore Character or integer vector of columns to ignore. Default `NULL`.
 #' @param print_dataset Logical; if `TRUE`, prints dataset summary. Default `TRUE`.
@@ -44,7 +44,7 @@
 run_cissvae <- function(
   data,
   index_col              = NULL,
-  val_percent            = 0.1,
+  val_proportion            = 0.1,
   replacement_value      = 0.0,
   columns_ignore         = NULL,
   print_dataset          = TRUE,
@@ -125,7 +125,7 @@ run_cissvae <- function(
   ## 7. Build argument list (omit device)
   py_args <- list(
     data                      = reticulate::r_to_py(mat),
-    val_percent               = val_percent,
+    val_proportion               = val_proportion,
     replacement_value         = replacement_value,
     columns_ignore            = if (is.null(columns_ignore)) NULL else reticulate::r_to_py(columns_ignore),
     print_dataset             = print_dataset,

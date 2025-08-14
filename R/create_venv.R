@@ -56,7 +56,7 @@ create_cissvae_env <- function(
     reticulate::virtualenv_create(
       envname = env_spec,
       python  = starter,
-      packages = c("numpy", "pandas", "torch", "tqdm", "matplotlib", "scikit-learn", "optuna")
+      packages = c("numpy", "pandas", "torch", "rich", "matplotlib", "scikit-learn", "optuna", "typing")
     )
   } else {
     message(

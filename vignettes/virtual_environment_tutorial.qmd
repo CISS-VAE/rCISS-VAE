@@ -1,0 +1,341 @@
+---
+title: "Manual Virtual Environment Setup Tutorial"
+author: "Dani V"
+date: "2025-08-14"
+lightbox: auto
+format:
+   html:
+    toc: true
+    code-fold: true
+    code-copy: true
+execute:
+  echo: true
+  warning: false
+  error: false
+  freeze: auto
+  eval: true
+  fig-dpi: 600
+---
+
+If the `create_cissvae_env()` helper function fails or you prefer to set up your environment manually, you can create a Python virtual environment using either R (via reticulate) or the command line.
+
+### Prerequisites
+
+Before starting, ensure you have:
+- Python 3.10 or 3.11 installed on your system
+- R with the `reticulate` package installed
+    ```{.r}
+    install.packages("reticulate")
+    ```
+
+You can check your Python version by running:
+```bash
+python --version
+# or
+python3 --version
+```
+
+---
+
+## Method 1: Creating Virtual Environment with R (reticulate)
+
+### Step 1: Install reticulate (if not already installed)
+```r
+install.packages("reticulate")
+library(reticulate)
+```
+
+### Step 2: Check available Python versions
+```r
+# Find Python installations on your system
+reticulate::py_discover_config()
+
+# Or check for a specific version
+reticulate::virtualenv_starter("3.10")
+```
+
+#### Installing Python via reticulate (if needed)
+
+If no suitable Python version is found, you can install Python directly through reticulate:
+
+```r
+# Install Python 3.10 (recommended)
+reticulate::install_python(version = "3.10")
+
+# Or install Python 3.11
+reticulate::install_python(version = "3.11")
+
+# Check available versions after installation
+reticulate::py_versions()
+
+# Verify the installation worked
+reticulate::virtualenv_starter("3.10")
+```
+
+**Note:** `reticulate::install_python()` will:
+- Download and install a standalone Python version managed by reticulate
+- Install it to a location that doesn't interfere with system Python
+- Work across Windows, macOS, and Linux
+- Automatically configure the PATH for reticulate to find it
+
+If the installation fails or you prefer more control, you can also install Python manually:
+- **Windows**: Download from [python.org](https://www.python.org/downloads/windows/) and check "Add Python to PATH"
+- **macOS**: Use Homebrew (`brew install python@3.10`) or download from python.org
+- **Linux**: Use your package manager (`sudo apt install python3.10` on Ubuntu)
+
+After manual installation, restart R and rerun `reticulate::py_discover_config()` to verify reticulate can find the new Python installation.
+
+### Step 3: Create the virtual environment
+
+Once you've identified the python installation you want to use, you can use the reticulate package to create your virtual environment either in the default location (`~/.virtualenvs/`) or in a directory of your choice. 
+
+```r
+# Create virtual environment in default location (~/.virtualenvs/)
+reticulate::virtualenv_create(
+  envname = "cissvae_env",
+  python = NULL,  # Use system default Python
+  packages = c("pip", "setuptools", "wheel")
+)
+
+# Alternative: Create in a specific directory
+reticulate::virtualenv_create(
+  envname = "./my_venvs/cissvae_env",  # Relative path
+  python = "/usr/bin/python3.10",     # Specific Python version
+  packages = c("pip", "setuptools", "wheel")
+)
+```
+
+### Step 4: Activate the environment
+
+In order to use your virtual environment, you have to tell reticulate to activate and use it with the command below. 
+You will repeat this command in each new R session that you want to use the virtual environment in. 
+
+```r
+# Activate environment (default location)
+reticulate::use_virtualenv("cissvae_env", required = TRUE)
+
+# Or activate from specific path
+reticulate::use_virtualenv("./my_venvs/cissvae_env", required = TRUE)
+```
+
+### Step 5: Install required packages
+
+Before using the virtual environment for the first time, install the necessary dependencies and the `ciss-vae` python package to the environment. This only needs to be done once per environment (unless you want to update the packages later).
+
+```r
+# Install core dependencies first
+reticulate::virtualenv_install(
+  envname = "cissvae_env",
+  packages = c(
+    "numpy",
+    "pandas", 
+    "torch",
+    "scikit-learn",
+    "optuna",
+    "rich",
+    "matplotlib",
+    "hdbscan"
+  )
+)
+
+# Install CISS-VAE from PyPI
+reticulate::virtualenv_install(
+  envname = "cissvae_env",
+  packages = "ciss-vae"
+)
+```
+
+### Step 6: Verify installation
+
+After installing the packages, you can use the following commands to make sure the ciss_vae package installed correctly. 
+
+```r
+# Check if CISS-VAE installed correctly
+reticulate::py_run_string("import ciss_vae; print('CISS-VAE version:', ciss_vae.__version__)")
+
+# List all installed packages
+reticulate::virtualenv_install(envname = "cissvae_env", packages = character(0))
+```
+
+---
+
+## Method 2: Creating Virtual Environment from Command Line
+
+### Step 1: Open terminal/command prompt
+Navigate to your desired directory:
+```bash
+cd /path/to/your/project
+```
+
+### Step 2: Create virtual environment
+
+Please note, python must be installed for this to work. 
+
+```bash
+# Using venv (Python 3.3+)
+python -m venv cissvae_env
+
+# Or using python3 explicitly
+python3 -m venv cissvae_env
+
+# For specific Python version
+python3.10 -m venv cissvae_env
+```
+
+### Step 3: Activate the environment
+
+**On Windows:**
+
+On Windows OS, the command to activate the environment differs based on the terminal you are using.
+
+```bash
+# Command Prompt
+cissvae_env\Scripts\activate
+
+# PowerShell
+cissvae_env\Scripts\Activate.ps1
+
+# Git Bash
+source cissvae_env/Scripts/activate
+```
+
+**On macOS/Linux:**
+```bash
+source cissvae_env/bin/activate
+```
+
+You should see `(cissvae_env)` at the beginning of your prompt when activated.
+
+### Step 4: Upgrade pip and install packages
+```bash
+# Upgrade pip first (optional)
+pip install --upgrade pip setuptools wheel
+
+# Install core scientific packages
+pip install numpy pandas matplotlib scikit-learn
+
+# Install machine learning frameworks
+pip install torch optuna rich hdbscan
+
+# Install CISS-VAE
+pip install ciss-vae
+```
+
+### Step 5: Verify installation
+```bash
+# Check Python version in environment
+python --version
+
+# List installed packages
+pip list
+
+# Test CISS-VAE import
+python -c "import ciss_vae; print('CISS-VAE installed successfully!')"
+```
+
+### Step 6: Connect R to your environment
+After creating the environment via command line, tell R where to find it:
+
+```r
+library(reticulate)
+
+# Point to your manually created environment
+reticulate::use_virtualenv("/path/to/your/project/cissvae_env", required = TRUE)
+
+# On Windows, the path might look like:
+# reticulate::use_virtualenv("C:/Users/YourName/project/cissvae_env", required = TRUE)
+
+# Verify connection
+reticulate::py_config()
+```
+
+---
+
+## Alternative: Using Conda Environment
+
+If you prefer conda over venv:
+
+### Command Line Approach:
+```bash
+# Create conda environment
+conda create -n cissvae_env python=3.10
+
+# Activate environment
+conda activate cissvae_env
+
+# Install packages
+conda install numpy pandas matplotlib scikit-learn
+pip install torch optuna rich hdbscan ciss-vae
+```
+
+### R Approach:
+```r
+# Create conda environment from R
+reticulate::conda_create(
+  envname = "cissvae_env",
+  python_version = "3.10",
+  packages = c("numpy", "pandas", "matplotlib", "scikit-learn")
+)
+
+# Activate and install additional packages
+reticulate::use_condaenv("cissvae_env", required = TRUE)
+reticulate::conda_install("cissvae_env", c("torch", "optuna", "rich", "hdbscan", "ciss-vae"))
+```
+
+---
+
+## Troubleshooting Common Issues
+
+### Issue 1: "Python not found"
+**Solution:** Ensure Python is in your system PATH, or specify the full path:
+```r
+reticulate::virtualenv_create(
+  envname = "cissvae_env",
+  python = "/usr/local/bin/python3.10"  # Full path to Python
+)
+```
+
+### Issue 2: "Permission denied" errors
+**Solution:** 
+- On Windows: Run R/RStudio as Administrator
+- On macOS/Linux: Check directory permissions or use a different location
+
+### Issue 3: Package installation fails
+**Solution:** Install packages one by one to identify the problematic package:
+```r
+packages <- c("numpy", "pandas", "torch", "ciss-vae")
+for (pkg in packages) {
+  cat("Installing", pkg, "...\n")
+  reticulate::virtualenv_install("cissvae_env", pkg)
+}
+```
+
+### Issue 4: CISS-VAE import fails in R
+**Solution:** Verify the environment is properly activated:
+```r
+# Check Python configuration
+reticulate::py_config()
+
+# Test import manually
+reticulate::py_run_string("
+try:
+    import ciss_vae
+    print('Success: ciss_vae imported')
+    print('Version:', ciss_vae.__version__)
+except ImportError as e:
+    print('Error importing ciss_vae:', e)
+")
+```
+
+### Issue 5: Environment not persisting between R sessions
+**Solution:** Always activate your environment at the start of each R session:
+```r
+# Add this to the top of your R scripts
+library(reticulate)
+reticulate::use_virtualenv("cissvae_env", required = TRUE)
+
+# Or add to your .Rprofile for automatic loading
+cat('reticulate::use_virtualenv("cissvae_env", required = TRUE)\n', 
+    file = "~/.Rprofile", append = TRUE)
+```
+

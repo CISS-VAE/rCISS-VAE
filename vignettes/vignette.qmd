@@ -1,7 +1,7 @@
 ---
 title: "rCISSVAE Vignette"
 author: "Dani V"
-date: "2025-08-04"
+date: "2025-08-14"
 lightbox: auto
 format:
    html:
@@ -16,51 +16,34 @@ execute:
   eval: true
   fig-dpi: 600
 ---
-
 ## Installing package
-
 Install devtools or remotes if not already installed: 
-
 ```{.r}
 install.packages("remotes")
 # or
 install.packages("devtools")
-
 ```
-
 The rCISSVAE package can be installed with:
-
 ```{.r}
 remotes::install_github("CISS-VAE/rCISS-VAE")
 # or
 devtools::install_github("CISS-VAE/rCISS-VAE")
-
 ```
-
 ## Ensuring correct virtual environment for reticulate
-
 This package uses `reticulate` to interface with the python version of the package `cissvae`. 
-
 Therefore, it is necessary to make sure that you have a venv or conda environment set up that has the `cissvae` package installed. 
-
 If you are comfortable creating an environment and installing the package, great! Then all you need to do is tell reticulate where to point. 
 
 **For Venv**
 ```{.r}
 reticulate::use_virtualenv("./.venv", required = TRUE)
-
 ```
-
 **For conda**
-
 ```{.r}
 reticulate::use_condaenv("myenv", required = TRUE)
 ```
-
 ### Virtual environment helper function 
-
 If you do not want to manually create the virtual environment, you can use the helper function `create_cissvae_env()` to create a virtual environment (venv) in your current working directory. 
-
 ```{.r}
 create_cissvae_env(
   envname = "cissvae_environment", ## name of environment
@@ -69,48 +52,39 @@ create_cissvae_env(
   python_version = "3.10" ## set to whatever version you want >=3.10. Python 3.10 or 3.11 recommended
 )
 ```
+<div class="callout-note"> 
+If you run into issues with create_cissvae_env(), you can create the virtual environment manually by following this <a href="virtual_environment_tutorial.html">tutorial</a> 
+</div>
 
 Once the environment is created, activate it using:
-
 ```{.r}
 reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
-
 # In other words,
 # reticulate::use_virtualenv("./your_environment_name", required = TRUE)
 
-
 ```
-
 ```{r}
 #| echo: false
 #| include: false
-
 reticulate::use_virtualenv("/home/nfs/vaithid1/CISS-VAE/CISS-VAE-demo/cissvae_demo_env_v1", required = TRUE)
-
 ```
-
 ### (optional) Installing other python packages
-
 If you want to install other python packages (eg seaborn) to your environment, you can use [`reticulate::virtualenv_install()`](https://rstudio.github.io/reticulate/reference/virtualenv-tools.html). 
 
 ## Quickstart
-
 Once reticulate is pointing to the virtual environment containing the `ciss_vae` python package, you can either use the `run_cissvae` function or the `autotune_cissvae` function. 
-
 If you know what hyperparameters you want to use for the model, use the `run_cissvae` function. 
 
-### Run Cissvae
+### Run CISSVAE with Training History and Progress Tracking
 Your data should be in a DataFrame format with optional index. If you already have clusters you want to use, they should be in a separate vector from the dataframe. If you do not have clusters to begin with, set 'clusters' in `run_cissvae()` to NULL. 
 
-Optionally, you can set 'return_model' to TRUE to include the model as part of the return object. This allows you to use `plot_cissvae_arch()` to plot your model architecture. 
+The function supports training history tracking, custom device selection, and returns detailed training information.
 
 ```{.r}
 library(tidyverse)
 library(reticulate)
 library(rCISSVAE)
-
 reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
-
 data(df_missing)
 data(clusters)
 
@@ -119,21 +93,30 @@ dat = run_cissvae(
   index_col = "index",
   clusters = clusters$clusters,
   epochs = 500,
-  return_silhouettes=TRUE,
-  verbose=TRUE,
+  return_silhouettes = TRUE,
+  return_history = TRUE,  # Get detailed training history
+  verbose = TRUE,
   return_model = TRUE,
+  device = "cuda",  # Explicit device selection
   layer_order_enc = c("unshared", "shared", "unshared"),
   layer_order_dec = c("shared", "unshared", "shared")
 )
 
-## retrieve results
-imputed_df = dat$imputed
-silhouette = dat$slhouettes ## if return_silhouettes = TRUE
+## Retrieve results
+imputed_df <- dat$imputed
+silhouette <- dat$silhouettes
+training_history <- dat$history  # Detailed training progress
 
-## optional
-plot_cissvae_arch(dat$model, title = "CISSVAE model") ## if return_model == TRUE
+## Plot training progress
+if (!is.null(training_history)) {
+  plot(training_history$epoch, training_history$loss, 
+       type = "l", main = "Training Loss Over Time", 
+       xlab = "Epoch", ylab = "Loss")
+}
+
+## Plot model architecture
+plot_cissvae_arch(dat$model, title = "CISSVAE model")
 ```
-
 
 ```{r}
 #| echo: false
@@ -141,100 +124,208 @@ library(tidyverse)
 library(reticulate)
 library(rCISSVAE)
 
-# reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
-
 data(df_missing)
 data(clusters)
-
 dat = run_cissvae(
   data = df_missing,
   index_col = "index",
   clusters = clusters$clusters,
   epochs = 500,
-  return_silhouettes=TRUE,
-  verbose=TRUE,
+  return_silhouettes = TRUE,
+  return_history = TRUE,
+  verbose = TRUE,
   return_model = TRUE,
+  device = "cuda",
   layer_order_enc = c("unshared", "shared", "unshared"),
   layer_order_dec = c("shared", "unshared", "shared")
 )
 
-## retrieve results
-imputed_df = dat$imputed
-silhouette = dat$slhouettes ## if return_silhouettes = TRUE
+## Retrieve results
+imputed_df <- dat$imputed
+silhouette <- dat$silhouettes
+training_history <- dat$history
 
-## optional
-plot_cissvae_arch(dat$model, title = "CISSVAE model") ## if return_model == TRUE
+## Plot training progress
+if (!is.null(training_history)) {
+  plot(training_history$epoch, training_history$loss, 
+       type = "l", main = "Training Loss Over Time", 
+       xlab = "Epoch", ylab = "Loss")
+}
+
+## Plot model architecture
+plot_cissvae_arch(dat$model, title = "CISSVAE model")
 ```
 
+## Clustering Features by Missingness Patterns
 
-## Autotune
+Before running CISS-VAE, you can cluster features based on their missingness patterns. This helps identify features that tend to be missing together systematically, which can improve imputation quality.
 
-If you want to perform hyperparameter tuning, you can use the `autotune_cissvae()` function. 
+```{.r}
+library(rCISSVAE)
 
-This function wraps the cluster dataset creation, search space creation and running the autotune into one function so there are a lot of parameters to be set. 
+# Create sample data with systematic missingness patterns
+set.seed(123)
+sample_data <- data.frame(
+  sample_id = 1:100,
+  # Features missing together in early samples
+  biomarker1 = c(rep(NA, 50), rnorm(50)),
+  biomarker2 = c(rep(NA, 45), rnorm(55)),
+  biomarker3 = c(rep(NA, 48), rnorm(52)),
+  # Features missing together in late samples
+  biomarker4 = c(rnorm(50), rep(NA, 50)),
+  biomarker5 = c(rnorm(52), rep(NA, 48)),
+  # Rarely missing features
+  biomarker6 = c(rnorm(90), rep(NA, 10))
+)
 
-For the SearchSpace args, 
-Types of parameters:  
-- reticulate::tuple(min, max, step) -\> creates a range   
-- \c(a, b, c\) -\> select value from list
-- x -\> set param as non-tunable    
+# One-step clustering from raw data
+cluster_result <- cluster_features_by_missingness(
+  data = sample_data,
+  index_col = "sample_id",
+  n_clusters = 3,  # Use KMeans with 3 clusters
+  seed = 42,
+  handle_noise = "keep"  # Each noise point gets own cluster
+)
 
+print("Cluster assignments for CISS-VAE:")
+print(cluster_result$labels_positive)  # Use these labels for CISS-VAE
+print(paste("Clustering quality (silhouette):", round(cluster_result$silhouette_score, 3)))
+print(paste("Found", cluster_result$n_clusters_final, "clusters total"))
+
+# Alternative: Use HDBSCAN for automatic cluster detection
+hdbscan_result <- cluster_features_by_missingness(
+  data = sample_data,
+  index_col = "sample_id",
+  n_clusters = NULL,  # Use HDBSCAN
+  min_cluster_size = 2,
+  handle_noise = "separate"  # All noise points in one cluster
+)
+
+# Use the missingness-based clusters with CISS-VAE
+result <- run_cissvae(
+  data = sample_data,
+  index_col = "sample_id",
+  clusters = cluster_result$labels_positive,
+  epochs = 100,
+  return_history = TRUE,
+  verbose = TRUE
+)
+```
+
+```{r}
+#| echo: false
+library(rCISSVAE)
+
+# Create sample data with systematic missingness patterns
+set.seed(123)
+sample_data <- data.frame(
+  sample_id = 1:100,
+  # Features missing together in early samples
+  biomarker1 = c(rep(NA, 50), rnorm(50)),
+  biomarker2 = c(rep(NA, 45), rnorm(55)),
+  biomarker3 = c(rep(NA, 48), rnorm(52)),
+  # Features missing together in late samples
+  biomarker4 = c(rnorm(50), rep(NA, 50)),
+  biomarker5 = c(rnorm(52), rep(NA, 48)),
+  # Rarely missing features
+  biomarker6 = c(rnorm(90), rep(NA, 10))
+)
+
+cluster_result <- cluster_features_by_missingness(
+  data = sample_data,
+  index_col = "sample_id",
+  n_clusters = 3,
+  seed = 42,
+  handle_noise = "keep"
+)
+
+print("Cluster assignments for CISS-VAE:")
+print(cluster_result$labels_positive)
+print(paste("Clustering quality (silhouette):", round(cluster_result$silhouette_score, 3)))
+print(paste("Found", cluster_result$n_clusters_final, "clusters total"))
+
+result <- run_cissvae(
+  data = sample_data,
+  index_col = "sample_id",
+  clusters = cluster_result$labels_positive,
+  epochs = 100,
+  return_history = TRUE,
+  verbose = TRUE
+)
+```
+
+## Advanced Hyperparameter Optimization with Autotune
+
+The autotune function provides comprehensive hyperparameter optimization with Rich progress bars, flexible layer arrangement strategies, and extensive search options.
 
 ```{.r}
 library(tidyverse)
 library(reticulate)
 library(rCISSVAE)
-
 reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
 
 data(df_missing)
 data(clusters)
 
-aut = autotune_cissvae (
+aut <- autotune_cissvae(
   data = df_missing,
-  index_col              = "index",
+  index_col = "index",
   clusters = clusters$clusters,
-  save_model_path        = NULL,
+  save_model_path = NULL,
   save_search_space_path = NULL,
-  n_trials               = 2, ## number of autotune trials to run
-  study_name             = "vae_autotune", ## name of optuna study
-  device_preference      = "cuda",
-  show_progress          = FALSE, ## set TRUE to show progressbar
-  optuna_dashboard_db    = NULL, ## optional sqlite3 database, eg: "sqlite:///db.sqlite3"
-  load_if_exists         = TRUE, ## if TRUE, loads existing study of name 'study_name' if one exists
-  seed                   = 42, 
-  verbose                = FALSE, 
-
-  ## SearchSpace args
-  num_hidden_layers = c(1, 4),  
-  hidden_dims       = c(64, 512),
-  latent_dim        = c(10, 100),
-  latent_shared     = c(TRUE, FALSE),
-  output_shared     = c(TRUE, FALSE),
-  lr                = reticulate::tuple(1e-4, 1e-3),
-  decay_factor      = c(0.9, 0.999),
-  beta              = 0.01,
-  num_epochs        = 10, ## setting this low for demo purposes
-  batch_size        = 4000,
-  num_shared_encode = c(0, 1, 3),
-  num_shared_decode = c(0, 1, 3),
-  refit_patience    = 2,
-  refit_loops       = 10, ## setting this low for demo purposes
-  epochs_per_loop   = 10, ## setting this low for demo purposes
-  reset_lr_refit    = c(TRUE, FALSE)
+  n_trials = 10,
+  study_name = "comprehensive_vae_autotune",
+  device_preference = "cuda",
+  show_progress = TRUE,  # Rich progress bars with training visualization
+  optuna_dashboard_db = "sqlite:///optuna_study.db",  # Save results to database
+  load_if_exists = TRUE,
+  seed = 42, 
+  verbose = FALSE,
+  
+  # Search strategy options
+  constant_layer_size = FALSE,     # Allow different sizes per layer
+  evaluate_all_orders = FALSE,     # Sample layer arrangements efficiently
+  max_exhaustive_orders = 100,     # Limit for exhaustive search
+  
+  ## Hyperparameter search space
+  num_hidden_layers = c(2, 5),     # Try 2-5 hidden layers
+  hidden_dims = c(64, 512),        # Layer sizes from 64 to 512
+  latent_dim = c(10, 100),         # Latent dimension range
+  latent_shared = c(TRUE, FALSE),
+  output_shared = c(TRUE, FALSE),
+  lr = reticulate::tuple(1e-4, 1e-2),  # Learning rate range
+  decay_factor = c(0.9, 0.999),
+  beta = reticulate::tuple(0.001, 0.01),  # KL weight range
+  num_epochs = 500,                # Fixed epochs for demo
+  batch_size = c(1000, 4000),     # Batch size options
+  num_shared_encode = c(0, 1, 2, 3),
+  num_shared_decode = c(0, 1, 2, 3),
+  
+  # Layer placement strategies - try different arrangements
+  encoder_shared_placement = c("at_end", "at_start", "alternating", "random"),
+  decoder_shared_placement = c("at_start", "at_end", "alternating", "random"),
+  
+  refit_patience = c(2, 5),        # Early stopping patience
+  refit_loops = 50,                # Fixed refit loops
+  epochs_per_loop = c(100, 500),   # Epochs per refit loop
+  reset_lr_refit = c(TRUE, FALSE)
 )
 
-# Access results:
-imputed   <- aut$imputed
+# Analyze results
+imputed <- aut$imputed
 best_model <- aut$model
-study     <- aut$study
-results   <- aut$results
+study <- aut$study
+results <- aut$results
 
+# View best hyperparameters
+cat("Best validation MSE:", study$best_value, "\n")
+print("Best trial parameters:")
+best_trial <- results[results$trial_number == study$best_trial$number, ]
+print(best_trial[, c("latent_dim", "lr", "encoder_shared_placement", "decoder_shared_placement", "val_mse")])
 
-## optional
-plot_cissvae_arch(best_model, title = "Best model from Autotune")
+# Plot model architecture
+plot_cissvae_arch(best_model, title = "Optimized CISSVAE Architecture")
 ```
-
 
 ```{r}
 #| echo: false
@@ -242,52 +333,148 @@ library(tidyverse)
 library(reticulate)
 library(rCISSVAE)
 
-reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
-
 data(df_missing)
 data(clusters)
 
-aut = autotune_cissvae (
+aut <- autotune_cissvae(
   data = df_missing,
-  index_col              = "index",
+  index_col = "index",
   clusters = clusters$clusters,
-  save_model_path        = NULL,
-  save_search_space_path = NULL,
-  n_trials               = 2, ## number of autotune trials to run
-  study_name             = "vae_autotune", ## name of optuna study
-  device_preference      = "cuda",
-  show_progress          = FALSE, ## set TRUE to show progressbar
-  optuna_dashboard_db    = NULL, ## optional sqlite3 database, eg: "sqlite:///db.sqlite3"
-  load_if_exists         = TRUE, ## if TRUE, loads existing study of name 'study_name' if one exists
-  seed                   = 42, 
-  verbose                = FALSE, 
-
-  ## SearchSpace args
-  num_hidden_layers = c(1, 4),  
-  hidden_dims       = c(64, 512),
-  latent_dim        = c(10, 100),
-  latent_shared     = c(TRUE, FALSE),
-  output_shared     = c(TRUE, FALSE),
-  lr                = reticulate::tuple(1e-4, 1e-3),
-  decay_factor      = c(0.9, 0.999),
-  beta              = 0.01,
-  num_epochs        = 10, ## setting this low for demo purposes
-  batch_size        = 4000,
-  num_shared_encode = c(0, 1, 3),
-  num_shared_decode = c(0, 1, 3),
-  refit_patience    = 2,
-  refit_loops       = 10, ## setting this low for demo purposes
-  epochs_per_loop   = 10, ## setting this low for demo purposes
-  reset_lr_refit    = c(TRUE, FALSE)
+  n_trials = 3,  # Reduced for demo
+  study_name = "vae_autotune_demo_v2",
+  device_preference = "cuda",
+  show_progress = TRUE,
+  seed = 42, 
+  verbose = FALSE,
+  constant_layer_size = FALSE,
+  evaluate_all_orders = FALSE,
+  num_hidden_layers = c(1, 3),
+  hidden_dims = c(64, 256),
+  latent_dim = c(10, 50),
+  latent_shared = c(TRUE, FALSE),
+  output_shared = c(TRUE, FALSE),
+  lr = reticulate::tuple(1e-4, 1e-3),
+  decay_factor = c(0.9, 0.999),
+  beta = 0.01,
+  num_epochs = 10,  # Reduced for demo
+  batch_size = 4000,
+  num_shared_encode = c(0, 1, 2),
+  num_shared_decode = c(0, 1, 2),
+  encoder_shared_placement = c("at_end", "at_start", "alternating"),
+  decoder_shared_placement = c("at_start", "at_end", "alternating"),
+  refit_patience = 2,
+  refit_loops = 5,  # Reduced for demo
+  epochs_per_loop = 5,  # Reduced for demo
+  reset_lr_refit = c(TRUE, FALSE)
 )
 
-# Access results:
-imputed   <- aut$imputed
+imputed <- aut$imputed
 best_model <- aut$model
-study     <- aut$study
-results   <- aut$results
+study <- aut$study
+results <- aut$results
 
+cat("Best validation MSE:", study$best_value, "\n")
+print("Trial results:")
+print(head(results[, c("trial_number", "latent_dim", "lr", "val_mse")]))
 
-## optional
-plot_cissvae_arch(best_model, title = "Best model from Autotune")
+plot_cissvae_arch(best_model, title = "Optimized CISSVAE Architecture")
 ```
+
+## Using Pre-computed Missingness Proportion Matrix
+
+For advanced control over the clustering process, you can provide a pre-computed missingness proportion matrix directly to `run_cissvae()`:
+
+```{.r}
+# Create and examine missingness proportion matrix
+prop_matrix <- create_missingness_prop_matrix(df_missing, index_col = "index")
+print("Missingness proportion matrix dimensions:")
+print(dim(prop_matrix))
+print("Sample of proportion matrix:")
+print(head(prop_matrix[, 1:5]))
+
+# Use proportion matrix with scaling for better clustering
+advanced_result <- run_cissvae(
+  data = df_missing,
+  index_col = "index",
+  clusters = NULL,  # Let function cluster using prop_matrix
+  missingness_proportion_matrix = prop_matrix,
+  scale_features = TRUE,  # Standardize features before clustering
+  n_clusters = 4,
+  cluster_selection_epsilon = 0.1,  # HDBSCAN parameter
+  epochs = 200,
+  return_history = TRUE,
+  return_silhouettes = TRUE,
+  device = "cuda",
+  verbose = TRUE
+)
+
+print("Clustering quality:")
+print(paste("Silhouette score:", round(advanced_result$silhouettes, 3)))
+
+# Plot training history
+if (!is.null(advanced_result$history)) {
+  plot(advanced_result$history$epoch, advanced_result$history$val_mse, 
+       type = "l", main = "Validation MSE During Training", 
+       xlab = "Epoch", ylab = "Validation MSE")
+}
+```
+
+```{r}
+#| echo: false
+prop_matrix <- create_missingness_prop_matrix(df_missing, index_col = "index")
+print("Missingness proportion matrix dimensions:")
+print(dim(prop_matrix))
+print("Sample of proportion matrix:")
+print(head(prop_matrix[, 1:5]))
+
+advanced_result <- run_cissvae(
+  data = df_missing,
+  index_col = "index",
+  clusters = NULL,
+  missingness_proportion_matrix = prop_matrix,
+  scale_features = TRUE,
+  n_clusters = 4,
+  epochs = 100,  # Reduced for demo
+  return_history = TRUE,
+  return_silhouettes = TRUE,
+  device = "cuda",
+  verbose = TRUE
+)
+
+print("Clustering quality:")
+print(paste("Silhouette score:", round(advanced_result$silhouettes, 3)))
+
+if (!is.null(advanced_result$history)) {
+  plot(advanced_result$history$epoch, advanced_result$history$val_mse, 
+       type = "l", main = "Validation MSE During Training", 
+       xlab = "Epoch", ylab = "Validation MSE")
+}
+```
+
+## Understanding Parameter Types
+
+For hyperparameter optimization in `autotune_cissvae()`, parameters can be specified as:
+
+- **Fixed value**: `beta = 0.01` → parameter remains constant across trials
+- **Categorical choice**: `c(64, 128, 256)` → Optuna selects from the provided options
+- **Integer range**: `c(1, 4)` → Optuna suggests integers between 1 and 4 (inclusive)
+- **Float range**: `reticulate::tuple(1e-4, 1e-3)` → Optuna suggests floats in the specified range
+
+### Layer Placement Strategies
+
+The layer arrangement strategies control how shared and unshared layers are positioned:
+
+- **`"at_end"`**: Places shared layers at the end of the encoder or start of the decoder
+- **`"at_start"`**: Places shared layers at the start of the encoder or end of the decoder  
+- **`"alternating"`**: Distributes shared layers evenly throughout the architecture
+- **`"random"`**: Uses random placement of shared layers (with reproducible seed)
+
+### Noise Handling in Clustering
+
+When using HDBSCAN clustering, some features may be classified as "noise" (outliers). The `handle_noise` parameter controls how to treat these:
+
+- **`"keep"`** (default): Each noise point becomes its own cluster
+- **`"separate"`**: All noise points are grouped into one cluster
+- **`"merge"`**: Noise points are merged with the largest existing cluster
+
+This comprehensive approach ensures that all features are properly clustered for CISS-VAE training while respecting the underlying missingness patterns in your data.

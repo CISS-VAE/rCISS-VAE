@@ -1,74 +1,192 @@
-#' Run the CISS-VAE pipeline (letting Python choose device)
+#' Run the CISS-VAE pipeline for missing data imputation
 #'
 #' @description
-#' Wraps the Python `run_cissvae` function from the `ciss_vae` module,
-#' handles an optional `index_col`, and returns imputed data,
-#' and optionally the model, silhouette scores, and training history.
+#' This function wraps the Python `run_cissvae` function from the `ciss_vae` module,
+#' providing a complete pipeline for missing data imputation using a Cluster-Informed
+#' Shared and Specific Variational Autoencoder (CISS-VAE). The function handles data
+#' preprocessing, model training, and returns imputed data along with optional
+#' model artifacts.
 #'
-#' @param data A data.frame or matrix (samples × features), may contain `NA`.
-#' @param index_col Character. Column in `data` to treat as sample ID; removed before training and re-attached. Default `NULL`.
-#' @param val_proportion Numeric fraction of non-missing entries to hold out. Default `0.1`.
-#' @param replacement_value Numeric fill value for masked entries. Default `0.0`.
-#' @param columns_ignore Character or integer vector of columns to ignore. Default `NULL`.
-#' @param print_dataset Logical; if `TRUE`, prints dataset summary. Default `TRUE`.
-#' @param clusters Optional vector (or single-column data.frame) of precomputed cluster labels. Default `NULL`.
-#' @param n_clusters Integer for KMeans if `clusters` is `NULL`. Default `NULL`.
-#' @param cluster_selection_epsilon Numeric epsilon for HDBSCAN. Default `0.25`.
-#' @param seed Integer random seed. Default `42`.
-#' @param missingness_proportion_matrix Optional pre-computed missingness proportion matrix for biomarker clustering. Default `NULL`.
-#' @param scale_features Logical; whether to scale features in proportion matrix clustering. Default `FALSE`.
-#' @param hidden_dims Integer vector of hidden layer sizes. Default `c(150,120,60)`.
-#' @param latent_dim Integer latent space dimension. Default `15`.
-#' @param layer_order_enc Character vector for encoder layer sharing. Default `c("unshared","unshared","unshared")`.
-#' @param layer_order_dec Character vector for decoder layer sharing. Default `c("shared","shared","shared")`.
-#' @param latent_shared Logical; share latent weights? Default `FALSE`.
-#' @param output_shared Logical; share output weights? Default `FALSE`.
-#' @param batch_size Integer batch size. Default `4000`.
-#' @param return_model Logical; if `TRUE`, returns Python model. Default `TRUE`.
-#' @param epochs Integer initial training epochs. Default `500`.
-#' @param initial_lr Numeric initial learning rate. Default `0.01`.
-#' @param decay_factor Numeric learning rate decay. Default `0.999`.
-#' @param beta Numeric KL weight. Default `0.001`.
-#' @param device Character device specification ("cpu" or "cuda"); auto-selects if `NULL`. Default `NULL`.
-#' @param max_loops Integer max refit loops. Default `100`.
-#' @param patience Integer early stop patience. Default `2`.
-#' @param epochs_per_loop Integer epochs per refit loop. Default `NULL` (uses `epochs`).
-#' @param initial_lr_refit Numeric LR for refit loops. Default `NULL` (uses `initial_lr`).
-#' @param decay_factor_refit Numeric decay for refit loops. Default `NULL` (uses `decay_factor`).
-#' @param beta_refit Numeric KL weight for refit loops. Default `NULL` (uses `beta`).
-#' @param verbose Logical; if `TRUE`, prints progress. Default `FALSE`.
-#' @param return_silhouettes Logical; if `TRUE`, returns silhouette scores. Default `FALSE`.
-#' @param return_history Logical; if `TRUE`, returns concatenated training history. Default `FALSE`.
+#' The CISS-VAE architecture uses cluster information to learn both shared and
+#' cluster-specific representations, enabling more accurate imputation by leveraging
+#' patterns within and across different data subgroups.
 #'
-#' @return A list with elements depending on return flags:
-#'   - `imputed`: data.frame of imputed values (with `index_col` re-attached) - always returned.
-#'   - `model`: Python VAE object (if `return_model = TRUE`).
-#'   - `silhouettes`: numeric silhouette score (if `return_silhouettes = TRUE`).
-#'   - `history`: data.frame of training history (if `return_history = TRUE`).
+#' @param data A data.frame or matrix (samples × features) containing the data to impute.
+#'   May contain `NA` values which will be imputed.
+#' @param index_col Character. Name of column in `data` to treat as sample identifier.
+#'   This column will be removed before training and re-attached to results. Default `NULL`.
+#' @param val_proportion Numeric. Fraction of non-missing entries to hold out for
+#'   validation during training. Must be between 0 and 1. Default `0.1`.
+#' @param replacement_value Numeric. Fill value for masked entries during training.
+#'   Default `0.0`.
+#' @param columns_ignore Character or integer vector. Columns to exclude from training.
+#'   Can specify by name or index. Default `NULL`.
+#' @param print_dataset Logical. If `TRUE`, prints dataset summary information during
+#'   processing. Default `TRUE`.
+#' @param clusters Optional vector or single-column data.frame of precomputed cluster
+#'   labels for samples. If `NULL`, clustering will be performed automatically. Default `NULL`.
+#' @param n_clusters Integer. Number of clusters for KMeans clustering when `clusters`
+#'   is `NULL`. If `NULL`, optimal number will be determined automatically. Default `NULL`.
+#' @param cluster_selection_epsilon Numeric. Epsilon parameter for HDBSCAN clustering
+#'   when automatic clustering is used. Default `0.25`.
+#' @param seed Integer. Random seed for reproducible results. Default `42`.
+#' @param missingness_proportion_matrix Optional pre-computed missingness proportion
+#'   matrix for biomarker-based clustering. If provided, clustering will be based on
+#'   missingness patterns. Default `NULL`.
+#' @param scale_features Logical. Whether to scale features when using missingness
+#'   proportion matrix clustering. Default `FALSE`.
+#' @param hidden_dims Integer vector. Sizes of hidden layers in encoder/decoder.
+#'   Length determines number of hidden layers. Default `c(150, 120, 60)`.
+#' @param latent_dim Integer. Dimension of latent space representation. Default `15`.
+#' @param layer_order_enc Character vector. Sharing pattern for encoder layers.
+#'   Each element should be "shared" or "unshared". Length must match `length(hidden_dims)`.
+#'   Default `c("unshared", "unshared", "unshared")`.
+#' @param layer_order_dec Character vector. Sharing pattern for decoder layers.
+#'   Each element should be "shared" or "unshared". Length must match `length(hidden_dims)`.
+#'   Default `c("shared", "shared", "shared")`.
+#' @param latent_shared Logical. Whether latent space weights are shared across clusters.
+#'   Default `FALSE`.
+#' @param output_shared Logical. Whether output layer weights are shared across clusters.
+#'   Default `FALSE`.
+#' @param batch_size Integer. Mini-batch size for training. Larger values may improve
+#'   training stability but require more memory. Default `4000`.
+#' @param return_model Logical. If `TRUE`, returns the trained Python VAE model object.
+#'   Default `TRUE`.
+#' @param epochs Integer. Number of epochs for initial training phase. Default `500`.
+#' @param initial_lr Numeric. Initial learning rate for optimizer. Default `0.01`.
+#' @param decay_factor Numeric. Exponential decay factor for learning rate scheduling.
+#'   Must be between 0 and 1. Default `0.999`.
+#' @param beta Numeric. Weight for KL divergence term in VAE loss function.
+#'   Controls regularization strength. Default `0.001`.
+#' @param device Character. Device specification for computation ("cpu" or "cuda").
+#'   If `NULL`, automatically selects best available device. Default `NULL`.
+#' @param max_loops Integer. Maximum number of impute-refit loops to perform.
+#'   Default `100`.
+#' @param patience Integer. Early stopping patience for refit loops. Training stops
+#'   if validation loss doesn't improve for this many consecutive loops. Default `2`.
+#' @param epochs_per_loop Integer. Number of epochs per refit loop. If `NULL`,
+#'   uses same value as `epochs`. Default `NULL`.
+#' @param initial_lr_refit Numeric. Learning rate for refit loops. If `NULL`,
+#'   uses same value as `initial_lr`. Default `NULL`.
+#' @param decay_factor_refit Numeric. Decay factor for refit loops. If `NULL`,
+#'   uses same value as `decay_factor`. Default `NULL`.
+#' @param beta_refit Numeric. KL weight for refit loops. If `NULL`,
+#'   uses same value as `beta`. Default `NULL`.
+#' @param verbose Logical. If `TRUE`, prints detailed progress information during
+#'   training. Default `FALSE`.
+#' @param return_silhouettes Logical. If `TRUE`, returns silhouette scores for
+#'   cluster quality assessment. Default `FALSE`.
+#' @param return_history Logical. If `TRUE`, returns training history as a data.frame
+#'   containing loss values and metrics over epochs. Default `FALSE`.
+#' @param return_dataset Logical. If `TRUE`, returns the ClusterDataset object used
+#'   during training (contains validation data, masks, etc.). Default `FALSE`.
+#'
+#' @details
+#' The CISS-VAE method works in two main phases:
+#' 
+#' 1. **Initial Training**: The model is trained on the original data with validation
+#'    holdout to learn initial representations and imputation patterns.
+#' 
+#' 2. **Impute-Refit Loops**: The model iteratively imputes missing values and
+#'    retrains on the updated dataset until convergence or maximum loops reached.
+#' 
+#' The architecture uses both shared and cluster-specific layers to capture:
+#' - **Shared patterns**: Common relationships across all clusters
+#' - **Specific patterns**: Unique relationships within each cluster
+#'
+#' @return A list containing imputed data and optional additional outputs:
+#' \describe{
+#'   \item{imputed}{data.frame of imputed data with same dimensions as input.
+#'     Missing values are filled with model predictions. If `index_col` was
+#'     provided, it is re-attached as the first column.}
+#'   \item{model}{(if `return_model=TRUE`) Python CISSVAE model object.
+#'     Can be used for further analysis or predictions.}
+#'   \item{dataset}{(if `return_dataset=TRUE`) Python ClusterDataset object
+#'     containing validation data, masks, normalization parameters, and cluster labels.
+#'     Can be used with performance_by_cluster() and other analysis functions.}
+#'   \item{silhouettes}{(if `return_silhouettes=TRUE`) Numeric silhouette
+#'     score measuring cluster separation quality.}
+#'   \item{history}{(if `return_history=TRUE`) data.frame containing training
+#'     history with columns for epoch, losses, and validation metrics.}
+#' }
+#'
+#' @section Requirements:
+#' This function requires the Python `ciss_vae` package to be installed and
+#' accessible via `reticulate`. The package handles automatic device selection
+#' (CPU/GPU) based on availability.
+#'
+#' @section Performance Tips:
+#' \itemize{
+#'   \item Use GPU computation when available for faster training on large datasets
+#'   \item Adjust `batch_size` based on available memory (larger = faster but more memory)
+#'   \item Start with default hyperparameters and adjust based on validation performance
+#'   \item Use `verbose=TRUE` to monitor training progress on large datasets
+#' }
+#'
 #' @export
 #'
 #' @examples
-#' # Basic usage
-#' result <- run_cissvae(my_data, clusters = my_clusters)
+#' \dontrun{
+#' # Basic usage with automatic clustering
+#' result <- run_cissvae(
+#'   data = my_data_with_missing,
+#'   index_col = "sample_id"
+#' )
 #' imputed_data <- result$imputed
 #' 
-#' # With training history and silhouettes
+#' # Advanced usage with dataset for performance analysis
 #' result <- run_cissvae(
 #'   data = my_data,
-#'   index_col = "sample_id",
+#'   clusters = my_cluster_labels,
+#'   hidden_dims = c(200, 150, 100),
+#'   latent_dim = 20,
+#'   epochs = 1000,
 #'   return_history = TRUE,
 #'   return_silhouettes = TRUE,
+#'   return_dataset = TRUE,
 #'   verbose = TRUE
 #' )
 #' 
-#' # Using pre-computed missingness proportion matrix
-#' prop_matrix <- create_missingness_prop_matrix(my_data, index_col = "sample_id")
+#' # Access different outputs
+#' imputed_data <- result$imputed
+#' training_history <- result$history
+#' cluster_quality <- result$silhouettes
+#' 
+#' # Use dataset for performance analysis
+#' perf <- performance_by_cluster(
+#'   original_data = my_data,
+#'   model = result$model,
+#'   dataset = result$dataset,
+#'   clusters = my_cluster_labels
+#' )
+#' 
+#' # Using pre-computed missingness matrix for clustering
+#' prop_matrix <- create_missingness_prop_matrix(
+#'   data = my_data, 
+#'   index_col = "sample_id"
+#' )
 #' result <- run_cissvae(
 #'   data = my_data,
 #'   index_col = "sample_id",
 #'   missingness_proportion_matrix = prop_matrix,
-#'   scale_features = TRUE
+#'   scale_features = TRUE,
+#'   return_dataset = TRUE
 #' )
+#' 
+#' # Custom layer sharing patterns
+#' result <- run_cissvae(
+#'   data = my_data,
+#'   hidden_dims = c(100, 80, 60),
+#'   layer_order_enc = c("unshared", "shared", "shared"),
+#'   layer_order_dec = c("shared", "shared", "unshared"),
+#'   latent_shared = TRUE
+#' )
+#' }
+#'
+#' @seealso
+#' \code{\link{create_missingness_prop_matrix}} for creating missingness proportion matrices
+#' \code{\link{performance_by_cluster}} for analyzing model performance using the returned dataset
+#' 
 run_cissvae <- function(
   data,
   index_col              = NULL,
@@ -80,7 +198,6 @@ run_cissvae <- function(
   n_clusters             = NULL,
   cluster_selection_epsilon = 0.25,
   seed                   = 42,
-  # NEW: Missingness proportion matrix parameters
   missingness_proportion_matrix = NULL,
   scale_features         = FALSE,
   hidden_dims            = c(150, 120, 60),
@@ -95,7 +212,6 @@ run_cissvae <- function(
   initial_lr             = 0.01,
   decay_factor           = 0.999,
   beta                   = 0.001,
-  # NEW: Device parameter
   device                 = NULL,
   max_loops              = 100,
   patience               = 2,
@@ -105,8 +221,8 @@ run_cissvae <- function(
   beta_refit             = NULL,
   verbose                = FALSE,
   return_silhouettes     = FALSE,
-  # NEW: Training history parameter
-  return_history         = FALSE
+  return_history         = FALSE,
+  return_dataset         = FALSE  # Changed from return_valdata
 ) {
   
   # ── 1) Coerce integer-only args ─────────────────────────────────────────
@@ -117,11 +233,10 @@ run_cissvae <- function(
   max_loops       <- as.integer(max_loops)
   patience        <- as.integer(patience)
   
-  # Optional single values
+  # Optional single values 
   n_clusters      <- if (!is.null(n_clusters)) as.integer(n_clusters) else NULL
   epochs_per_loop <- if (!is.null(epochs_per_loop)) as.integer(epochs_per_loop) else NULL
   
-  # FIXED: These should remain numeric, not integer
   initial_lr_refit    <- if (!is.null(initial_lr_refit)) as.numeric(initial_lr_refit) else NULL
   decay_factor_refit  <- if (!is.null(decay_factor_refit)) as.numeric(decay_factor_refit) else NULL
   beta_refit          <- if (!is.null(beta_refit)) as.numeric(beta_refit) else NULL
@@ -182,7 +297,6 @@ run_cissvae <- function(
     n_clusters                    = n_clusters,
     cluster_selection_epsilon     = cluster_selection_epsilon,
     seed                          = seed,
-    # NEW: Missingness proportion matrix parameters
     missingness_proportion_matrix = prop_matrix_py,
     scale_features                = scale_features,
     hidden_dims                   = reticulate::r_to_py(hidden_dims),
@@ -197,7 +311,6 @@ run_cissvae <- function(
     initial_lr                    = initial_lr,
     decay_factor                  = decay_factor,
     beta                          = beta,
-    # NEW: Device parameter
     device                        = device,
     max_loops                     = max_loops,
     patience                      = patience,
@@ -207,8 +320,8 @@ run_cissvae <- function(
     beta_refit                    = beta_refit,
     verbose                       = verbose,
     return_silhouettes            = return_silhouettes,
-    # NEW: Training history parameter
-    return_history                = return_history
+    return_history                = return_history,
+    return_dataset                = return_dataset  # Now maps directly
   )
   
   # Filter out NULLs
@@ -219,11 +332,21 @@ run_cissvae <- function(
   res    <- reticulate::py_to_r(res_py)
   
   # ── 10) Handle return values based on what was requested ────────────────
-  # The Python function returns different combinations based on flags
-  # We need to parse the returned tuple correctly
+  # Python returns in this exact order:
+  # 1. imputed_dataset (always)
+  # 2. vae (if return_model=True)
+  # 3. dataset (if return_dataset=True)
+  # 4. silh (if return_silhouettes=True) 
+  # 5. combined_history_df (if return_history=True)
+  
+  if (verbose) {
+    cat("Received", if(is.list(res)) length(res) else 1, "return values\n")
+    cat("Return flags: model =", return_model, ", dataset =", return_dataset, 
+        ", silhouettes =", return_silhouettes, ", history =", return_history, "\n")
+  }
   
   if (is.list(res)) {
-    # Multiple return values - need to parse based on return flags
+    # Multiple return values
     imputed_data <- res[[1]]
     idx <- 2
   } else {
@@ -243,29 +366,88 @@ run_cissvae <- function(
     imputed_df <- imputed_df[, c(index_col, setdiff(names(imputed_df), index_col))]
   }
   
-  # ── 13) Assemble output based on return flags ───────────────────────────
+  # ── 13) Assemble output based on return flags and exact Python order ────
   out <- list(imputed = imputed_df)
   
   if (!is.null(idx) && length(res) >= idx) {
-    # Parse remaining return values in the order they appear in Python function
-    if (return_model) {
+    
+    # Parse in the exact order Python returns them
+    
+    # 2. Model (if return_model=True)
+    if (return_model && idx <= length(res)) {
       out$model <- res[[idx]]
       idx <- idx + 1
     }
     
-    if (return_silhouettes && !is.null(idx) && length(res) >= idx) {
+    # 3. Dataset (if return_dataset=True) - Return ClusterDataset object as-is
+    if (return_dataset && idx <= length(res)) {
+      dataset_py <- res[[idx]]
+      
+      # Return the ClusterDataset object directly without conversion
+      tryCatch({
+        # Validate it's a ClusterDataset object
+        if (reticulate::py_has_attr(dataset_py, "__class__")) {
+          class_name <- reticulate::py_to_r(dataset_py$`__class__`$`__name__`)
+          if (grepl("ClusterDataset", class_name)) {
+            out$dataset <- dataset_py  # Return Python object directly
+          } else {
+            warning("Expected ClusterDataset but got ", class_name)
+            out$dataset <- dataset_py  # Return anyway
+          }
+        } else {
+          out$dataset <- dataset_py  # Return as-is
+        }
+      }, error = function(e) {
+        warning("Could not validate ClusterDataset object: ", e$message)
+        out$dataset <- dataset_py  # Return as-is if validation fails
+      })
+      
+      idx <- idx + 1
+    }
+    
+    # 4. Silhouettes (if return_silhouettes=True)
+    if (return_silhouettes && idx <= length(res)) {
       out$silhouettes <- res[[idx]]
       idx <- idx + 1
     }
     
-    if (return_history && !is.null(idx) && length(res) >= idx) {
-      # Convert history to R data.frame
+    # 5. History (if return_history=True)
+    if (return_history && idx <= length(res)) {
       history_py <- res[[idx]]
-      if (!is.null(history_py)) {
-        out$history <- as.data.frame(history_py, stringsAsFactors = FALSE)
-      } else {
-        out$history <- NULL
-      }
+      
+      tryCatch({
+        if (reticulate::py_has_attr(history_py, "to_numpy")) {
+          # It's a pandas DataFrame
+          out$history <- reticulate::py_to_r(history_py)
+        } else if (is.data.frame(history_py)) {
+          # Already converted to R data.frame
+          out$history <- history_py
+        } else if (is.list(history_py)) {
+          # It's an R list - try to convert to data.frame
+          if (length(history_py) > 0 && all(sapply(history_py, function(x) is.vector(x) && is.numeric(x)))) {
+            # Check if all elements have the same length
+            lengths <- sapply(history_py, length)
+            if (length(unique(lengths)) == 1) {
+              # All same length - can convert to data.frame
+              out$history <- as.data.frame(history_py, stringsAsFactors = FALSE)
+            } else {
+              # Different lengths - return as list with warning
+              warning("Training history has inconsistent lengths, returning as list")
+              out$history <- history_py
+            }
+          } else {
+            # Try direct conversion to data.frame
+            out$history <- as.data.frame(history_py, stringsAsFactors = FALSE)
+          }
+        } else {
+          # Try direct conversion
+          out$history <- as.data.frame(reticulate::py_to_r(history_py), stringsAsFactors = FALSE)
+        }
+      }, error = function(e) {
+        warning("Failed to convert training history to R data.frame: ", e$message)
+        out$history <- history_py  # Return as-is if conversion fails
+      })
+      
       idx <- idx + 1
     }
   }

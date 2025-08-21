@@ -21,4 +21,9 @@ navbar:
 articles:
 - title: "Vignettes"
   desc: "Package vignettes"  
-  contents: "vignette"
+  contents: 
+    - vignette
+    - virtual_environment_tutorial
+
+    
+

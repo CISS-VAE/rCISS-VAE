@@ -48,7 +48,51 @@
 <div class="page-header"><h1 id="rciss-vae---work-in-progress">rCISS-VAE - WORK IN PROGRESS!<a class="anchor" aria-label="anchor" href="#rciss-vae---work-in-progress"></a>
 </h1></div>
 <p>The R implementation of the Clustering-Informed Shared-Structure Variational Autoencoder (CISS-VAE). The Python implementation can be found <a href="https://github.com/CISS-VAE/CISS-VAE-python" class="external-link">here</a>.</p>
-<p>This package is currently a work in progress.</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>Install devtools or remotes if not already installed:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
+<span><span class="co"># or</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span></code></pre></div>
+<p>The rCISSVAE package can be installed with:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"CISS-VAE/rCISS-VAE"</span><span class="op">)</span></span>
+<span><span class="co"># or</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"CISS-VAE/rCISS-VAE"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="ensuring-correct-virtual-environment-for-reticulate">Ensuring correct virtual environment for reticulate<a class="anchor" aria-label="anchor" href="#ensuring-correct-virtual-environment-for-reticulate"></a>
+</h2>
+<p>This package uses <code>reticulate</code> to interface with the python version of the package <code>cissvae</code>.</p>
+<p>Therefore, it is necessary to make sure that you have a venv or conda environment set up that has the <code>cissvae</code> package installed.</p>
+<p>If you are comfortable creating an environment and installing the package, great! Then all you need to do is tell reticulate where to point.</p>
+<p><strong>For Venv</strong></p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_virtualenv</a></span><span class="op">(</span><span class="st">"./.venv"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><strong>For conda</strong></p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_condaenv</a></span><span class="op">(</span><span class="st">"myenv"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="virtual-environment-helper-function">Virtual environment helper function<a class="anchor" aria-label="anchor" href="#virtual-environment-helper-function"></a>
+</h3>
+<p>If you do not want to manually create the virtual environment, you can use the helper function <code><a href="reference/create_cissvae_env.html">create_cissvae_env()</a></code> to create a virtual environment (venv) in your current working directory.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/create_cissvae_env.html">create_cissvae_env</a></span><span class="op">(</span></span>
+<span>  envname <span class="op">=</span> <span class="st">"cissvae_environment"</span>, <span class="co">## name of environment</span></span>
+<span>  path <span class="op">=</span> <span class="cn">NULL</span>, <span class="co">## add path to wherever you want virtual environment to be</span></span>
+<span>  install_python <span class="op">=</span> <span class="cn">FALSE</span>, <span class="co">## set to TRUE if you want create_cisssvae_env to install python for you</span></span>
+<span>  python_version <span class="op">=</span> <span class="st">"3.10"</span> <span class="co">## set to whatever version you want &gt;=3.10. Python 3.10 or 3.11 recommended</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Once the environment is created, activate it using:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_virtualenv</a></span><span class="op">(</span><span class="st">"./cissvae_environment"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># In other words,</span></span>
+<span><span class="co"># reticulate::use_virtualenv("./your_environment_name", required = TRUE)</span></span></code></pre></div>
+</div>
+</div>
 </div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>

@@ -63,7 +63,7 @@ reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
 # reticulate::use_virtualenv("./your_environment_name", required = TRUE)
 
 ```
-```{r}
+```{r usevenv}
 #| echo: false
 #| include: false
 reticulate::use_virtualenv("/home/nfs/vaithid1/CISS-VAE/CISS-VAE-demo/cissvae_demo_env_v1", required = TRUE)
@@ -97,7 +97,7 @@ dat = run_cissvae(
   return_history = TRUE,  # Get detailed training history
   verbose = TRUE,
   return_model = TRUE,
-  device = "cuda",  # Explicit device selection
+  device = "cpu",  # Explicit device selection
   layer_order_enc = c("unshared", "shared", "unshared"),
   layer_order_dec = c("shared", "unshared", "shared")
 )
@@ -113,12 +113,10 @@ if (!is.null(training_history)) {
        type = "l", main = "Training Loss Over Time", 
        xlab = "Epoch", ylab = "Loss")
 }
-
-## Plot model architecture
-plot_cissvae_arch(dat$model, title = "CISSVAE model")
+plot_vae_architecture(model = dat$model, save_path = "test_plot_arch.png")
 ```
 
-```{r}
+```{r showruncissvae}
 #| echo: false
 library(tidyverse)
 library(reticulate)
@@ -135,7 +133,7 @@ dat = run_cissvae(
   return_history = TRUE,
   verbose = TRUE,
   return_model = TRUE,
-  device = "cuda",
+  device = "cpu",
   layer_order_enc = c("unshared", "shared", "unshared"),
   layer_order_dec = c("shared", "unshared", "shared")
 )
@@ -153,8 +151,11 @@ if (!is.null(training_history)) {
 }
 
 ## Plot model architecture
-plot_cissvae_arch(dat$model, title = "CISSVAE model")
+plot_vae_architecture(model = dat$model, save_path = "test_plot_arch.png")
 ```
+
+
+![](test_plot_arch.png)
 
 ## Clustering Features by Missingness Patterns
 
@@ -212,7 +213,7 @@ result <- run_cissvae(
 )
 ```
 
-```{r}
+```{r show_simclus}
 #| echo: false
 library(rCISSVAE)
 
@@ -324,10 +325,10 @@ best_trial <- results[results$trial_number == study$best_trial$number, ]
 print(best_trial[, c("latent_dim", "lr", "encoder_shared_placement", "decoder_shared_placement", "val_mse")])
 
 # Plot model architecture
-plot_cissvae_arch(best_model, title = "Optimized CISSVAE Architecture")
+plot_vae_architecture(best_model, title = "Optimized CISSVAE Architecture")
 ```
 
-```{r}
+```{r show_autotune}
 #| echo: false
 library(tidyverse)
 library(reticulate)
@@ -377,7 +378,7 @@ cat("Best validation MSE:", study$best_value, "\n")
 print("Trial results:")
 print(head(results[, c("trial_number", "latent_dim", "lr", "val_mse")]))
 
-plot_cissvae_arch(best_model, title = "Optimized CISSVAE Architecture")
+plot_vae_architecture(best_model, title = "Optimized CISSVAE Architecture")
 ```
 
 ## Using Pre-computed Missingness Proportion Matrix
@@ -419,7 +420,7 @@ if (!is.null(advanced_result$history)) {
 }
 ```
 
-```{r}
+```{r show_missingpropmatrix}
 #| echo: false
 prop_matrix <- create_missingness_prop_matrix(df_missing, index_col = "index")
 print("Missingness proportion matrix dimensions:")

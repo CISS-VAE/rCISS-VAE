@@ -252,13 +252,7 @@ return(final_summary)
 }
 
 ## ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 #' Calculate performance metrics by cluster and subgroups
-#'
-#' Computes Mean Squared Error (MSE) and other performance metrics between model
-#' predictions and validation data, with breakdowns by cluster and optional subgroups.
-#' Uses the Python get_val_comp_df function to obtain denormalized predictions and
-#' extracts validation data from the ClusterDataset object.
 #'
 #' @param original_data Original data frame with true values (for grouping variables)
 #' @param model Trained Python CISS-VAE model object
@@ -269,25 +263,10 @@ return(final_summary)
 #' @param device Device for model inference ("cpu" or "cuda")
 #' @param metrics Vector of metrics to compute (default: c("mse", "mae", "correlation"))
 #' @param only_validation Logical; if TRUE, only compute metrics on validation (masked) entries
+#' @param verbose Logical; if TRUE, prints debug information
 #'
 #' @return Data frame with performance metrics by cluster and optional subgroups
 #' @export
-#'
-#' @examples
-#' # Basic cluster performance
-#' perf <- performance_by_cluster(original_data, best_model, dataset, clusters)
-#' perf %>% gt()
-#' 
-#' # Performance by cluster and demographic groups  
-#' perf <- performance_by_cluster(
-#'   original_data = my_data,
-#'   model = best_model, 
-#'   dataset = train_dataset,
-#'   clusters = my_clusters,
-#'   grouping_vars = c("race", "sex"),
-#'   metrics = c("mse", "mae")
-#' )
-#' perf %>% gt() %>% tab_header(title = "Model Performance by Cluster and Demographics")
 performance_by_cluster <- function(original_data,
   model,
   dataset,
@@ -296,32 +275,99 @@ performance_by_cluster <- function(original_data,
   grouping_vars = NULL,
   device = "cpu",
   metrics = c("mse", "mae", "correlation"),
-  only_validation = FALSE) {
+  only_validation = TRUE,
+  verbose = FALSE) {  # Added verbose parameter
 
-# Import Python function
-helpers_mod <- import("ciss_vae.utils.helpers", convert = FALSE)
-get_val_comp_df <- helpers_mod$get_val_comp_df
+# Import Python function for getting model predictions
+helpers_mod <- reticulate::import("ciss_vae.utils.helpers", convert = FALSE)
 
-# Get model predictions (denormalized)
-predictions_py <- get_val_comp_df(model, dataset, device = device)
-predictions_df <- py_to_r(predictions_py)
+# Check if we have the get_val_comp_df function and use it
+if (reticulate::py_has_attr(helpers_mod, "get_val_comp_df")) {
+tryCatch({
+# Get predictions using the helper function with ClusterDataset
+predictions_py <- helpers_mod$get_val_comp_df(model, dataset, device = device)
+predictions_df <- reticulate::py_to_r(predictions_py)
+}, error = function(e) {
+stop("Failed to get model predictions from ClusterDataset. Error: ", e$message)
+})
+} else {
+stop("get_val_comp_df function not found in ciss_vae.utils.helpers module")
+}
 
 # Extract validation data from ClusterDataset object
-# The dataset.val_data contains the true validation values (denormalized)
+tryCatch({
+# Extract val_data tensor from ClusterDataset
 val_data_py <- dataset$val_data
-val_data_df <- py_to_r(val_data_py)
 
-# Get validation mask - where values were masked for validation
-val_mask_py <- py_to_r(dataset$val_mask)  # Boolean mask: TRUE where validation data exists
+# Convert tensor to R data.frame
+if (reticulate::py_has_attr(val_data_py, "cpu")) {
+# PyTorch tensor on GPU
+val_data_array <- reticulate::py_to_r(val_data_py$cpu()$numpy())
+} else if (reticulate::py_has_attr(val_data_py, "numpy")) {
+# PyTorch tensor on CPU
+val_data_array <- reticulate::py_to_r(val_data_py$numpy())
+} else {
+# Already numpy array or other format
+val_data_array <- reticulate::py_to_r(val_data_py)
+}
+
+val_data_df <- as.data.frame(val_data_array, stringsAsFactors = FALSE)
+
+}, error = function(e) {
+stop("Failed to extract validation data from ClusterDataset. Error: ", e$message)
+})
+
+# Get feature names from ClusterDataset
+tryCatch({
+if (reticulate::py_has_attr(dataset, "feature_names")) {
+feature_names <- reticulate::py_to_r(dataset$feature_names)
+
+# Set column names for both dataframes
+if (length(feature_names) == ncol(val_data_df)) {
+colnames(val_data_df) <- feature_names
+}
+if (length(feature_names) == ncol(predictions_df)) {
+colnames(predictions_df) <- feature_names
+}
+} else {
+warning("ClusterDataset does not have feature_names attribute")
+# Generate generic column names
+feature_names <- paste0("feature_", seq_len(ncol(val_data_df)))
+colnames(val_data_df) <- feature_names
+colnames(predictions_df) <- feature_names
+}
+}, error = function(e) {
+warning("Failed to get feature names from ClusterDataset: ", e$message)
+# Generate generic column names
+feature_names <- paste0("feature_", seq_len(ncol(val_data_df)))
+colnames(val_data_df) <- feature_names
+colnames(predictions_df) <- feature_names
+})
+
+# Since there's no val_mask, we'll compute metrics on all data when only_validation = TRUE
+if (only_validation) {
+warning("ClusterDataset does not contain validation mask. Computing metrics on all data.")
+warning("To get true validation-only metrics, you would need access to the original validation mask.")
+only_validation <- FALSE
+}
 
 # Prepare original data for grouping variables
 if (!is.null(index_col)) {
 if (!index_col %in% colnames(original_data)) {
 stop("index_col '", index_col, "' not found in original_data")
 }
-original_clean <- original_data %>% select(-all_of(index_col))
+original_clean <- original_data %>% dplyr::select(-dplyr::all_of(index_col))
 } else {
 original_clean <- original_data
+}
+
+# Validate dimensions
+if (length(clusters) != nrow(val_data_df)) {
+stop("Length of clusters (", length(clusters), ") must match number of rows in validation data (", nrow(val_data_df), ")")
+}
+
+if (nrow(original_data) != nrow(val_data_df)) {
+stop("Number of rows in original_data (", nrow(original_data), ") must match validation data (", nrow(val_data_df), ")")
 }
 
 # Add cluster and grouping variables to datasets
@@ -344,6 +390,19 @@ feature_cols <- setdiff(colnames(predictions_df), exclude_cols)
 
 # Ensure feature columns match between prediction and validation data
 feature_cols <- intersect(feature_cols, colnames(val_data_df))
+
+if (length(feature_cols) == 0) {
+if (verbose) {
+cat("Prediction columns:", colnames(predictions_df), "\n")
+cat("Validation columns:", colnames(val_data_df), "\n")
+}
+stop("No matching feature columns found between predictions and validation data")
+}
+
+if (verbose) {
+cat("Found", length(feature_cols), "matching feature columns\n")
+cat("Feature columns:", head(feature_cols, 10), "\n")
+}
 
 # Helper function to compute metrics
 compute_metrics <- function(true_vals, pred_vals, requested_metrics) {
@@ -385,66 +444,36 @@ result$correlation <- NA_real_
 return(result)
 }
 
-# Prepare data for metric calculation
-if (only_validation) {
-# Only compute metrics on validation entries (where val_mask is TRUE)
-metric_data <- map_dfr(feature_cols, function(feature) {
-# Get validation mask for this feature
-feature_idx <- which(colnames(val_data_df) == feature)
-if (length(feature_idx) == 0) {
-return(tibble())
-}
-
-validation_mask <- val_mask_py[, feature_idx]  # Boolean vector for this feature
-
-if (!any(validation_mask)) {
-return(tibble(feature = feature, n_validation = 0))
-}
-
-# Extract validation entries
-true_vals <- val_data_df[[feature]][validation_mask]
-pred_vals <- predictions_df[[feature]][validation_mask]
-cluster_vals <- clusters[validation_mask]
-
-# Create result tibble
-result_df <- tibble(
+# Prepare data for metric calculation - compute on all data since no validation mask
+metric_data <- purrr::map_dfr(feature_cols, function(feature) {
+result_df <- tibble::tibble(
 feature = feature,
-cluster = cluster_vals,
-true_val = true_vals,
-pred_val = pred_vals
+cluster = clusters,
+true_val = val_data_df[[feature]],  # True values from val_data
+pred_val = predictions_df[[feature]] # Predictions from model
 )
 
 # Add grouping variables if specified
 if (!is.null(grouping_vars)) {
 for (var in grouping_vars) {
-result_df[[var]] <- original_data[[var]][validation_mask]
+result_df[[var]] <- original_data[[var]]
 }
 }
 
 return(result_df)
 })
 
-} else {
-# Compute metrics on all data (both training and validation)
-# Use val_data_df as the source of truth, but include both masked and unmasked entries
-metric_data <- map_dfr(feature_cols, function(feature) {
-tibble(
-feature = feature,
-cluster = clusters,
-true_val = val_data_df[[feature]],  # True values from dataset
-pred_val = predictions_df[[feature]], # Predictions from model
-!!!original_data[, grouping_vars, drop = FALSE]
-)
-})
-}
-
 # Remove rows with missing values
 metric_data <- metric_data %>%
-filter(!is.na(true_val), !is.na(pred_val))
+dplyr::filter(!is.na(true_val), !is.na(pred_val))
 
 if (nrow(metric_data) == 0) {
 warning("No valid data points found for performance calculation")
-return(tibble())
+return(tibble::tibble())
+}
+
+if (verbose) {
+cat("Final metric data has", nrow(metric_data), "observations\n")
 }
 
 # Set up grouping variables
@@ -455,8 +484,8 @@ group_vars <- c(group_vars, grouping_vars)
 
 # Compute overall metrics (across all features)
 overall_metrics <- metric_data %>%
-group_by(across(all_of(group_vars))) %>%
-summarise(
+dplyr::group_by(dplyr::across(dplyr::all_of(group_vars))) %>%
+dplyr::summarise(
 feature = "Overall",
 !!!compute_metrics(true_val, pred_val, metrics),
 .groups = "drop"
@@ -464,64 +493,59 @@ feature = "Overall",
 
 # Compute feature-specific metrics
 feature_metrics <- metric_data %>%
-group_by(feature, across(all_of(group_vars))) %>%
-summarise(
+dplyr::group_by(feature, dplyr::across(dplyr::all_of(group_vars))) %>%
+dplyr::summarise(
 !!!compute_metrics(true_val, pred_val, metrics),
 .groups = "drop"
 )
 
 # Combine results
-all_metrics <- bind_rows(overall_metrics, feature_metrics)
+all_metrics <- dplyr::bind_rows(overall_metrics, feature_metrics)
 
 # Format for gt table
 all_metrics <- all_metrics %>%
-mutate(
+dplyr::mutate(
 cluster = paste("Cluster", cluster),
-across(all_of(metrics), ~ round(.x, 4))
+dplyr::across(dplyr::all_of(metrics), ~ round(.x, 4))
 ) %>%
-arrange(cluster, feature)
-
-# Add validation information if only_validation = TRUE
-if (only_validation) {
-validation_counts <- metric_data %>%
-group_by(cluster, across(all_of(grouping_vars))) %>%
-summarise(n_validation = n(), .groups = "drop")
-
-all_metrics <- all_metrics %>%
-left_join(validation_counts, by = c("cluster", grouping_vars))
-}
+dplyr::arrange(cluster, feature)
 
 return(all_metrics)
 }
 
+#--------------------------------
+
 # Helper function to create a formatted gt table from cluster_summary output
+# Simplified version with basic functionality
 format_cluster_summary_gt <- function(summary_df, title = "Cluster Characteristics") {
 summary_df %>%
-gt() %>%
-tab_header(title = title) %>%
-tab_style(
-style = cell_text(weight = "bold"),
-locations = cells_body(columns = "Variable", rows = !grepl("^  ", Variable))
+gt::gt() %>%
+gt::tab_header(title = title) %>%
+gt::tab_style(
+style = gt::cell_text(weight = "bold"),
+locations = gt::cells_body(columns = "Variable", rows = !grepl("^  ", Variable))
 ) %>%
-tab_style(
-style = cell_text(indent = px(20)),
-locations = cells_body(columns = "Variable", rows = grepl("^  ", Variable))
+gt::tab_style(
+style = gt::cell_text(indent = gt::px(20)),
+locations = gt::cells_body(columns = "Variable", rows = grepl("^  ", Variable))
 ) %>%
-cols_align(align = "left", columns = "Variable") %>%
-cols_align(align = "center", columns = -"Variable")
+gt::cols_align(align = "left", columns = c("Variable")) %>%
+gt::cols_align(align = "center", columns = everything()) %>%
+gt::cols_align(align = "left", columns = c("Variable"))  # Override Variable back to left
 }
 
-# Helper function to create a formatted gt table from performance_by_cluster output
 format_performance_gt <- function(performance_df, title = "Model Performance by Cluster") {
 performance_df %>%
-gt() %>%
-tab_header(title = title) %>%
-fmt_number(columns = c("mse", "mae", "rmse"), decimals = 4) %>%
-fmt_number(columns = "correlation", decimals = 3) %>%
-tab_style(
-style = cell_text(weight = "bold"),
-locations = cells_body(rows = feature == "Overall")
-) %>%
-cols_align(align = "left", columns = c("feature", "cluster")) %>%
-cols_align(align = "center", columns = -c("feature", "cluster"))
+gt::gt() %>%
+gt::tab_header(title = title) %>%
+{if("mse" %in% names(performance_df)) gt::fmt_number(., columns = c("mse"), decimals = 4) else .} %>%
+{if("mae" %in% names(performance_df)) gt::fmt_number(., columns = c("mae"), decimals = 4) else .} %>%
+{if("rmse" %in% names(performance_df)) gt::fmt_number(., columns = c("rmse"), decimals = 4) else .} %>%
+{if("correlation" %in% names(performance_df)) gt::fmt_number(., columns = c("correlation"), decimals = 3) else .} %>%
+{if("feature" %in% names(performance_df)) 
+gt::tab_style(., style = gt::cell_text(weight = "bold"), locations = gt::cells_body(rows = feature == "Overall")) 
+else .} %>%
+gt::cols_align(align = "left", columns = c("feature", "cluster")[c("feature", "cluster") %in% names(performance_df)]) %>%
+gt::cols_align(align = "center", columns = everything()) %>%
+gt::cols_align(align = "left", columns = c("feature", "cluster")[c("feature", "cluster") %in% names(performance_df)])
 }

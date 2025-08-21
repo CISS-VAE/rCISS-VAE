@@ -2,8 +2,7 @@
 % Please edit documentation in R/autotune_fun.R
 \name{autotune_cissvae}
 \alias{autotune_cissvae}
-\title{Autotune CISS-VAE hyperparameters with Optuna
-...}
+\title{Autotune CISS-VAE hyperparameters with Optuna}
 \usage{
 autotune_cissvae(
   data,
@@ -19,6 +18,9 @@ autotune_cissvae(
   load_if_exists = TRUE,
   seed = 42,
   verbose = FALSE,
+  constant_layer_size = FALSE,
+  evaluate_all_orders = FALSE,
+  max_exhaustive_orders = 100,
   num_hidden_layers = c(1, 4),
   hidden_dims = c(64, 512),
   latent_dim = c(10, 100),
@@ -31,6 +33,8 @@ autotune_cissvae(
   batch_size = 4000,
   num_shared_encode = c(0, 1, 3),
   num_shared_decode = c(0, 1, 3),
+  encoder_shared_placement = c("at_end", "at_start", "alternating", "random"),
+  decoder_shared_placement = c("at_start", "at_end", "alternating", "random"),
   refit_patience = 2,
   refit_loops = 100,
   epochs_per_loop = 500,
@@ -38,14 +42,78 @@ autotune_cissvae(
 )
 }
 \arguments{
-\item{num_hidden_layers}{Numeric(2) vector: (min, max) for # hidden layers.}
+\item{data}{Data frame or matrix containing the input data}
 
-\item{num_shared_encode}{Numeric vector: categorical # shared encoder layers.}
+\item{index_col}{String name of index column to preserve (optional)}
 
-\item{num_shared_decode}{Numeric vector: categorical # shared decoder layers.
-...}
+\item{clusters}{Integer vector specifying cluster assignments for each row}
+
+\item{save_model_path}{Optional path to save the best model's state_dict}
+
+\item{save_search_space_path}{Optional path to save search space configuration}
+
+\item{n_trials}{Number of Optuna trials to run}
+
+\item{study_name}{Name identifier for the Optuna study}
+
+\item{device_preference}{Preferred device ("cuda" or "cpu")}
+
+\item{show_progress}{Whether to display Rich progress bars during training}
+
+\item{optuna_dashboard_db}{RDB storage URL/file for Optuna dashboard}
+
+\item{load_if_exists}{Whether to load existing study from storage}
+
+\item{seed}{Base random seed for reproducible results}
+
+\item{verbose}{Whether to print detailed diagnostic information}
+
+\item{constant_layer_size}{Whether all hidden layers use same dimension}
+
+\item{evaluate_all_orders}{Whether to test all possible layer arrangements}
+
+\item{max_exhaustive_orders}{Max arrangements to test when evaluate_all_orders=TRUE}
+
+\item{num_hidden_layers}{Numeric(2) vector: (min, max) for number of hidden layers}
+
+\item{hidden_dims}{Numeric vector: hidden layer dimensions to test}
+
+\item{latent_dim}{Numeric(2) vector: (min, max) for latent dimension}
+
+\item{latent_shared}{Logical vector: whether latent space is shared across clusters}
+
+\item{output_shared}{Logical vector: whether output layer is shared across clusters}
+
+\item{lr}{Numeric(2) vector: (min, max) learning rate range}
+
+\item{decay_factor}{Numeric(2) vector: (min, max) LR decay factor range}
+
+\item{beta}{Numeric: KL divergence weight (fixed or range)}
+
+\item{num_epochs}{Integer: number of initial training epochs (fixed or range)}
+
+\item{batch_size}{Integer: mini-batch size (fixed or range)}
+
+\item{num_shared_encode}{Numeric vector: numbers of shared encoder layers to test}
+
+\item{num_shared_decode}{Numeric vector: numbers of shared decoder layers to test}
+
+\item{encoder_shared_placement}{Character vector: placement strategies for encoder shared layers}
+
+\item{decoder_shared_placement}{Character vector: placement strategies for decoder shared layers}
+
+\item{refit_patience}{Integer: early stopping patience for refit loops}
+
+\item{refit_loops}{Integer: maximum number of refit loops}
+
+\item{epochs_per_loop}{Integer: epochs per refit loop}
+
+\item{reset_lr_refit}{Logical vector: whether to reset LR before refit}
+}
+\value{
+List containing imputed data, best model, study object, and results dataframe
 }
 \description{
-Autotune CISS-VAE hyperparameters with Optuna
-...
+Performs hyperparameter optimization for CISS-VAE using Optuna, with support for
+Rich progress bars and flexible layer arrangement strategies.
 }

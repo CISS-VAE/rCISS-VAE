@@ -12,12 +12,13 @@ Depends: R (>= 4.2.0)
 Imports: 
     reticulate,
     methods,
-    ggplot2
+    ggplot2,
+    dplyr
 Suggests: 
     testthat (>= 3.0.0),
     knitr,
     quarto,
-    rmarkdown
+    rmarkdown,
 URL: https://github.com/CISS-VAE/rCISS-VAE
 BugReports: https://github.com/CISS-VAE/rCISS-VAE/issues
 Config/testthat/edition: 3

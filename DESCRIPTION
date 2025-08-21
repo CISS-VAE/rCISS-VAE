@@ -13,7 +13,8 @@ Imports:
     reticulate,
     methods,
     ggplot2,
-    dplyr
+    dplyr,
+    purrr
 Suggests: 
     testthat (>= 3.0.0),
     knitr,

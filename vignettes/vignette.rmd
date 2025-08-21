@@ -2,49 +2,73 @@
 title: "rCISSVAE Vignette"
 author: "Dani V"
 date: "2025-08-14"
-lightbox: auto
-format:
-   html:
+output: 
+  rmarkdown::html_vignette:
     toc: true
-    code-fold: true
-    code-copy: true
-execute:
-  echo: true
-  warning: false
-  error: false
-  freeze: auto
-  eval: true
-  fig-dpi: 600
+    toc_depth: 2
+    fig_width: 7
+    fig_height: 5
+    dpi: 600
+vignette: >
+  %\VignetteIndexEntry{rCISSVAE Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  error = FALSE,
+  fig.width = 7,
+  fig.height = 5,
+  dpi = 600,
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
 ## Installing package
+
 Install devtools or remotes if not already installed: 
-```{.r}
+
+```{r eval=FALSE}
 install.packages("remotes")
 # or
 install.packages("devtools")
 ```
+
 The rCISSVAE package can be installed with:
-```{.r}
+
+```{r eval=FALSE}
 remotes::install_github("CISS-VAE/rCISS-VAE")
 # or
 devtools::install_github("CISS-VAE/rCISS-VAE")
 ```
+
 ## Ensuring correct virtual environment for reticulate
+
 This package uses `reticulate` to interface with the python version of the package `cissvae`. 
 Therefore, it is necessary to make sure that you have a venv or conda environment set up that has the `cissvae` package installed. 
 If you are comfortable creating an environment and installing the package, great! Then all you need to do is tell reticulate where to point. 
 
 **For Venv**
-```{.r}
+
+```{r eval=FALSE}
 reticulate::use_virtualenv("./.venv", required = TRUE)
 ```
+
 **For conda**
-```{.r}
+
+```{r eval=FALSE}
 reticulate::use_condaenv("myenv", required = TRUE)
 ```
+
 ### Virtual environment helper function 
+
 If you do not want to manually create the virtual environment, you can use the helper function `create_cissvae_env()` to create a virtual environment (venv) in your current working directory. 
-```{.r}
+
+```{r eval=FALSE}
 create_cissvae_env(
   envname = "cissvae_environment", ## name of environment
   path = NULL, ## add path to wherever you want virtual environment to be
@@ -52,39 +76,41 @@ create_cissvae_env(
   python_version = "3.10" ## set to whatever version you want >=3.10. Python 3.10 or 3.11 recommended
 )
 ```
-<div class="callout-note"> 
-If you run into issues with create_cissvae_env(), you can create the virtual environment manually by following this <a href="virtual_environment_tutorial.html">tutorial</a> 
-</div>
+
+> **Note:** If you run into issues with create_cissvae_env(), you can create the virtual environment manually by following this [tutorial](virtual_environment_tutorial.html)
 
 Once the environment is created, activate it using:
-```{.r}
+
+```{r eval=FALSE}
 reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
 # In other words,
 # reticulate::use_virtualenv("./your_environment_name", required = TRUE)
-
 ```
-```{r usevenv}
-#| echo: false
-#| include: false
+
+```{r usevenv, echo=FALSE, include=FALSE}
 reticulate::use_virtualenv("/home/nfs/vaithid1/CISS-VAE/CISS-VAE-demo/cissvae_demo_env_v1", required = TRUE)
 ```
+
 ### (optional) Installing other python packages
+
 If you want to install other python packages (eg seaborn) to your environment, you can use [`reticulate::virtualenv_install()`](https://rstudio.github.io/reticulate/reference/virtualenv-tools.html). 
 
 ## Quickstart
+
 Once reticulate is pointing to the virtual environment containing the `ciss_vae` python package, you can either use the `run_cissvae` function or the `autotune_cissvae` function. 
 If you know what hyperparameters you want to use for the model, use the `run_cissvae` function. 
 
 ### Run CISSVAE with Training History and Progress Tracking
-Your data should be in a DataFrame format with optional index. If you already have clusters you want to use, they should be in a separate vector from the dataframe. If you do not have clusters to begin with, set 'clusters' in `run_cissvae()` to NULL. 
 
+Your data should be in a DataFrame format with optional index. If you already have clusters you want to use, they should be in a separate vector from the dataframe. If you do not have clusters to begin with, set 'clusters' in `run_cissvae()` to NULL. 
 The function supports training history tracking, custom device selection, and returns detailed training information.
 
-```{.r}
+```{r eval=FALSE}
 library(tidyverse)
 library(reticulate)
 library(rCISSVAE)
 reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
+
 data(df_missing)
 data(clusters)
 
@@ -113,17 +139,18 @@ if (!is.null(training_history)) {
        type = "l", main = "Training Loss Over Time", 
        xlab = "Epoch", ylab = "Loss")
 }
+
 plot_vae_architecture(model = dat$model, save_path = "test_plot_arch.png")
 ```
 
-```{r showruncissvae}
-#| echo: false
+```{r showruncissvae, echo=FALSE}
 library(tidyverse)
 library(reticulate)
 library(rCISSVAE)
 
 data(df_missing)
 data(clusters)
+
 dat = run_cissvae(
   data = df_missing,
   index_col = "index",
@@ -154,14 +181,13 @@ if (!is.null(training_history)) {
 plot_vae_architecture(model = dat$model, save_path = "test_plot_arch.png")
 ```
 
-
 ![](test_plot_arch.png)
 
 ## Clustering Features by Missingness Patterns
 
 Before running CISS-VAE, you can cluster features based on their missingness patterns. This helps identify features that tend to be missing together systematically, which can improve imputation quality.
 
-```{.r}
+```{r eval=FALSE}
 library(rCISSVAE)
 
 # Create sample data with systematic missingness patterns
@@ -213,8 +239,7 @@ result <- run_cissvae(
 )
 ```
 
-```{r show_simclus}
-#| echo: false
+```{r show_simclus, echo=FALSE}
 library(rCISSVAE)
 
 # Create sample data with systematic missingness patterns
@@ -259,7 +284,7 @@ result <- run_cissvae(
 
 The autotune function provides comprehensive hyperparameter optimization with Rich progress bars, flexible layer arrangement strategies, and extensive search options.
 
-```{.r}
+```{r eval=FALSE}
 library(tidyverse)
 library(reticulate)
 library(rCISSVAE)
@@ -328,8 +353,7 @@ print(best_trial[, c("latent_dim", "lr", "encoder_shared_placement", "decoder_sh
 plot_vae_architecture(best_model, title = "Optimized CISSVAE Architecture")
 ```
 
-```{r show_autotune}
-#| echo: false
+```{r show_autotune, echo=FALSE}
 library(tidyverse)
 library(reticulate)
 library(rCISSVAE)
@@ -385,7 +409,7 @@ plot_vae_architecture(best_model, title = "Optimized CISSVAE Architecture")
 
 For advanced control over the clustering process, you can provide a pre-computed missingness proportion matrix directly to `run_cissvae()`:
 
-```{.r}
+```{r eval=FALSE}
 # Create and examine missingness proportion matrix
 prop_matrix <- create_missingness_prop_matrix(df_missing, index_col = "index")
 print("Missingness proportion matrix dimensions:")
@@ -420,8 +444,7 @@ if (!is.null(advanced_result$history)) {
 }
 ```
 
-```{r show_missingpropmatrix}
-#| echo: false
+```{r show_missingpropmatrix, echo=FALSE}
 prop_matrix <- create_missingness_prop_matrix(df_missing, index_col = "index")
 print("Missingness proportion matrix dimensions:")
 print(dim(prop_matrix))

@@ -205,34 +205,23 @@ sample_data <- data.frame(
   biomarker6 = c(rnorm(90), rep(NA, 10))
 )
 
-# One-step clustering from raw data
-cluster_result <- cluster_features_by_missingness(
+
+cluster_result <- cluster_on_missing(
   data = sample_data,
-  index_col = "sample_id",
+  cols_ignore = "sample_id",
   n_clusters = 3,  # Use KMeans with 3 clusters
-  seed = 42,
-  handle_noise = "keep"  # Each noise point gets own cluster
+  seed = 42
 )
 
 print("Cluster assignments for CISS-VAE:")
-print(cluster_result$labels_positive)  # Use these labels for CISS-VAE
-print(paste("Clustering quality (silhouette):", round(cluster_result$silhouette_score, 3)))
-print(paste("Found", cluster_result$n_clusters_final, "clusters total"))
+print(cluster_result$clusters)
+print(paste("Clustering quality (silhouette):", round(cluster_result$silhouette, 3)))
 
-# Alternative: Use HDBSCAN for automatic cluster detection
-hdbscan_result <- cluster_features_by_missingness(
-  data = sample_data,
-  index_col = "sample_id",
-  n_clusters = NULL,  # Use HDBSCAN
-  min_cluster_size = 2,
-  handle_noise = "separate"  # All noise points in one cluster
-)
 
-# Use the missingness-based clusters with CISS-VAE
 result <- run_cissvae(
   data = sample_data,
   index_col = "sample_id",
-  clusters = cluster_result$labels_positive,
+  clusters = cluster_result$clusters,
   epochs = 100,
   return_history = TRUE,
   verbose = TRUE
@@ -257,23 +246,22 @@ sample_data <- data.frame(
   biomarker6 = c(rnorm(90), rep(NA, 10))
 )
 
-cluster_result <- cluster_features_by_missingness(
+cluster_result <- cluster_on_missing(
   data = sample_data,
-  index_col = "sample_id",
-  n_clusters = 3,
-  seed = 42,
-  handle_noise = "keep"
+  cols_ignore = "sample_id",
+  n_clusters = 3,  # Use KMeans with 3 clusters
+  seed = 42
 )
 
 print("Cluster assignments for CISS-VAE:")
-print(cluster_result$labels_positive)
-print(paste("Clustering quality (silhouette):", round(cluster_result$silhouette_score, 3)))
-print(paste("Found", cluster_result$n_clusters_final, "clusters total"))
+print(cluster_result$clusters)
+print(paste("Clustering quality (silhouette):", round(cluster_result$silhouette, 3)))
+
 
 result <- run_cissvae(
   data = sample_data,
   index_col = "sample_id",
-  clusters = cluster_result$labels_positive,
+  clusters = cluster_result$clusters,
   epochs = 100,
   return_history = TRUE,
   verbose = TRUE

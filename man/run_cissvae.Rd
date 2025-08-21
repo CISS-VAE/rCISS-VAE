@@ -2,12 +2,12 @@
 % Please edit documentation in R/ciss_vae.R
 \name{run_cissvae}
 \alias{run_cissvae}
-\title{Run the CISS-VAE pipeline (letting Python choose device)}
+\title{Run the CISS-VAE pipeline for missing data imputation}
 \usage{
 run_cissvae(
   data,
   index_col = NULL,
-  val_percent = 0.1,
+  val_proportion = 0.1,
   replacement_value = 0,
   columns_ignore = NULL,
   print_dataset = TRUE,
@@ -15,6 +15,8 @@ run_cissvae(
   n_clusters = NULL,
   cluster_selection_epsilon = 0.25,
   seed = 42,
+  missingness_proportion_matrix = NULL,
+  scale_features = FALSE,
   hidden_dims = c(150, 120, 60),
   latent_dim = 15,
   layer_order_enc = c("unshared", "unshared", "unshared"),
@@ -27,6 +29,7 @@ run_cissvae(
   initial_lr = 0.01,
   decay_factor = 0.999,
   beta = 0.001,
+  device = NULL,
   max_loops = 100,
   patience = 2,
   epochs_per_loop = NULL,
@@ -34,80 +37,236 @@ run_cissvae(
   decay_factor_refit = NULL,
   beta_refit = NULL,
   verbose = FALSE,
-  return_silhouettes = FALSE
+  return_silhouettes = FALSE,
+  return_history = FALSE,
+  return_dataset = FALSE
 )
 }
 \arguments{
-\item{data}{A data.frame or matrix (samples × features), may contain \code{NA}.}
+\item{data}{A data.frame or matrix (samples × features) containing the data to impute.
+May contain \code{NA} values which will be imputed.}
 
-\item{index_col}{Character. Column in \code{data} to treat as sample ID; removed before training and re-attached. Default \code{NULL}.}
+\item{index_col}{Character. Name of column in \code{data} to treat as sample identifier.
+This column will be removed before training and re-attached to results. Default \code{NULL}.}
 
-\item{val_percent}{Numeric fraction of non-missing entries to hold out. Default \code{0.1}.}
+\item{val_proportion}{Numeric. Fraction of non-missing entries to hold out for
+validation during training. Must be between 0 and 1. Default \code{0.1}.}
 
-\item{replacement_value}{Numeric fill value for masked entries. Default \code{0.0}.}
+\item{replacement_value}{Numeric. Fill value for masked entries during training.
+Default \code{0.0}.}
 
-\item{columns_ignore}{Character or integer vector of columns to ignore. Default \code{NULL}.}
+\item{columns_ignore}{Character or integer vector. Columns to exclude from training.
+Can specify by name or index. Default \code{NULL}.}
 
-\item{print_dataset}{Logical; if \code{TRUE}, prints dataset summary. Default \code{TRUE}.}
+\item{print_dataset}{Logical. If \code{TRUE}, prints dataset summary information during
+processing. Default \code{TRUE}.}
 
-\item{clusters}{Optional vector (or single-column data.frame) of precomputed cluster labels. Default \code{NULL}.}
+\item{clusters}{Optional vector or single-column data.frame of precomputed cluster
+labels for samples. If \code{NULL}, clustering will be performed automatically. Default \code{NULL}.}
 
-\item{n_clusters}{Integer for KMeans if \code{clusters} is \code{NULL}. Default \code{NULL}.}
+\item{n_clusters}{Integer. Number of clusters for KMeans clustering when \code{clusters}
+is \code{NULL}. If \code{NULL}, optimal number will be determined automatically. Default \code{NULL}.}
 
-\item{cluster_selection_epsilon}{Numeric epsilon for HDBSCAN. Default \code{0.25}.}
+\item{cluster_selection_epsilon}{Numeric. Epsilon parameter for HDBSCAN clustering
+when automatic clustering is used. Default \code{0.25}.}
 
-\item{seed}{Integer random seed. Default \code{42}.}
+\item{seed}{Integer. Random seed for reproducible results. Default \code{42}.}
 
-\item{hidden_dims}{Integer vector of hidden layer sizes. Default \code{c(150,120,60)}.}
+\item{missingness_proportion_matrix}{Optional pre-computed missingness proportion
+matrix for biomarker-based clustering. If provided, clustering will be based on
+missingness patterns. Default \code{NULL}.}
 
-\item{latent_dim}{Integer latent space dimension. Default \code{15}.}
+\item{scale_features}{Logical. Whether to scale features when using missingness
+proportion matrix clustering. Default \code{FALSE}.}
 
-\item{layer_order_enc}{Character vector for encoder layer sharing. Default \code{c("unshared","unshared","unshared")}.}
+\item{hidden_dims}{Integer vector. Sizes of hidden layers in encoder/decoder.
+Length determines number of hidden layers. Default \code{c(150, 120, 60)}.}
 
-\item{layer_order_dec}{Character vector for decoder layer sharing. Default \code{c("shared","shared","shared")}.}
+\item{latent_dim}{Integer. Dimension of latent space representation. Default \code{15}.}
 
-\item{latent_shared}{Logical; share latent weights? Default \code{FALSE}.}
+\item{layer_order_enc}{Character vector. Sharing pattern for encoder layers.
+Each element should be "shared" or "unshared". Length must match \code{length(hidden_dims)}.
+Default \code{c("unshared", "unshared", "unshared")}.}
 
-\item{output_shared}{Logical; share output weights? Default \code{FALSE}.}
+\item{layer_order_dec}{Character vector. Sharing pattern for decoder layers.
+Each element should be "shared" or "unshared". Length must match \code{length(hidden_dims)}.
+Default \code{c("shared", "shared", "shared")}.}
 
-\item{batch_size}{Integer batch size. Default \code{4000}.}
+\item{latent_shared}{Logical. Whether latent space weights are shared across clusters.
+Default \code{FALSE}.}
 
-\item{return_model}{Logical; if \code{TRUE}, returns Python model. Default \code{TRUE}.}
+\item{output_shared}{Logical. Whether output layer weights are shared across clusters.
+Default \code{FALSE}.}
 
-\item{epochs}{Integer initial training epochs. Default \code{500}.}
+\item{batch_size}{Integer. Mini-batch size for training. Larger values may improve
+training stability but require more memory. Default \code{4000}.}
 
-\item{initial_lr}{Numeric initial learning rate. Default \code{0.01}.}
+\item{return_model}{Logical. If \code{TRUE}, returns the trained Python VAE model object.
+Default \code{TRUE}.}
 
-\item{decay_factor}{Numeric learning rate decay. Default \code{0.999}.}
+\item{epochs}{Integer. Number of epochs for initial training phase. Default \code{500}.}
 
-\item{beta}{Numeric KL weight. Default \code{0.001}.}
+\item{initial_lr}{Numeric. Initial learning rate for optimizer. Default \code{0.01}.}
 
-\item{max_loops}{Integer max refit loops. Default \code{100}.}
+\item{decay_factor}{Numeric. Exponential decay factor for learning rate scheduling.
+Must be between 0 and 1. Default \code{0.999}.}
 
-\item{patience}{Integer early stop patience. Default \code{2}.}
+\item{beta}{Numeric. Weight for KL divergence term in VAE loss function.
+Controls regularization strength. Default \code{0.001}.}
 
-\item{epochs_per_loop}{Integer epochs per refit loop. Default \code{NULL} (uses \code{epochs}).}
+\item{device}{Character. Device specification for computation ("cpu" or "cuda").
+If \code{NULL}, automatically selects best available device. Default \code{NULL}.}
 
-\item{initial_lr_refit}{Numeric LR for refit loops. Default \code{NULL}.}
+\item{max_loops}{Integer. Maximum number of impute-refit loops to perform.
+Default \code{100}.}
 
-\item{decay_factor_refit}{Numeric decay for refit loops. Default \code{NULL}.}
+\item{patience}{Integer. Early stopping patience for refit loops. Training stops
+if validation loss doesn't improve for this many consecutive loops. Default \code{2}.}
 
-\item{beta_refit}{Numeric KL weight for refit loops. Default \code{NULL}.}
+\item{epochs_per_loop}{Integer. Number of epochs per refit loop. If \code{NULL},
+uses same value as \code{epochs}. Default \code{NULL}.}
 
-\item{verbose}{Logical; if \code{TRUE}, prints progress. Default \code{FALSE}.}
+\item{initial_lr_refit}{Numeric. Learning rate for refit loops. If \code{NULL},
+uses same value as \code{initial_lr}. Default \code{NULL}.}
 
-\item{return_silhouettes}{Logical; if \code{TRUE}, returns silhouette scores. Default \code{FALSE}.}
+\item{decay_factor_refit}{Numeric. Decay factor for refit loops. If \code{NULL},
+uses same value as \code{decay_factor}. Default \code{NULL}.}
+
+\item{beta_refit}{Numeric. KL weight for refit loops. If \code{NULL},
+uses same value as \code{beta}. Default \code{NULL}.}
+
+\item{verbose}{Logical. If \code{TRUE}, prints detailed progress information during
+training. Default \code{FALSE}.}
+
+\item{return_silhouettes}{Logical. If \code{TRUE}, returns silhouette scores for
+cluster quality assessment. Default \code{FALSE}.}
+
+\item{return_history}{Logical. If \code{TRUE}, returns training history as a data.frame
+containing loss values and metrics over epochs. Default \code{FALSE}.}
+
+\item{return_dataset}{Logical. If \code{TRUE}, returns the ClusterDataset object used
+during training (contains validation data, masks, etc.). Default \code{FALSE}.}
 }
 \value{
-A list with elements:
-\itemize{
-\item \code{imputed}: data.frame of imputed values (with \code{index_col} re-attached).
-\item \code{model}: Python VAE object (if \code{return_model = TRUE}).
-\item \code{silhouettes}: numeric vector (if \code{return_silhouettes = TRUE}).
+A list containing imputed data and optional additional outputs:
+\describe{
+\item{imputed}{data.frame of imputed data with same dimensions as input.
+Missing values are filled with model predictions. If \code{index_col} was
+provided, it is re-attached as the first column.}
+\item{model}{(if \code{return_model=TRUE}) Python CISSVAE model object.
+Can be used for further analysis or predictions.}
+\item{dataset}{(if \code{return_dataset=TRUE}) Python ClusterDataset object
+containing validation data, masks, normalization parameters, and cluster labels.
+Can be used with performance_by_cluster() and other analysis functions.}
+\item{silhouettes}{(if \code{return_silhouettes=TRUE}) Numeric silhouette
+score measuring cluster separation quality.}
+\item{history}{(if \code{return_history=TRUE}) data.frame containing training
+history with columns for epoch, losses, and validation metrics.}
 }
 }
 \description{
-Wraps the Python \code{run_cissvae} function from the \code{ciss_vae} module,
-handles an optional \code{index_col}, and returns imputed data,
-and optionally the model and silhouette scores.
+This function wraps the Python \code{run_cissvae} function from the \code{ciss_vae} module,
+providing a complete pipeline for missing data imputation using a Cluster-Informed
+Shared and Specific Variational Autoencoder (CISS-VAE). The function handles data
+preprocessing, model training, and returns imputed data along with optional
+model artifacts.
+
+The CISS-VAE architecture uses cluster information to learn both shared and
+cluster-specific representations, enabling more accurate imputation by leveraging
+patterns within and across different data subgroups.
+}
+\details{
+The CISS-VAE method works in two main phases:
+\enumerate{
+\item \strong{Initial Training}: The model is trained on the original data with validation
+holdout to learn initial representations and imputation patterns.
+\item \strong{Impute-Refit Loops}: The model iteratively imputes missing values and
+retrains on the updated dataset until convergence or maximum loops reached.
+}
+
+The architecture uses both shared and cluster-specific layers to capture:
+\itemize{
+\item \strong{Shared patterns}: Common relationships across all clusters
+\item \strong{Specific patterns}: Unique relationships within each cluster
+}
+}
+\section{Requirements}{
+
+This function requires the Python \code{ciss_vae} package to be installed and
+accessible via \code{reticulate}. The package handles automatic device selection
+(CPU/GPU) based on availability.
+}
+
+\section{Performance Tips}{
+
+\itemize{
+\item Use GPU computation when available for faster training on large datasets
+\item Adjust \code{batch_size} based on available memory (larger = faster but more memory)
+\item Start with default hyperparameters and adjust based on validation performance
+\item Use \code{verbose=TRUE} to monitor training progress on large datasets
+}
+}
+
+\examples{
+\dontrun{
+# Basic usage with automatic clustering
+result <- run_cissvae(
+  data = my_data_with_missing,
+  index_col = "sample_id"
+)
+imputed_data <- result$imputed
+
+# Advanced usage with dataset for performance analysis
+result <- run_cissvae(
+  data = my_data,
+  clusters = my_cluster_labels,
+  hidden_dims = c(200, 150, 100),
+  latent_dim = 20,
+  epochs = 1000,
+  return_history = TRUE,
+  return_silhouettes = TRUE,
+  return_dataset = TRUE,
+  verbose = TRUE
+)
+
+# Access different outputs
+imputed_data <- result$imputed
+training_history <- result$history
+cluster_quality <- result$silhouettes
+
+# Use dataset for performance analysis
+perf <- performance_by_cluster(
+  original_data = my_data,
+  model = result$model,
+  dataset = result$dataset,
+  clusters = my_cluster_labels
+)
+
+# Using pre-computed missingness matrix for clustering
+prop_matrix <- create_missingness_prop_matrix(
+  data = my_data, 
+  index_col = "sample_id"
+)
+result <- run_cissvae(
+  data = my_data,
+  index_col = "sample_id",
+  missingness_proportion_matrix = prop_matrix,
+  scale_features = TRUE,
+  return_dataset = TRUE
+)
+
+# Custom layer sharing patterns
+result <- run_cissvae(
+  data = my_data,
+  hidden_dims = c(100, 80, 60),
+  layer_order_enc = c("unshared", "shared", "shared"),
+  layer_order_dec = c("shared", "shared", "unshared"),
+  latent_shared = TRUE
+)
+}
+
+}
+\seealso{
+\code{\link{create_missingness_prop_matrix}} for creating missingness proportion matrices
+\code{\link{performance_by_cluster}} for analyzing model performance using the returned dataset
 }

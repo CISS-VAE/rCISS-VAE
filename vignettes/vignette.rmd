@@ -434,7 +434,7 @@ if (!is.null(advanced_result$history)) {
 }
 ```
 
-```{r show_missingpropmatrix, echo=FALSE}
+```{r show_missingpropmatrix, echo=FALSE, eval=FALSE}
 prop_matrix <- create_missingness_prop_matrix(df_missing, index_col = "index")
 print("Missingness proportion matrix dimensions:")
 print(dim(prop_matrix))

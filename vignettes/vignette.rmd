@@ -224,7 +224,8 @@ result <- run_cissvae(
   clusters = cluster_result$clusters,
   epochs = 100,
   return_history = TRUE,
-  verbose = TRUE
+  verbose = TRUE,
+  device = "cpu"
 )
 ```
 
@@ -264,7 +265,8 @@ result <- run_cissvae(
   clusters = cluster_result$clusters,
   epochs = 100,
   return_history = TRUE,
-  verbose = TRUE
+  verbose = TRUE,
+  device = "cpu"
 )
 ```
 
@@ -289,7 +291,7 @@ aut <- autotune_cissvae(
   save_search_space_path = NULL,
   n_trials = 10,
   study_name = "comprehensive_vae_autotune",
-  device_preference = "cuda",
+  device_preference = "cpu",
   show_progress = TRUE,  # Rich progress bars with training visualization
   optuna_dashboard_db = "sqlite:///optuna_study.db",  # Save results to database
   load_if_exists = TRUE,
@@ -355,7 +357,7 @@ aut <- autotune_cissvae(
   clusters = clusters$clusters,
   n_trials = 3,  # Reduced for demo
   study_name = "vae_autotune_demo_v2",
-  device_preference = "cuda",
+  device_preference = "cpu",
   show_progress = TRUE,
   seed = 42, 
   verbose = FALSE,
@@ -417,7 +419,7 @@ advanced_result <- run_cissvae(
   epochs = 200,
   return_history = TRUE,
   return_silhouettes = TRUE,
-  device = "cuda",
+  device = "cpu",
   verbose = TRUE
 )
 
@@ -449,7 +451,7 @@ advanced_result <- run_cissvae(
   epochs = 100,  # Reduced for demo
   return_history = TRUE,
   return_silhouettes = TRUE,
-  device = "cuda",
+  device = "cpu",
   verbose = TRUE
 )
 

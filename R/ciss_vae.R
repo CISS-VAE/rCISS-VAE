@@ -19,20 +19,22 @@
 #'   validation during training. Must be between 0 and 1. Default `0.1`.
 #' @param replacement_value Numeric. Fill value for masked entries during training.
 #'   Default `0.0`.
-#' @param columns_ignore Character or integer vector. Columns to exclude from training.
+#' @param columns_ignore Character or integer vector. Columns to exclude from validation set.
 #'   Can specify by name or index. Default `NULL`.
 #' @param print_dataset Logical. If `TRUE`, prints dataset summary information during
 #'   processing. Default `TRUE`.
 #' @param clusters Optional vector or single-column data.frame of precomputed cluster
 #'   labels for samples. If `NULL`, clustering will be performed automatically. Default `NULL`.
 #' @param n_clusters Integer. Number of clusters for KMeans clustering when `clusters`
-#'   is `NULL`. If `NULL`, optimal number will be determined automatically. Default `NULL`.
+#'   is `NULL`. Number of clusters for KMeans clustering when 'clusters' is NULL. If `NULL`, 
+#'   will use [HDBSCAN](https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html) for clustering.  
+#'   Default `NULL`.
 #' @param cluster_selection_epsilon Numeric. Epsilon parameter for HDBSCAN clustering
 #'   when automatic clustering is used. Default `0.25`.
 #' @param seed Integer. Random seed for reproducible results. Default `42`.
 #' @param missingness_proportion_matrix Optional pre-computed missingness proportion
 #'   matrix for biomarker-based clustering. If provided, clustering will be based on
-#'   missingness patterns. Default `NULL`.
+#'   these proportions. Default `NULL`.
 #' @param scale_features Logical. Whether to scale features when using missingness
 #'   proportion matrix clustering. Default `FALSE`.
 #' @param hidden_dims Integer vector. Sizes of hidden layers in encoder/decoder.

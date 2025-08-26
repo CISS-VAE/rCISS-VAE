@@ -1,6 +1,5 @@
 ---
 title: "rCISSVAE Vignette"
-author: "Dani V"
 date: "2025-08-14"
 output: 
   rmarkdown::html_vignette:
@@ -83,7 +82,7 @@ Once the environment is created, activate it using:
 
 ```{r eval=FALSE}
 reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
-# In other words,
+# If you used a non-default environment name then,
 # reticulate::use_virtualenv("./your_environment_name", required = TRUE)
 ```
 
@@ -95,20 +94,73 @@ reticulate::use_virtualenv("/home/nfs/vaithid1/CISS-VAE/CISS-VAE-demo/cissvae_de
 
 If you want to install other python packages (eg seaborn) to your environment, you can use [`reticulate::virtualenv_install()`](https://rstudio.github.io/reticulate/reference/virtualenv-tools.html). 
 
-## Quickstart
+# Quickstart
 
 Once reticulate is pointing to the virtual environment containing the `ciss_vae` python package, you can either use the `run_cissvae` function or the `autotune_cissvae` function. 
+
 If you know what hyperparameters you want to use for the model, use the `run_cissvae` function. 
 
-### Run CISSVAE with Training History and Progress Tracking
+## Run CISSVAE with Training History and Progress Tracking
 
-Your data should be in a DataFrame format with optional index. If you already have clusters you want to use, they should be in a separate vector from the dataframe. If you do not have clusters to begin with, set 'clusters' in `run_cissvae()` to NULL. 
-The function supports training history tracking, custom device selection, and returns detailed training information.
+Your data should be in a `DataFrame` format with optional index column. If you already have clusters you want to use, they should be in a separate vector from the dataframe. If you do not have clusters to begin with, set 'clusters' in `run_cissvae()` to NULL. 
 
-```{r eval=FALSE}
-library(tidyverse)
-library(reticulate)
-library(rCISSVAE)
+#### Explanation of `run_cissvae()` Parameters
+
+<details>
+<summary> Click for a detailed explanation of all parameters </summary>
+
+**Dataset Parameters** 
+- data: A `DataFrame` containing the dataset to be imputed. Contains optional index column.   
+- index_col: Name of index column to be preserved when imputing. Index column will not have any values held out for validation  
+- val_proportion: Fraction of non-missing entries to hold out for validation during training. To use different proportions for each cluster, pass a vector.  
+- replacement_value: Fill value for masked entries during training. Default is 0.0.   
+- columns_ignore: Character or integer vector containing columns to exclude when selecting validation data. These columns will be used during training. 
+- print_dataset: Set `TRUE` to print dataset summary information during processing.   
+
+**Clustering Parameters (optional)**    
+- clusters: Vector of one cluster label per row of 'data' dataframe. If NULL, will automatically determine clusters using [HDBSCAN](https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html) or [KMeans](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html).   
+- n_clusters: Number of clusters for KMeans clustering when 'clusters' is NULL. If n_clusters is NULL, will use [HDBSCAN](https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html) for clustering.  
+- cluster_selection_epsilon: Epsilon parameter for [HDBSCAN](https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html) clustering when automatic clustering is used.   
+- missingness_proportion_matrix: Optional pre-computed missingness proportion matrix for feature-based clustering. If provided, clustering will be based on these proportions instead of direct 0/1 missingness pattern.    
+- scale_features: Set `TRUE` to scale features when using missingness proportion matrix clustering.  
+
+**Model Parameters**  
+- hidden_dims: A vector containing the sizes of hidden layers in encoder/decoder. The length of this vector determines number of hidden layers.   
+- latent_dim: The dimension of the latent space representation.  
+- layer_order_enc: A vector stating the pattern of 'shared' and 'unshared' layers for the encoder. The length must match `length(hidden_dims)`. Default c('unshared', 'unshared', 'unshared').  
+- layer_order_dec: A vector stating the pattern of 'shared' and 'unshared' layers for the decoder. The length must match `length(hidden_dims)`. Default c('shared', 'shared', 'shared').  
+- latent_shared: Whether latent space weights are shared across clusters. If FALSE, will have separate latent weights for each cluster.  
+- ouput_shared: If FALSE, will have separate output layer for each cluster.  
+- batch_size: Integer. Mini-batch size for training. Larger values may improve training stability but require more memory.  
+- return_model: If TRUE, returns the model object. Set TRUE to use `plot_vae_architecture()` after running.  
+- epochs: Number of epochs for initial training phase  
+- initial_lr: Initial learning rate for optimizer.   
+- decay_factor: Exponential decay factor for learning rate.  
+- beta: Weight for KL divergence term in VAE loss function.   
+- device: Device specification for computation ("cpu" or "cuda"). If NULL, automatically selects best available device.  
+- max-loops: Max number of impute-refit loops to perform.   
+- patience: Training stops if validation loss doesn't improve for this many consecutive impute-refit loops.   
+- epochs-per-loop: Number of epochs per refit loop. If null, uses same value as `epochs`. Default NULL.  
+- decay_factor_refit: Decay factor for refit loops. If NULL, uses same value as decay_factor. Default NULL.  
+- beta_refit: KL weight for refit loops. If NULL, uses same value as beta. Default NULL.  
+
+**Optional Parameters**  
+- verbose: Set `TRUE` to print MSE for each loop as it runs.
+- return_silhouettes: If clusters not given, will return silhouette scores for automatic clustering.
+- return_history: If `TRUE`, returns training history as data.frame. Good for checking for overfitting. 
+- return_dataset: If `TRUE`, returns ClusterDataset object. 
+
+
+</details>
+
+
+
+```{r eval=FALSE, message=FALSE, warning=FALSE}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(reticulate)
+  library(rCISSVAE)
+})
 reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
 
 data(df_missing)
@@ -117,11 +169,13 @@ data(clusters)
 dat = run_cissvae(
   data = df_missing,
   index_col = "index",
+  val_proportion = 0.1, ## pass a vector for different proportions by cluster
+  columns_ignore = NULL, ## If there are columns in addition to the index you want to ignore when selecting validation set, list them here
   clusters = clusters$clusters,
   epochs = 500,
   return_silhouettes = TRUE,
   return_history = TRUE,  # Get detailed training history
-  verbose = TRUE,
+  verbose = FALSE,
   return_model = TRUE,
   device = "cpu",  # Explicit device selection
   layer_order_enc = c("unshared", "shared", "unshared"),
@@ -158,7 +212,7 @@ dat = run_cissvae(
   epochs = 500,
   return_silhouettes = TRUE,
   return_history = TRUE,
-  verbose = TRUE,
+  verbose = FALSE,
   return_model = TRUE,
   device = "cpu",
   layer_order_enc = c("unshared", "shared", "unshared"),
@@ -224,7 +278,7 @@ result <- run_cissvae(
   clusters = cluster_result$clusters,
   epochs = 100,
   return_history = TRUE,
-  verbose = TRUE,
+  verbose = FALSE,
   device = "cpu"
 )
 ```
@@ -265,14 +319,30 @@ result <- run_cissvae(
   clusters = cluster_result$clusters,
   epochs = 100,
   return_history = TRUE,
-  verbose = TRUE,
+  verbose = FALSE,
   device = "cpu"
 )
 ```
 
 ## Advanced Hyperparameter Optimization with Autotune
 
-The autotune function provides comprehensive hyperparameter optimization with Rich progress bars, flexible layer arrangement strategies, and extensive search options.
+### Understanding Parameter Types
+
+For hyperparameter optimization in `autotune_cissvae()`, parameters can be specified as:
+
+- **Fixed value**: `beta = 0.01` → parameter remains constant across trials
+- **Categorical choice**: `c(64, 128, 256)` → Optuna selects from the provided options
+- **Integer range**: `c(1, 4)` → Optuna suggests integers between 1 and 4 (inclusive)
+- **Float range**: `reticulate::tuple(1e-4, 1e-3)` → Optuna suggests floats in the specified range
+
+#### Layer Placement Strategies
+
+The layer arrangement strategies control how shared and unshared layers are positioned:
+
+- **`"at_end"`**: Places shared layers at the end of the encoder or start of the decoder
+- **`"at_start"`**: Places shared layers at the start of the encoder or end of the decoder  
+- **`"alternating"`**: Distributes shared layers evenly throughout the architecture
+- **`"random"`**: Uses random placement of shared layers (with reproducible seed)
 
 ```{r eval=FALSE}
 library(tidyverse)
@@ -289,7 +359,7 @@ aut <- autotune_cissvae(
   clusters = clusters$clusters,
   save_model_path = NULL,
   save_search_space_path = NULL,
-  n_trials = 10,
+  n_trials = 3, ## Using low number of trials for demo
   study_name = "comprehensive_vae_autotune",
   device_preference = "cpu",
   show_progress = TRUE,  # Rich progress bars with training visualization
@@ -309,9 +379,9 @@ aut <- autotune_cissvae(
   latent_dim = c(10, 100),         # Latent dimension range
   latent_shared = c(TRUE, FALSE),
   output_shared = c(TRUE, FALSE),
-  lr = reticulate::tuple(1e-4, 1e-2),  # Learning rate range
-  decay_factor = c(0.9, 0.999),
-  beta = reticulate::tuple(0.001, 0.01),  # KL weight range
+  lr = 0.01,  # Learning rate range
+  decay_factor = 0.99,
+  beta = 0.01,  # KL weight range
   num_epochs = 500,                # Fixed epochs for demo
   batch_size = c(1000, 4000),     # Batch size options
   num_shared_encode = c(0, 1, 2, 3),
@@ -321,9 +391,9 @@ aut <- autotune_cissvae(
   encoder_shared_placement = c("at_end", "at_start", "alternating", "random"),
   decoder_shared_placement = c("at_start", "at_end", "alternating", "random"),
   
-  refit_patience = c(2, 5),        # Early stopping patience
-  refit_loops = 50,                # Fixed refit loops
-  epochs_per_loop = c(100, 500),   # Epochs per refit loop
+  refit_patience = 2,        # Early stopping patience
+  refit_loops = 100,                # Fixed refit loops
+  epochs_per_loop = 100,   # Epochs per refit loop
   reset_lr_refit = c(TRUE, FALSE)
 )
 
@@ -355,31 +425,43 @@ aut <- autotune_cissvae(
   data = df_missing,
   index_col = "index",
   clusters = clusters$clusters,
-  n_trials = 3,  # Reduced for demo
-  study_name = "vae_autotune_demo_v2",
+  save_model_path = NULL,
+  save_search_space_path = NULL,
+  n_trials = 3, ## Using low number of trials for demo
+  study_name = "comprehensive_vae_autotune",
   device_preference = "cpu",
-  show_progress = TRUE,
+  show_progress = TRUE,  # Rich progress bars with training visualization
+  optuna_dashboard_db = "sqlite:///optuna_study.db",  # Save results to database
+  load_if_exists = TRUE,
   seed = 42, 
   verbose = FALSE,
-  constant_layer_size = FALSE,
-  evaluate_all_orders = FALSE,
-  num_hidden_layers = c(1, 3),
-  hidden_dims = c(64, 256),
-  latent_dim = c(10, 50),
+  
+  # Search strategy options
+  constant_layer_size = FALSE,     # Allow different sizes per layer
+  evaluate_all_orders = FALSE,     # Sample layer arrangements efficiently
+  max_exhaustive_orders = 100,     # Limit for exhaustive search
+  
+  ## Hyperparameter search space
+  num_hidden_layers = c(2, 5),     # Try 2-5 hidden layers
+  hidden_dims = c(64, 512),        # Layer sizes from 64 to 512
+  latent_dim = c(10, 100),         # Latent dimension range
   latent_shared = c(TRUE, FALSE),
   output_shared = c(TRUE, FALSE),
-  lr = reticulate::tuple(1e-4, 1e-3),
-  decay_factor = c(0.9, 0.999),
-  beta = 0.01,
-  num_epochs = 10,  # Reduced for demo
-  batch_size = 4000,
-  num_shared_encode = c(0, 1, 2),
-  num_shared_decode = c(0, 1, 2),
-  encoder_shared_placement = c("at_end", "at_start", "alternating"),
-  decoder_shared_placement = c("at_start", "at_end", "alternating"),
-  refit_patience = 2,
-  refit_loops = 5,  # Reduced for demo
-  epochs_per_loop = 5,  # Reduced for demo
+  lr = 0.01,  # Learning rate range
+  decay_factor = 0.99,
+  beta = 0.01,  # KL weight range
+  num_epochs = 500,                # Fixed epochs for demo
+  batch_size = c(1000, 4000),     # Batch size options
+  num_shared_encode = c(0, 1, 2, 3),
+  num_shared_decode = c(0, 1, 2, 3),
+  
+  # Layer placement strategies - try different arrangements
+  encoder_shared_placement = c("at_end", "at_start", "alternating", "random"),
+  decoder_shared_placement = c("at_start", "at_end", "alternating", "random"),
+  
+  refit_patience = 2,        # Early stopping patience
+  refit_loops = 100,                # Fixed refit loops
+  epochs_per_loop = 100,   # Epochs per refit loop
   reset_lr_refit = c(TRUE, FALSE)
 )
 
@@ -392,10 +474,12 @@ cat("Best validation MSE:", study$best_value, "\n")
 print("Trial results:")
 print(head(results[, c("trial_number", "latent_dim", "lr", "val_mse")]))
 
-plot_vae_architecture(best_model, title = "Optimized CISSVAE Architecture")
+plot_vae_architecture(best_model, title = "Optimized CISSVAE Architecture", save_path = "autotune_vae_arch.png")
 ```
 
-## Using Pre-computed Missingness Proportion Matrix
+![Autotuned VAE Architecture](autotune_vae_arch.png)
+
+## Using Pre-computed Missingness Proportion Matrix -- not quite working yet
 
 For advanced control over the clustering process, you can provide a pre-computed missingness proportion matrix directly to `run_cissvae()`:
 
@@ -420,7 +504,7 @@ advanced_result <- run_cissvae(
   return_history = TRUE,
   return_silhouettes = TRUE,
   device = "cpu",
-  verbose = TRUE
+  verbose = FALSE
 )
 
 print("Clustering quality:")
@@ -452,7 +536,7 @@ advanced_result <- run_cissvae(
   return_history = TRUE,
   return_silhouettes = TRUE,
   device = "cpu",
-  verbose = TRUE
+  verbose = FALSE
 )
 
 print("Clustering quality:")
@@ -465,30 +549,6 @@ if (!is.null(advanced_result$history)) {
 }
 ```
 
-## Understanding Parameter Types
 
-For hyperparameter optimization in `autotune_cissvae()`, parameters can be specified as:
 
-- **Fixed value**: `beta = 0.01` → parameter remains constant across trials
-- **Categorical choice**: `c(64, 128, 256)` → Optuna selects from the provided options
-- **Integer range**: `c(1, 4)` → Optuna suggests integers between 1 and 4 (inclusive)
-- **Float range**: `reticulate::tuple(1e-4, 1e-3)` → Optuna suggests floats in the specified range
 
-### Layer Placement Strategies
-
-The layer arrangement strategies control how shared and unshared layers are positioned:
-
-- **`"at_end"`**: Places shared layers at the end of the encoder or start of the decoder
-- **`"at_start"`**: Places shared layers at the start of the encoder or end of the decoder  
-- **`"alternating"`**: Distributes shared layers evenly throughout the architecture
-- **`"random"`**: Uses random placement of shared layers (with reproducible seed)
-
-### Noise Handling in Clustering
-
-When using HDBSCAN clustering, some features may be classified as "noise" (outliers). The `handle_noise` parameter controls how to treat these:
-
-- **`"keep"`** (default): Each noise point becomes its own cluster
-- **`"separate"`**: All noise points are grouped into one cluster
-- **`"merge"`**: Noise points are merged with the largest existing cluster
-
-This comprehensive approach ensures that all features are properly clustered for CISS-VAE training while respecting the underlying missingness patterns in your data.

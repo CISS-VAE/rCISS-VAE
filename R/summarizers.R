@@ -1,3 +1,4 @@
+#'@export
 cluster_summary <- function(data, 
   clusters, 
   index_col = NULL,
@@ -6,6 +7,8 @@ cluster_summary <- function(data,
   digits = 2,
   show_overall = TRUE,
   na_label = "Missing") {
+  
+  ## for cluster_summary maybe just import gt_summary's tbl_summary and pretty it up for the task at hand? 
 
 # Input validation
 if (nrow(data) != length(clusters)) {

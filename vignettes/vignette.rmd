@@ -104,7 +104,34 @@ If you know what hyperparameters you want to use for the model, use the `run_cis
 
 Your data should be in a `DataFrame` format with optional index column. If you already have clusters you want to use, they should be in a separate vector from the dataframe. If you do not have clusters to begin with, set 'clusters' in `run_cissvae()` to NULL. 
 
-#### Explanation of `run_cissvae()` Parameters
+### Example Dataset
+With the rCISSVAE package comes a sample dataset with predetermined clusters. We will use this for the sake of the tutorial. 
+
+The dataset, `df_missing` contains an index column as well as the following:
+
+```{r show_dataset, echo=FALSE}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(reticulate)
+  library(rCISSVAE)
+  library(gtsummary)
+})
+
+
+data(df_missing)
+data(clusters)
+
+tbl_summary(df_missing, include = -"index") %>%
+   as_kable()
+```
+
+Age, Salary and ZipCode columns represent demographic data with no missingness and columns Y1t-Y5t represent biomarker data obtained at different timepoints t. 
+
+
+
+### Explanation of `run_cissvae()` Parameters
+
+The `run_cissvae()` function is a comprehensive wrapper for all basic steps in running the CISS-VAE model, including dataset preparation, optional clustering, and running the imputation model. 
 
 <details>
 <summary> Click for a detailed explanation of all parameters </summary>
@@ -154,6 +181,9 @@ Your data should be in a `DataFrame` format with optional index column. If you a
 </details>
 
 
+### Running the imputation
+
+To run the imputation model, first load your data. 
 
 ```{r eval=FALSE, message=FALSE, warning=FALSE}
 suppressPackageStartupMessages({
@@ -161,22 +191,28 @@ suppressPackageStartupMessages({
   library(reticulate)
   library(rCISSVAE)
 })
+
+## Set correct virtualenv
 reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
 
+## Load the data
 data(df_missing)
-data(clusters)
+data(clusters) ## actual cluster labels in clusters$clusters (other column is index)
 
+cluster_summary(df_missing, clusters$clusters, index_col = "index")  %>% kable()
+
+## Run the imputation model. 
 dat = run_cissvae(
   data = df_missing,
   index_col = "index",
   val_proportion = 0.1, ## pass a vector for different proportions by cluster
-  columns_ignore = NULL, ## If there are columns in addition to the index you want to ignore when selecting validation set, list them here
-  clusters = clusters$clusters,
+  columns_ignore = c("Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"), ## If there are columns in addition to the index you want to ignore when selecting validation set, list them here. In this case, we ignore the 'demographic' columns because we do not want to remove data from them for validation purposes. 
+  clusters = clusters$clusters, ## we have precomputed cluster labels so we pass them here
   epochs = 500,
-  return_silhouettes = TRUE,
+  return_silhouettes = FALSE,
   return_history = TRUE,  # Get detailed training history
   verbose = FALSE,
-  return_model = TRUE,
+  return_model = TRUE, ## Allows for plotting model schematic
   device = "cpu",  # Explicit device selection
   layer_order_enc = c("unshared", "shared", "unshared"),
   layer_order_dec = c("shared", "unshared", "shared")
@@ -201,20 +237,25 @@ plot_vae_architecture(model = dat$model, save_path = "test_plot_arch.png")
 library(tidyverse)
 library(reticulate)
 library(rCISSVAE)
+library(kableExtra)
 
 data(df_missing)
 data(clusters)
 
+cluster_summary(df_missing, clusters$clusters, index_col = "index")  %>% kable()
+
 dat = run_cissvae(
   data = df_missing,
   index_col = "index",
-  clusters = clusters$clusters,
-  epochs = 500,
-  return_silhouettes = TRUE,
-  return_history = TRUE,
+  val_proportion = 0.1, ## pass a vector for different proportions by cluster
+  columns_ignore = c("Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"), ## If there are columns in addition to the index you want to ignore when selecting validation set, list them here. In this case, we ignore the 'demographic' columns because we do not want to remove data from them for validation purposes. 
+  clusters = clusters$clusters, ## we have precomputed cluster labels so we pass them here
+  epochs = 5,
+  return_silhouettes = FALSE,
+  return_history = TRUE,  # Get detailed training history
   verbose = FALSE,
-  return_model = TRUE,
-  device = "cpu",
+  return_model = TRUE, ## Allows for plotting model schematic
+  device = "cpu",  # Explicit device selection
   layer_order_enc = c("unshared", "shared", "unshared"),
   layer_order_dec = c("shared", "unshared", "shared")
 )
@@ -241,29 +282,16 @@ plot_vae_architecture(model = dat$model, save_path = "test_plot_arch.png")
 
 Before running CISS-VAE, you can cluster features based on their missingness patterns. This helps identify features that tend to be missing together systematically, which can improve imputation quality.
 
-```{r eval=FALSE}
+```{r}
 library(rCISSVAE)
 
-# Create sample data with systematic missingness patterns
-set.seed(123)
-sample_data <- data.frame(
-  sample_id = 1:100,
-  # Features missing together in early samples
-  biomarker1 = c(rep(NA, 50), rnorm(50)),
-  biomarker2 = c(rep(NA, 45), rnorm(55)),
-  biomarker3 = c(rep(NA, 48), rnorm(52)),
-  # Features missing together in late samples
-  biomarker4 = c(rnorm(50), rep(NA, 50)),
-  biomarker5 = c(rnorm(52), rep(NA, 48)),
-  # Rarely missing features
-  biomarker6 = c(rnorm(90), rep(NA, 10))
-)
+data(df_missing)
 
 
 cluster_result <- cluster_on_missing(
-  data = sample_data,
-  cols_ignore = "sample_id",
-  n_clusters = 3,  # Use KMeans with 3 clusters
+  data = df_missing,
+  cols_ignore =  c("index", "Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"),
+  n_clusters = 4,  # Use KMeans with 4 clusters
   seed = 42
 )
 
@@ -273,56 +301,16 @@ print(paste("Clustering quality (silhouette):", round(cluster_result$silhouette,
 
 
 result <- run_cissvae(
-  data = sample_data,
-  index_col = "sample_id",
+  data = df_missing,
+  index_col = "index",
   clusters = cluster_result$clusters,
-  epochs = 100,
+  epochs = 5, ## short run for demo purposes
   return_history = TRUE,
   verbose = FALSE,
   device = "cpu"
 )
 ```
 
-```{r show_simclus, echo=FALSE}
-library(rCISSVAE)
-
-# Create sample data with systematic missingness patterns
-set.seed(123)
-sample_data <- data.frame(
-  sample_id = 1:100,
-  # Features missing together in early samples
-  biomarker1 = c(rep(NA, 50), rnorm(50)),
-  biomarker2 = c(rep(NA, 45), rnorm(55)),
-  biomarker3 = c(rep(NA, 48), rnorm(52)),
-  # Features missing together in late samples
-  biomarker4 = c(rnorm(50), rep(NA, 50)),
-  biomarker5 = c(rnorm(52), rep(NA, 48)),
-  # Rarely missing features
-  biomarker6 = c(rnorm(90), rep(NA, 10))
-)
-
-cluster_result <- cluster_on_missing(
-  data = sample_data,
-  cols_ignore = "sample_id",
-  n_clusters = 3,  # Use KMeans with 3 clusters
-  seed = 42
-)
-
-print("Cluster assignments for CISS-VAE:")
-print(cluster_result$clusters)
-print(paste("Clustering quality (silhouette):", round(cluster_result$silhouette, 3)))
-
-
-result <- run_cissvae(
-  data = sample_data,
-  index_col = "sample_id",
-  clusters = cluster_result$clusters,
-  epochs = 100,
-  return_history = TRUE,
-  verbose = FALSE,
-  device = "cpu"
-)
-```
 
 ## Advanced Hyperparameter Optimization with Autotune
 
@@ -450,7 +438,7 @@ aut <- autotune_cissvae(
   lr = 0.01,  # Learning rate range
   decay_factor = 0.99,
   beta = 0.01,  # KL weight range
-  num_epochs = 500,                # Fixed epochs for demo
+  num_epochs = 5,                # Fixed epochs for demo
   batch_size = c(1000, 4000),     # Batch size options
   num_shared_encode = c(0, 1, 2, 3),
   num_shared_decode = c(0, 1, 2, 3),
@@ -461,7 +449,7 @@ aut <- autotune_cissvae(
   
   refit_patience = 2,        # Early stopping patience
   refit_loops = 100,                # Fixed refit loops
-  epochs_per_loop = 100,   # Epochs per refit loop
+  epochs_per_loop = 5,   # Epochs per refit loop
   reset_lr_refit = c(TRUE, FALSE)
 )
 
@@ -472,7 +460,7 @@ results <- aut$results
 
 cat("Best validation MSE:", study$best_value, "\n")
 print("Trial results:")
-print(head(results[, c("trial_number", "latent_dim", "lr", "val_mse")]))
+print(head(results))
 
 plot_vae_architecture(best_model, title = "Optimized CISSVAE Architecture", save_path = "autotune_vae_arch.png")
 ```
@@ -484,8 +472,16 @@ plot_vae_architecture(best_model, title = "Optimized CISSVAE Architecture", save
 For advanced control over the clustering process, you can provide a pre-computed missingness proportion matrix directly to `run_cissvae()`:
 
 ```{r eval=FALSE}
+## Standardize df_missing column names to feature_timepoint format
+colnames(df_missing) = c('index', 'Age', 'Salary', 'ZipCode10001', 'ZipCode20002', 'ZipCode30003', 'Y1_1', 'Y1_2', 'Y1_3', 'Y1_4', 'Y1_5', 'Y2_1', 'Y2_2', 'Y2_3', 'Y2_4', 'Y2_5', 'Y3_1', 'Y3_2', 'Y3_3', 'Y3_4', 'Y3_5', 'Y4_1', 'Y4_2', 'Y4_3', 'Y4_4', 'Y4_5', 'Y5_1', 'Y5_2', 'Y5_3', 'Y5_4', 'Y5_5')
+
 # Create and examine missingness proportion matrix
-prop_matrix <- create_missingness_prop_matrix(df_missing, index_col = "index")
+prop_matrix <- create_missingness_prop_matrix(df_missing, 
+index_col = "index", 
+cols_ignore = c('Age', 'Salary', 'ZipCode10001', 'ZipCode20002', 'ZipCode30003'),
+repeat_feature_names = c("Y1", "Y2", "Y3", "Y4", "Y5"))
+
+
 print("Missingness proportion matrix dimensions:")
 print(dim(prop_matrix))
 print("Sample of proportion matrix:")
@@ -500,7 +496,7 @@ advanced_result <- run_cissvae(
   scale_features = TRUE,  # Standardize features before clustering
   n_clusters = 4,
   cluster_selection_epsilon = 0.1,  # HDBSCAN parameter
-  epochs = 200,
+  epochs = 5,
   return_history = TRUE,
   return_silhouettes = TRUE,
   device = "cpu",
@@ -532,7 +528,7 @@ advanced_result <- run_cissvae(
   missingness_proportion_matrix = prop_matrix,
   scale_features = TRUE,
   n_clusters = 4,
-  epochs = 100,  # Reduced for demo
+  epochs = 5,  # Reduced for demo
   return_history = TRUE,
   return_silhouettes = TRUE,
   device = "cpu",

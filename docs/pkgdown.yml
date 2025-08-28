@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   vignette: vignette.html
   virtual_environment_tutorial: virtual_environment_tutorial.html
-last_built: 2025-08-26T12:23Z
+last_built: 2025-08-28T18:50Z
 urls:
   reference: https://ciss-vae.github.io/rCISS-VAE/reference
   article: https://ciss-vae.github.io/rCISS-VAE/articles

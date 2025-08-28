@@ -67,101 +67,13 @@ cluster_on_missing <- function(
   )
 }
 
+## ----------------------------------------------------
 
-#' Create Missingness Proportion Matrix
-#'
-#' Creates a matrix where each entry represents the proportion of missing values
-#' for each feature across samples. This matrix can be used with cluster_on_missing_prop
-#' to identify features with similar missingness patterns.
-#'
-#' @param data Data frame or matrix containing the input data with potential missing values
-#' @param index_col String name of index column to exclude from analysis (optional)
-#' @param na_values Vector of values to treat as missing (default: c(NA, NaN, Inf, -Inf))
-#' @param by_row Logical: if TRUE, compute missingness by row; if FALSE, by column (default: FALSE)
-#'
-#' @return Matrix where rows are samples and columns are features, with entries as missingness proportions [0,1]
-#' @export
-#'
-#' @examples
-#' # Create sample data with missing values
-#' data <- data.frame(
-#'   sample_id = 1:100,
-#'   feature1 = c(rnorm(80), rep(NA, 20)),
-#'   feature2 = c(rep(NA, 30), rnorm(70)),
-#'   feature3 = rnorm(100)
-#' )
-#' 
-#' # Create proportion matrix
-#' prop_mat <- create_missingness_prop_matrix(data, index_col = "sample_id")
-#' print(dim(prop_mat))  # Should be 100 x 3
-#' print(head(prop_mat))
-create_missingness_prop_matrix <- function(
-  data,
-  index_col = NULL,
-  na_values = c(NA, NaN, Inf, -Inf),
-  by_row = FALSE
-) {
-  requireNamespace("reticulate", quietly = TRUE)
-  requireNamespace("dplyr", quietly = TRUE)
-  # Handle index column
-  if (!is.null(index_col)) {
-    if (!index_col %in% colnames(data)) {
-      stop("`index_col` '", index_col, "' not found in data.")
-    }
-    row_names <- data[[index_col]]
-    data <- data[, setdiff(colnames(data), index_col), drop = FALSE]
-  } else {
-    row_names <- rownames(data)
-  }
-  
-  # Convert to matrix
-  mat <- if (is.data.frame(data)) as.matrix(data) else data
-  
-  # Create missingness indicator matrix
-  is_missing <- matrix(FALSE, nrow = nrow(mat), ncol = ncol(mat))
-  
-  # Check for each type of missing value
-  for (na_val in na_values) {
-    if (is.na(na_val)) {
-      is_missing <- is_missing | is.na(mat)
-    } else if (is.infinite(na_val)) {
-      if (na_val > 0) {
-        is_missing <- is_missing | (mat == Inf)
-      } else {
-        is_missing <- is_missing | (mat == -Inf)
-      }
-    } else {
-      is_missing <- is_missing | (mat == na_val)
-    }
-  }
-  
-  # Calculate proportions
-  if (by_row) {
-    # Each column represents proportion of missing values in that row
-    prop_matrix <- apply(is_missing, 1, function(row) {
-      colMeans(matrix(row, nrow = 1))
-    })
-    prop_matrix <- t(prop_matrix)  # Transpose to get samples as rows
-  } else {
-    # Each entry is the proportion of samples where that feature is missing
-    # This creates a matrix where each row-column combination shows the
-    # missingness proportion for that feature in that sample context
-    n_samples <- nrow(mat)
-    prop_matrix <- matrix(0, nrow = n_samples, ncol = ncol(mat))
-    
-    for (j in 1:ncol(mat)) {
-      # For each feature, what proportion of samples have it missing
-      feature_missing_prop <- sum(is_missing[, j]) / n_samples
-      prop_matrix[, j] <- feature_missing_prop
-    }
-  }
-  
-  # Set row and column names
-  rownames(prop_matrix) <- row_names
-  colnames(prop_matrix) <- colnames(mat)
-  
-  return(prop_matrix)
-}
+
+
+
+
+
 
 #' Cluster Features Based on Missingness Proportions
 #'
@@ -169,8 +81,6 @@ create_missingness_prop_matrix <- function(
 #' K-means clustering (when n_clusters is specified) or HDBSCAN (when n_clusters is NULL).
 #' This helps identify features that tend to be missing together systematically.
 #' 
-#' Note: HDBSCAN may assign some features to "noise" (cluster -1). These features are 
-#' kept and will be treated as individual clusters by CISS-VAE.
 #'
 #' @param prop_matrix Matrix or data frame where rows are samples, columns are features, 
 #'   entries are missingness proportions [0,1]. Can be created with create_missingness_prop_matrix().

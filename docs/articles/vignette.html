@@ -44,7 +44,7 @@
 
 
 
-
+<script src="vignette_files/kePrint-0.0.1/kePrint.js"></script><link href="vignette_files/lightable-0.0.1/lightable.css" rel="stylesheet">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
@@ -141,231 +141,455 @@ to begin with, set ‘clusters’ in <code><a href="../reference/run_cissvae.htm
 clusters. We will use this for the sake of the tutorial.</p>
 <p>The dataset, <code>df_missing</code> contains an index column as well
 as the following:</p>
-<table class="table">
-<thead><tr class="header">
-<th align="left"><strong>Characteristic</strong></th>
-<th align="center"><strong>N = 8,000</strong></th>
+<table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead><tr>
+<th style="text-align:left;">
+<strong>Characteristic</strong>
+</th>
+<th style="text-align:center;">
+<strong>N = 8,000</strong>
+</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
-<td align="left">Age</td>
-<td align="center">9.99 (8.73, 11.44)</td>
+<tr>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:center;">
+9.99 (8.73, 11.44)
+</td>
 </tr>
-<tr class="even">
-<td align="left">Salary</td>
-<td align="center">5.70 (5.34, 6.17)</td>
+<tr>
+<td style="text-align:left;">
+Salary
+</td>
+<td style="text-align:center;">
+5.70 (5.34, 6.17)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">ZipCode10001</td>
-<td align="center">2,628 (33%)</td>
+<tr>
+<td style="text-align:left;">
+ZipCode10001
+</td>
+<td style="text-align:center;">
+2,628 (33%)
+</td>
 </tr>
-<tr class="even">
-<td align="left">ZipCode20002</td>
-<td align="center">2,697 (34%)</td>
+<tr>
+<td style="text-align:left;">
+ZipCode20002
+</td>
+<td style="text-align:center;">
+2,697 (34%)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">ZipCode30003</td>
-<td align="center">2,675 (33%)</td>
+<tr>
+<td style="text-align:left;">
+ZipCode30003
+</td>
+<td style="text-align:center;">
+2,675 (33%)
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y11</td>
-<td align="center">0 (-11, 7)</td>
+<tr>
+<td style="text-align:left;">
+Y11
+</td>
+<td style="text-align:center;">
+0 (-11, 7)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">3,122</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+3,122
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y12</td>
-<td align="center">49 (-22, 58)</td>
+<tr>
+<td style="text-align:left;">
+Y12
+</td>
+<td style="text-align:center;">
+49 (-22, 58)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">3,118</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+3,118
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y13</td>
-<td align="center">72 (-17, 95)</td>
+<tr>
+<td style="text-align:left;">
+Y13
+</td>
+<td style="text-align:center;">
+72 (-17, 95)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">3,110</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+3,110
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y14</td>
-<td align="center">69 (-12, 119)</td>
+<tr>
+<td style="text-align:left;">
+Y14
+</td>
+<td style="text-align:center;">
+69 (-12, 119)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">3,129</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+3,129
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y15</td>
-<td align="center">72 (-12, 134)</td>
+<tr>
+<td style="text-align:left;">
+Y15
+</td>
+<td style="text-align:center;">
+72 (-12, 134)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">3,141</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+3,141
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y21</td>
-<td align="center">-9 (-22, 0)</td>
+<tr>
+<td style="text-align:left;">
+Y21
+</td>
+<td style="text-align:center;">
+-9 (-22, 0)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">3,135</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+3,135
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y22</td>
-<td align="center">47 (-35, 58)</td>
+<tr>
+<td style="text-align:left;">
+Y22
+</td>
+<td style="text-align:center;">
+47 (-35, 58)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">3,094</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+3,094
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y23</td>
-<td align="center">74 (-29, 100)</td>
+<tr>
+<td style="text-align:left;">
+Y23
+</td>
+<td style="text-align:center;">
+74 (-29, 100)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">3,098</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+3,098
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y24</td>
-<td align="center">71 (-22, 128)</td>
+<tr>
+<td style="text-align:left;">
+Y24
+</td>
+<td style="text-align:center;">
+71 (-22, 128)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">3,146</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+3,146
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y25</td>
-<td align="center">73 (-22, 145)</td>
+<tr>
+<td style="text-align:left;">
+Y25
+</td>
+<td style="text-align:center;">
+73 (-22, 145)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">3,106</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+3,106
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y31</td>
-<td align="center">0 (-14, 11)</td>
+<tr>
+<td style="text-align:left;">
+Y31
+</td>
+<td style="text-align:center;">
+0 (-14, 11)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">2,067</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+2,067
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y32</td>
-<td align="center">59 (-17, 69)</td>
+<tr>
+<td style="text-align:left;">
+Y32
+</td>
+<td style="text-align:center;">
+59 (-17, 69)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">2,056</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+2,056
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y33</td>
-<td align="center">81 (-13, 101)</td>
+<tr>
+<td style="text-align:left;">
+Y33
+</td>
+<td style="text-align:center;">
+81 (-13, 101)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">2,013</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+2,013
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y34</td>
-<td align="center">79 (-6, 124)</td>
+<tr>
+<td style="text-align:left;">
+Y34
+</td>
+<td style="text-align:center;">
+79 (-6, 124)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">2,051</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+2,051
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y35</td>
-<td align="center">81 (-6, 139)</td>
+<tr>
+<td style="text-align:left;">
+Y35
+</td>
+<td style="text-align:center;">
+81 (-6, 139)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">2,054</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+2,054
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y41</td>
-<td align="center">0 (-6, 5)</td>
+<tr>
+<td style="text-align:left;">
+Y41
+</td>
+<td style="text-align:center;">
+0 (-6, 5)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">2,032</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+2,032
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y42</td>
-<td align="center">27 (-8, 32)</td>
+<tr>
+<td style="text-align:left;">
+Y42
+</td>
+<td style="text-align:center;">
+27 (-8, 32)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">2,022</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+2,022
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y43</td>
-<td align="center">37 (-5, 46)</td>
+<tr>
+<td style="text-align:left;">
+Y43
+</td>
+<td style="text-align:center;">
+37 (-5, 46)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">2,013</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+2,013
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y44</td>
-<td align="center">36 (-3, 56)</td>
+<tr>
+<td style="text-align:left;">
+Y44
+</td>
+<td style="text-align:center;">
+36 (-3, 56)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">2,023</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+2,023
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y45</td>
-<td align="center">37 (-3, 63)</td>
+<tr>
+<td style="text-align:left;">
+Y45
+</td>
+<td style="text-align:center;">
+37 (-3, 63)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">2,086</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+2,086
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y51</td>
-<td align="center">1.8 (-3.6, 5.8)</td>
+<tr>
+<td style="text-align:left;">
+Y51
+</td>
+<td style="text-align:center;">
+1.8 (-3.6, 5.8)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">2,077</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+2,077
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y52</td>
-<td align="center">25 (-5, 29)</td>
+<tr>
+<td style="text-align:left;">
+Y52
+</td>
+<td style="text-align:center;">
+25 (-5, 29)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">2,034</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+2,034
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y53</td>
-<td align="center">34 (-3, 41)</td>
+<tr>
+<td style="text-align:left;">
+Y53
+</td>
+<td style="text-align:center;">
+34 (-3, 41)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">1,976</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+1,976
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y54</td>
-<td align="center">33 (-1, 50)</td>
+<tr>
+<td style="text-align:left;">
+Y54
+</td>
+<td style="text-align:center;">
+33 (-1, 50)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">2,047</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+2,047
+</td>
 </tr>
-<tr class="even">
-<td align="left">Y55</td>
-<td align="center">34 (-1, 56)</td>
+<tr>
+<td style="text-align:left;">
+Y55
+</td>
+<td style="text-align:center;">
+34 (-1, 56)
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Unknown</td>
-<td align="center">2,050</td>
+<tr>
+<td style="text-align:left;">
+Unknown
+</td>
+<td style="text-align:center;">
+2,050
+</td>
 </tr>
 </tbody>
 </table>
@@ -459,7 +683,9 @@ ClusterDataset object.</p>
 <div class="section level4">
 <h4 id="running-the-imputation">Running the imputation<a class="anchor" aria-label="anchor" href="#running-the-imputation"></a>
 </h4>
-<p>To run the imputation model, first load your data.</p>
+<p>To run the imputation model, first load your data. You can use the
+<code>cluster_summary()</code> function to visualize the missingness by
+cluster.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
@@ -474,9 +700,658 @@ ClusterDataset object.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">df_missing</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clusters</span><span class="op">)</span> <span class="co">## actual cluster labels in clusters$clusters (other column is index)</span></span>
 <span></span>
-<span><span class="fu">cluster_summary</span><span class="op">(</span><span class="va">df_missing</span>, <span class="va">clusters</span><span class="op">$</span><span class="va">clusters</span>, index_col <span class="op">=</span> <span class="st">"index"</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">kable</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">## Run the imputation model. </span></span>
+<span><span class="fu">cluster_summary</span><span class="op">(</span><span class="va">df_missing</span>, <span class="va">clusters</span><span class="op">$</span><span class="va">clusters</span>, index_col <span class="op">=</span> <span class="st">"index"</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">kable</span><span class="op">(</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">kable_styling</span><span class="op">(</span>font_size <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; Processing continuous variables: Age, Salary, ZipCode10001, ZipCode20002, ZipCode30003, Y11, Y12, Y13, Y14, Y15, Y21, Y22, Y23, Y24, Y25, Y31, Y32, Y33, Y34, Y35, Y41, Y42, Y43, Y44, Y45, Y51, Y52, Y53, Y54, Y55 </span></span>
+<span><span class="co">#&gt; Processing categorical variables:</span></span></code></pre>
+<table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead><tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:left;">
+Overall
+</th>
+<th style="text-align:left;">
+Cluster 0
+</th>
+<th style="text-align:left;">
+Cluster 1
+</th>
+<th style="text-align:left;">
+Cluster 2
+</th>
+<th style="text-align:left;">
+Cluster 3
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:left;">
+8000
+</td>
+<td style="text-align:left;">
+2000
+</td>
+<td style="text-align:left;">
+2000
+</td>
+<td style="text-align:left;">
+2000
+</td>
+<td style="text-align:left;">
+2000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:left;">
+10.2 (2.08); 9.99 [8.73, 11.44]
+</td>
+<td style="text-align:left;">
+10.1 (2.04); 9.94 [8.72, 11.34]
+</td>
+<td style="text-align:left;">
+10.19 (2.08); 10 [8.68, 11.42]
+</td>
+<td style="text-align:left;">
+10.21 (2.14); 9.94 [8.65, 11.53]
+</td>
+<td style="text-align:left;">
+10.29 (2.06); 10.09 [8.83, 11.46]
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Salary
+</td>
+<td style="text-align:left;">
+5.82 (0.61); 5.7 [5.34, 6.17]
+</td>
+<td style="text-align:left;">
+5.81 (0.61); 5.69 [5.34, 6.16]
+</td>
+<td style="text-align:left;">
+5.83 (0.62); 5.69 [5.34, 6.16]
+</td>
+<td style="text-align:left;">
+5.83 (0.61); 5.71 [5.33, 6.2]
+</td>
+<td style="text-align:left;">
+5.81 (0.6); 5.71 [5.33, 6.15]
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ZipCode10001
+</td>
+<td style="text-align:left;">
+0.33 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.32 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.34 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.33 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.32 (0.47); 0 [0, 1]
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ZipCode20002
+</td>
+<td style="text-align:left;">
+0.34 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.35 (0.48); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.33 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.33 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.34 (0.47); 0 [0, 1]
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ZipCode30003
+</td>
+<td style="text-align:left;">
+0.33 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.33 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.34 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.34 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.33 (0.47); 0 [0, 1]
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y11
+</td>
+<td style="text-align:left;">
+-2.82 (13.25); -0.41 [-11.13, 7.24], 3122 (39%) missing
+</td>
+<td style="text-align:left;">
+-21.2 (10.08); -20.61 [-27.35, -14.34], 1281 (64%) missing
+</td>
+<td style="text-align:left;">
+-16.04 (8.89); -14.82 [-21.5, -9.96], 1288 (64.4%) missing
+</td>
+<td style="text-align:left;">
+8.39 (5.39); 8.39 [4.87, 11.97]
+</td>
+<td style="text-align:left;">
+-2.68 (5.86); -2.33 [-6.35, 1.43], 553 (27.6%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y12
+</td>
+<td style="text-align:left;">
+22.23 (42.54); 48.6 [-22.37, 58.35], 3118 (39%) missing
+</td>
+<td style="text-align:left;">
+68.9 (11.29); 67.55 [60.96, 75.67], 1264 (63.2%) missing
+</td>
+<td style="text-align:left;">
+-26.43 (9.3); -25.95 [-32.64, -19.82], 1283 (64.2%) missing
+</td>
+<td style="text-align:left;">
+55.35 (6.18); 55.11 [50.82, 59.29]
+</td>
+<td style="text-align:left;">
+-23.73 (7.87); -22.99 [-28.45, -18.19], 571 (28.6%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y13
+</td>
+<td style="text-align:left;">
+42.75 (57.09); 72.43 [-17.25, 94.71], 3110 (38.9%) missing
+</td>
+<td style="text-align:left;">
+77.28 (12.34); 76.4 [68.65, 84.87], 1289 (64.4%) missing
+</td>
+<td style="text-align:left;">
+-24.92 (8.71); -24.39 [-30.29, -18.89], 1264 (63.2%) missing
+</td>
+<td style="text-align:left;">
+98.14 (11.87); 97.13 [89.53, 105.64]
+</td>
+<td style="text-align:left;">
+-16.52 (6.63); -16.05 [-20.32, -11.85], 557 (27.9%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y14
+</td>
+<td style="text-align:left;">
+55.55 (66.05); 69.08 [-11.98, 118.98], 3129 (39.1%) missing
+</td>
+<td style="text-align:left;">
+73.32 (11.53); 72.74 [65.01, 79.92], 1300 (65%) missing
+</td>
+<td style="text-align:left;">
+-20.78 (7.8); -20.36 [-25.74, -15.03], 1283 (64.2%) missing
+</td>
+<td style="text-align:left;">
+125.13 (16.23); 123.49 [113.3, 135.39]
+</td>
+<td style="text-align:left;">
+-11.08 (5.61); -10.57 [-14.53, -7.17], 546 (27.3%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y15
+</td>
+<td style="text-align:left;">
+63.77 (72.61); 72.28 [-11.56, 134.28], 3141 (39.3%) missing
+</td>
+<td style="text-align:left;">
+75.96 (11.74); 74.87 [67.97, 82.98], 1273 (63.6%) missing
+</td>
+<td style="text-align:left;">
+-11.93 (6.41); -11.5 [-16, -7.6], 1293 (64.7%) missing
+</td>
+<td style="text-align:left;">
+141.25 (19.01); 138.89 [127.54, 153.1]
+</td>
+<td style="text-align:left;">
+-13.64 (6.4); -13.08 [-17.33, -9.05], 575 (28.8%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y21
+</td>
+<td style="text-align:left;">
+-12.23 (15.68); -9.48 [-22.1, -0.1], 3135 (39.2%) missing
+</td>
+<td style="text-align:left;">
+-33.45 (12.23); -32.63 [-40.76, -25.16], 1266 (63.3%) missing
+</td>
+<td style="text-align:left;">
+-27.52 (10.59); -26.59 [-34.29, -19.8], 1292 (64.6%) missing
+</td>
+<td style="text-align:left;">
+0.9 (6.62); 1.02 [-3.19, 5.41]
+</td>
+<td style="text-align:left;">
+-12.14 (7.39); -11.61 [-16.67, -7.02], 577 (28.9%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y22
+</td>
+<td style="text-align:left;">
+16.04 (48.68); 47.36 [-34.6, 57.56], 3094 (38.7%) missing
+</td>
+<td style="text-align:left;">
+69.27 (11.68); 67.96 [60.99, 76.57], 1266 (63.3%) missing
+</td>
+<td style="text-align:left;">
+-39.51 (11.64); -38.76 [-46.74, -31.3], 1276 (63.8%) missing
+</td>
+<td style="text-align:left;">
+54.43 (6.21); 54.24 [50.14, 58.44]
+</td>
+<td style="text-align:left;">
+-36.19 (9.78); -35.36 [-42.22, -29.16], 552 (27.6%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y23
+</td>
+<td style="text-align:left;">
+39.92 (65.7); 74.15 [-29.16, 99.94], 3098 (38.7%) missing
+</td>
+<td style="text-align:left;">
+78.76 (13.09); 77.34 [69.45, 86.91], 1273 (63.6%) missing
+</td>
+<td style="text-align:left;">
+-38.1 (11); -37.07 [-44.92, -30.52], 1275 (63.8%) missing
+</td>
+<td style="text-align:left;">
+103.87 (12.61); 103.02 [94.73, 111.7]
+</td>
+<td style="text-align:left;">
+-28.73 (8.52); -28.05 [-33.89, -22.87], 550 (27.5%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y24
+</td>
+<td style="text-align:left;">
+55.14 (75.63); 71.14 [-22.44, 128.49], 3146 (39.3%) missing
+</td>
+<td style="text-align:left;">
+75.32 (12.36); 74.81 [66.48, 82.65], 1302 (65.1%) missing
+</td>
+<td style="text-align:left;">
+-32.22 (9.53); -31.83 [-37.98, -25.66], 1287 (64.3%) missing
+</td>
+<td style="text-align:left;">
+134.69 (17.51); 133.04 [122.14, 145.61]
+</td>
+<td style="text-align:left;">
+-21.7 (7.16); -21.21 [-25.84, -16.54], 557 (27.9%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y25
+</td>
+<td style="text-align:left;">
+63.86 (83.02); 73.21 [-21.76, 145.23], 3106 (38.8%) missing
+</td>
+<td style="text-align:left;">
+77.63 (12.52); 76.27 [68.98, 85.19], 1257 (62.9%) missing
+</td>
+<td style="text-align:left;">
+-22.23 (7.81); -21.39 [-27.19, -16.83], 1294 (64.7%) missing
+</td>
+<td style="text-align:left;">
+153.08 (20.72); 150.83 [138.24, 166.3]
+</td>
+<td style="text-align:left;">
+-24.63 (8.12); -23.93 [-29.28, -18.78], 555 (27.8%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y31
+</td>
+<td style="text-align:left;">
+-2.38 (15.47); -0.44 [-14.24, 10.52], 2067 (25.8%) missing
+</td>
+<td style="text-align:left;">
+-18.28 (10.37); -17.72 [-24.49, -11.15], 192 (9.6%) missing
+</td>
+<td style="text-align:left;">
+-13.16 (9.15); -12.14 [-18.64, -7.15], 1285 (64.2%) missing
+</td>
+<td style="text-align:left;">
+13.4 (5.48); 13.3 [9.89, 16.97]
+</td>
+<td style="text-align:left;">
+1.07 (6.02); 1.49 [-2.59, 5.04], 590 (29.5%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y32
+</td>
+<td style="text-align:left;">
+35.48 (44.33); 59.39 [-16.84, 69.12], 2056 (25.7%) missing
+</td>
+<td style="text-align:left;">
+74.39 (10.92); 73.43 [66.77, 80.86], 206 (10.3%) missing
+</td>
+<td style="text-align:left;">
+-24.27 (9.9); -23.74 [-30.45, -17.06], 1287 (64.3%) missing
+</td>
+<td style="text-align:left;">
+62.21 (6.63); 61.73 [57.57, 66.41]
+</td>
+<td style="text-align:left;">
+-20.65 (8); -19.79 [-25.4, -15.04], 563 (28.1%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y33
+</td>
+<td style="text-align:left;">
+54.8 (56.83); 80.92 [-12.68, 101.36], 2013 (25.2%) missing
+</td>
+<td style="text-align:left;">
+83.77 (12.9); 82.77 [74.7, 91.41], 203 (10.2%) missing
+</td>
+<td style="text-align:left;">
+-23.25 (9.53); -22.31 [-29.3, -16.44], 1267 (63.4%) missing
+</td>
+<td style="text-align:left;">
+107.81 (12.65); 106.95 [98.54, 115.69]
+</td>
+<td style="text-align:left;">
+-14.43 (7.08); -14.08 [-18.51, -9.7], 543 (27.1%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y34
+</td>
+<td style="text-align:left;">
+66.6 (63.23); 79.15 [-6.08, 124.15], 2051 (25.6%) missing
+</td>
+<td style="text-align:left;">
+81.4 (12.51); 80.34 [72.73, 88.83], 195 (9.8%) missing
+</td>
+<td style="text-align:left;">
+-16.58 (7.73); -16.22 [-21.35, -11.12], 1275 (63.8%) missing
+</td>
+<td style="text-align:left;">
+135.95 (17.14); 134.48 [123.74, 146.48]
+</td>
+<td style="text-align:left;">
+-7.48 (5.83); -7.11 [-10.91, -3.41], 581 (29%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y35
+</td>
+<td style="text-align:left;">
+73.13 (69.46); 80.88 [-5.82, 138.75], 2054 (25.7%) missing
+</td>
+<td style="text-align:left;">
+83.22 (12.63); 82.29 [74.42, 91.01], 204 (10.2%) missing
+</td>
+<td style="text-align:left;">
+-7.56 (6.11); -7.22 [-11.37, -3.47], 1285 (64.2%) missing
+</td>
+<td style="text-align:left;">
+152.77 (20); 150.77 [138.32, 165.12]
+</td>
+<td style="text-align:left;">
+-10.27 (6.66); -9.89 [-14.35, -5.61], 565 (28.2%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y41
+</td>
+<td style="text-align:left;">
+-1.03 (6.75); -0.06 [-6.42, 4.78], 2032 (25.4%) missing
+</td>
+<td style="text-align:left;">
+-8.43 (4.11); -8.17 [-10.89, -5.63], 184 (9.2%) missing
+</td>
+<td style="text-align:left;">
+-5.47 (3.4); -5.19 [-7.68, -3.05], 1279 (64%) missing
+</td>
+<td style="text-align:left;">
+6 (2.08); 6.04 [4.59, 7.42]
+</td>
+<td style="text-align:left;">
+0.79 (2.29); 0.83 [-0.72, 2.35], 569 (28.4%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y42
+</td>
+<td style="text-align:left;">
+16.62 (20.72); 27.03 [-7.99, 32.32], 2022 (25.3%) missing
+</td>
+<td style="text-align:left;">
+35.33 (6.07); 34.86 [31.08, 38.96], 199 (9.9%) missing
+</td>
+<td style="text-align:left;">
+-10.85 (3.89); -10.51 [-13.34, -8.02], 1282 (64.1%) missing
+</td>
+<td style="text-align:left;">
+28.63 (3.53); 28.38 [26.11, 30.84]
+</td>
+<td style="text-align:left;">
+-9.43 (3.15); -9.1 [-11.36, -7.25], 541 (27%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y43
+</td>
+<td style="text-align:left;">
+25.38 (25.81); 37.1 [-5.29, 46.39], 2013 (25.2%) missing
+</td>
+<td style="text-align:left;">
+38.94 (6.89); 38.4 [34.22, 42.96], 217 (10.8%) missing
+</td>
+<td style="text-align:left;">
+-9.74 (3.42); -9.56 [-12.03, -7.25], 1242 (62.1%) missing
+</td>
+<td style="text-align:left;">
+49.16 (6.44); 48.53 [44.48, 53.16]
+</td>
+<td style="text-align:left;">
+-5.82 (2.54); -5.65 [-7.56, -3.91], 554 (27.7%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y44
+</td>
+<td style="text-align:left;">
+30.33 (29.1); 35.89 [-2.97, 56.24], 2023 (25.3%) missing
+</td>
+<td style="text-align:left;">
+37.26 (6.6); 36.58 [32.56, 41.32], 186 (9.3%) missing
+</td>
+<td style="text-align:left;">
+-8.17 (3.15); -8.05 [-10.24, -5.94], 1280 (64%) missing
+</td>
+<td style="text-align:left;">
+62.18 (8.63); 61.05 [55.99, 67.7]
+</td>
+<td style="text-align:left;">
+-3.33 (2.17); -3.25 [-4.69, -1.83], 557 (27.9%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y45
+</td>
+<td style="text-align:left;">
+33.81 (31.9); 37.45 [-2.93, 63.2], 2086 (26.1%) missing
+</td>
+<td style="text-align:left;">
+38.57 (6.75); 37.9 [34.02, 42.57], 204 (10.2%) missing
+</td>
+<td style="text-align:left;">
+-3.85 (2.5); -3.74 [-5.46, -2.19], 1305 (65.2%) missing
+</td>
+<td style="text-align:left;">
+69.91 (9.98); 68.68 [62.6, 76.11]
+</td>
+<td style="text-align:left;">
+-4.52 (2.45); -4.4 [-6.1, -2.82], 577 (28.9%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y51
+</td>
+<td style="text-align:left;">
+0.95 (5.79); 1.8 [-3.64, 5.83], 2077 (26%) missing
+</td>
+<td style="text-align:left;">
+-5.38 (3.58); -5.17 [-7.57, -2.96], 222 (11.1%) missing
+</td>
+<td style="text-align:left;">
+-2.94 (3.05); -2.64 [-4.83, -0.93], 1279 (64%) missing
+</td>
+<td style="text-align:left;">
+6.88 (1.91); 6.81 [5.59, 8.08]
+</td>
+<td style="text-align:left;">
+2.48 (2.04); 2.58 [1.22, 3.88], 576 (28.8%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y52
+</td>
+<td style="text-align:left;">
+16 (17.75); 24.85 [-5.06, 29.46], 2034 (25.4%) missing
+</td>
+<td style="text-align:left;">
+32.07 (5.19); 31.6 [28.56, 35.22], 209 (10.4%) missing
+</td>
+<td style="text-align:left;">
+-7.54 (3.37); -7.21 [-9.72, -5.21], 1283 (64.2%) missing
+</td>
+<td style="text-align:left;">
+26.28 (3.07); 26.07 [24.08, 28.24]
+</td>
+<td style="text-align:left;">
+-6.26 (2.73); -6.1 [-7.92, -4.34], 542 (27.1%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y53
+</td>
+<td style="text-align:left;">
+23.58 (22.01); 33.75 [-2.69, 41.4], 1976 (24.7%) missing
+</td>
+<td style="text-align:left;">
+35.23 (5.83); 34.78 [31.24, 38.69], 184 (9.2%) missing
+</td>
+<td style="text-align:left;">
+-6.5 (3.01); -6.4 [-8.34, -4.35], 1243 (62.1%) missing
+</td>
+<td style="text-align:left;">
+43.78 (5.51); 43.17 [39.8, 47.14]
+</td>
+<td style="text-align:left;">
+-3.13 (2.22); -3.03 [-4.44, -1.72], 549 (27.4%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y54
+</td>
+<td style="text-align:left;">
+27.66 (24.95); 32.59 [-0.7, 49.97], 2047 (25.6%) missing
+</td>
+<td style="text-align:left;">
+33.71 (5.52); 33.14 [30.02, 36.9], 217 (10.8%) missing
+</td>
+<td style="text-align:left;">
+-5.23 (2.74); -5.14 [-6.81, -3.45], 1281 (64%) missing
+</td>
+<td style="text-align:left;">
+54.94 (7.4); 54 [49.67, 59.44]
+</td>
+<td style="text-align:left;">
+-1.08 (1.92); -0.92 [-2.34, 0.24], 549 (27.4%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y55
+</td>
+<td style="text-align:left;">
+30.49 (27.35); 33.72 [-0.86, 55.61], 2050 (25.6%) missing
+</td>
+<td style="text-align:left;">
+34.83 (5.69); 34.24 [30.9, 38.23], 207 (10.3%) missing
+</td>
+<td style="text-align:left;">
+-1.63 (2.14); -1.53 [-2.94, -0.28], 1292 (64.6%) missing
+</td>
+<td style="text-align:left;">
+61.59 (8.52); 60.68 [55.39, 66.94]
+</td>
+<td style="text-align:left;">
+-2.09 (2.15); -1.94 [-3.42, -0.68], 551 (27.6%) missing
+</td>
+</tr>
+</tbody>
+</table>
+<p>Then, plug your data and clusters into the <code><a href="../reference/run_cissvae.html">run_cissvae()</a></code>
+function.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## Run the imputation model. </span></span>
 <span><span class="va">dat</span> <span class="op">=</span> <span class="fu"><a href="../reference/run_cissvae.html">run_cissvae</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">df_missing</span>,</span>
 <span>  index_col <span class="op">=</span> <span class="st">"index"</span>,</span>
@@ -506,380 +1381,6 @@ ClusterDataset object.</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/plot_vae_architecture.html">plot_vae_architecture</a></span><span class="op">(</span>model <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">model</span>, save_path <span class="op">=</span> <span class="st">"test_plot_arch.png"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'kableExtra'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     group_rows</span></span>
-<span><span class="co">#&gt; Processing continuous variables: Age, Salary, ZipCode10001, ZipCode20002, ZipCode30003, Y11, Y12, Y13, Y14, Y15, Y21, Y22, Y23, Y24, Y25, Y31, Y32, Y33, Y34, Y35, Y41, Y42, Y43, Y44, Y45, Y51, Y52, Y53, Y54, Y55 </span></span>
-<span><span class="co">#&gt; Processing categorical variables:</span></span></code></pre>
-<table class="table">
-<colgroup>
-<col width="4%">
-<col width="20%">
-<col width="20%">
-<col width="20%">
-<col width="13%">
-<col width="20%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Variable</th>
-<th align="left">Overall</th>
-<th align="left">Cluster 0</th>
-<th align="left">Cluster 1</th>
-<th align="left">Cluster 2</th>
-<th align="left">Cluster 3</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">N</td>
-<td align="left">8000</td>
-<td align="left">2000</td>
-<td align="left">2000</td>
-<td align="left">2000</td>
-<td align="left">2000</td>
-</tr>
-<tr class="even">
-<td align="left">Age</td>
-<td align="left">10.2 (2.08); 9.99 [8.73, 11.44]</td>
-<td align="left">10.1 (2.04); 9.94 [8.72, 11.34]</td>
-<td align="left">10.19 (2.08); 10 [8.68, 11.42]</td>
-<td align="left">10.21 (2.14); 9.94 [8.65, 11.53]</td>
-<td align="left">10.29 (2.06); 10.09 [8.83, 11.46]</td>
-</tr>
-<tr class="odd">
-<td align="left">Salary</td>
-<td align="left">5.82 (0.61); 5.7 [5.34, 6.17]</td>
-<td align="left">5.81 (0.61); 5.69 [5.34, 6.16]</td>
-<td align="left">5.83 (0.62); 5.69 [5.34, 6.16]</td>
-<td align="left">5.83 (0.61); 5.71 [5.33, 6.2]</td>
-<td align="left">5.81 (0.6); 5.71 [5.33, 6.15]</td>
-</tr>
-<tr class="even">
-<td align="left">ZipCode10001</td>
-<td align="left">0.33 (0.47); 0 [0, 1]</td>
-<td align="left">0.32 (0.47); 0 [0, 1]</td>
-<td align="left">0.34 (0.47); 0 [0, 1]</td>
-<td align="left">0.33 (0.47); 0 [0, 1]</td>
-<td align="left">0.32 (0.47); 0 [0, 1]</td>
-</tr>
-<tr class="odd">
-<td align="left">ZipCode20002</td>
-<td align="left">0.34 (0.47); 0 [0, 1]</td>
-<td align="left">0.35 (0.48); 0 [0, 1]</td>
-<td align="left">0.33 (0.47); 0 [0, 1]</td>
-<td align="left">0.33 (0.47); 0 [0, 1]</td>
-<td align="left">0.34 (0.47); 0 [0, 1]</td>
-</tr>
-<tr class="even">
-<td align="left">ZipCode30003</td>
-<td align="left">0.33 (0.47); 0 [0, 1]</td>
-<td align="left">0.33 (0.47); 0 [0, 1]</td>
-<td align="left">0.34 (0.47); 0 [0, 1]</td>
-<td align="left">0.34 (0.47); 0 [0, 1]</td>
-<td align="left">0.33 (0.47); 0 [0, 1]</td>
-</tr>
-<tr class="odd">
-<td align="left">Y11</td>
-<td align="left">-2.82 (13.25); -0.41 [-11.13, 7.24], 3122 (39%)
-missing</td>
-<td align="left">-21.2 (10.08); -20.61 [-27.35, -14.34], 1281 (64%)
-missing</td>
-<td align="left">-16.04 (8.89); -14.82 [-21.5, -9.96], 1288 (64.4%)
-missing</td>
-<td align="left">8.39 (5.39); 8.39 [4.87, 11.97]</td>
-<td align="left">-2.68 (5.86); -2.33 [-6.35, 1.43], 553 (27.6%)
-missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y12</td>
-<td align="left">22.23 (42.54); 48.6 [-22.37, 58.35], 3118 (39%)
-missing</td>
-<td align="left">68.9 (11.29); 67.55 [60.96, 75.67], 1264 (63.2%)
-missing</td>
-<td align="left">-26.43 (9.3); -25.95 [-32.64, -19.82], 1283 (64.2%)
-missing</td>
-<td align="left">55.35 (6.18); 55.11 [50.82, 59.29]</td>
-<td align="left">-23.73 (7.87); -22.99 [-28.45, -18.19], 571 (28.6%)
-missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y13</td>
-<td align="left">42.75 (57.09); 72.43 [-17.25, 94.71], 3110 (38.9%)
-missing</td>
-<td align="left">77.28 (12.34); 76.4 [68.65, 84.87], 1289 (64.4%)
-missing</td>
-<td align="left">-24.92 (8.71); -24.39 [-30.29, -18.89], 1264 (63.2%)
-missing</td>
-<td align="left">98.14 (11.87); 97.13 [89.53, 105.64]</td>
-<td align="left">-16.52 (6.63); -16.05 [-20.32, -11.85], 557 (27.9%)
-missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y14</td>
-<td align="left">55.55 (66.05); 69.08 [-11.98, 118.98], 3129 (39.1%)
-missing</td>
-<td align="left">73.32 (11.53); 72.74 [65.01, 79.92], 1300 (65%)
-missing</td>
-<td align="left">-20.78 (7.8); -20.36 [-25.74, -15.03], 1283 (64.2%)
-missing</td>
-<td align="left">125.13 (16.23); 123.49 [113.3, 135.39]</td>
-<td align="left">-11.08 (5.61); -10.57 [-14.53, -7.17], 546 (27.3%)
-missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y15</td>
-<td align="left">63.77 (72.61); 72.28 [-11.56, 134.28], 3141 (39.3%)
-missing</td>
-<td align="left">75.96 (11.74); 74.87 [67.97, 82.98], 1273 (63.6%)
-missing</td>
-<td align="left">-11.93 (6.41); -11.5 [-16, -7.6], 1293 (64.7%)
-missing</td>
-<td align="left">141.25 (19.01); 138.89 [127.54, 153.1]</td>
-<td align="left">-13.64 (6.4); -13.08 [-17.33, -9.05], 575 (28.8%)
-missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y21</td>
-<td align="left">-12.23 (15.68); -9.48 [-22.1, -0.1], 3135 (39.2%)
-missing</td>
-<td align="left">-33.45 (12.23); -32.63 [-40.76, -25.16], 1266 (63.3%)
-missing</td>
-<td align="left">-27.52 (10.59); -26.59 [-34.29, -19.8], 1292 (64.6%)
-missing</td>
-<td align="left">0.9 (6.62); 1.02 [-3.19, 5.41]</td>
-<td align="left">-12.14 (7.39); -11.61 [-16.67, -7.02], 577 (28.9%)
-missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y22</td>
-<td align="left">16.04 (48.68); 47.36 [-34.6, 57.56], 3094 (38.7%)
-missing</td>
-<td align="left">69.27 (11.68); 67.96 [60.99, 76.57], 1266 (63.3%)
-missing</td>
-<td align="left">-39.51 (11.64); -38.76 [-46.74, -31.3], 1276 (63.8%)
-missing</td>
-<td align="left">54.43 (6.21); 54.24 [50.14, 58.44]</td>
-<td align="left">-36.19 (9.78); -35.36 [-42.22, -29.16], 552 (27.6%)
-missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y23</td>
-<td align="left">39.92 (65.7); 74.15 [-29.16, 99.94], 3098 (38.7%)
-missing</td>
-<td align="left">78.76 (13.09); 77.34 [69.45, 86.91], 1273 (63.6%)
-missing</td>
-<td align="left">-38.1 (11); -37.07 [-44.92, -30.52], 1275 (63.8%)
-missing</td>
-<td align="left">103.87 (12.61); 103.02 [94.73, 111.7]</td>
-<td align="left">-28.73 (8.52); -28.05 [-33.89, -22.87], 550 (27.5%)
-missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y24</td>
-<td align="left">55.14 (75.63); 71.14 [-22.44, 128.49], 3146 (39.3%)
-missing</td>
-<td align="left">75.32 (12.36); 74.81 [66.48, 82.65], 1302 (65.1%)
-missing</td>
-<td align="left">-32.22 (9.53); -31.83 [-37.98, -25.66], 1287 (64.3%)
-missing</td>
-<td align="left">134.69 (17.51); 133.04 [122.14, 145.61]</td>
-<td align="left">-21.7 (7.16); -21.21 [-25.84, -16.54], 557 (27.9%)
-missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y25</td>
-<td align="left">63.86 (83.02); 73.21 [-21.76, 145.23], 3106 (38.8%)
-missing</td>
-<td align="left">77.63 (12.52); 76.27 [68.98, 85.19], 1257 (62.9%)
-missing</td>
-<td align="left">-22.23 (7.81); -21.39 [-27.19, -16.83], 1294 (64.7%)
-missing</td>
-<td align="left">153.08 (20.72); 150.83 [138.24, 166.3]</td>
-<td align="left">-24.63 (8.12); -23.93 [-29.28, -18.78], 555 (27.8%)
-missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y31</td>
-<td align="left">-2.38 (15.47); -0.44 [-14.24, 10.52], 2067 (25.8%)
-missing</td>
-<td align="left">-18.28 (10.37); -17.72 [-24.49, -11.15], 192 (9.6%)
-missing</td>
-<td align="left">-13.16 (9.15); -12.14 [-18.64, -7.15], 1285 (64.2%)
-missing</td>
-<td align="left">13.4 (5.48); 13.3 [9.89, 16.97]</td>
-<td align="left">1.07 (6.02); 1.49 [-2.59, 5.04], 590 (29.5%)
-missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y32</td>
-<td align="left">35.48 (44.33); 59.39 [-16.84, 69.12], 2056 (25.7%)
-missing</td>
-<td align="left">74.39 (10.92); 73.43 [66.77, 80.86], 206 (10.3%)
-missing</td>
-<td align="left">-24.27 (9.9); -23.74 [-30.45, -17.06], 1287 (64.3%)
-missing</td>
-<td align="left">62.21 (6.63); 61.73 [57.57, 66.41]</td>
-<td align="left">-20.65 (8); -19.79 [-25.4, -15.04], 563 (28.1%)
-missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y33</td>
-<td align="left">54.8 (56.83); 80.92 [-12.68, 101.36], 2013 (25.2%)
-missing</td>
-<td align="left">83.77 (12.9); 82.77 [74.7, 91.41], 203 (10.2%)
-missing</td>
-<td align="left">-23.25 (9.53); -22.31 [-29.3, -16.44], 1267 (63.4%)
-missing</td>
-<td align="left">107.81 (12.65); 106.95 [98.54, 115.69]</td>
-<td align="left">-14.43 (7.08); -14.08 [-18.51, -9.7], 543 (27.1%)
-missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y34</td>
-<td align="left">66.6 (63.23); 79.15 [-6.08, 124.15], 2051 (25.6%)
-missing</td>
-<td align="left">81.4 (12.51); 80.34 [72.73, 88.83], 195 (9.8%)
-missing</td>
-<td align="left">-16.58 (7.73); -16.22 [-21.35, -11.12], 1275 (63.8%)
-missing</td>
-<td align="left">135.95 (17.14); 134.48 [123.74, 146.48]</td>
-<td align="left">-7.48 (5.83); -7.11 [-10.91, -3.41], 581 (29%)
-missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y35</td>
-<td align="left">73.13 (69.46); 80.88 [-5.82, 138.75], 2054 (25.7%)
-missing</td>
-<td align="left">83.22 (12.63); 82.29 [74.42, 91.01], 204 (10.2%)
-missing</td>
-<td align="left">-7.56 (6.11); -7.22 [-11.37, -3.47], 1285 (64.2%)
-missing</td>
-<td align="left">152.77 (20); 150.77 [138.32, 165.12]</td>
-<td align="left">-10.27 (6.66); -9.89 [-14.35, -5.61], 565 (28.2%)
-missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y41</td>
-<td align="left">-1.03 (6.75); -0.06 [-6.42, 4.78], 2032 (25.4%)
-missing</td>
-<td align="left">-8.43 (4.11); -8.17 [-10.89, -5.63], 184 (9.2%)
-missing</td>
-<td align="left">-5.47 (3.4); -5.19 [-7.68, -3.05], 1279 (64%)
-missing</td>
-<td align="left">6 (2.08); 6.04 [4.59, 7.42]</td>
-<td align="left">0.79 (2.29); 0.83 [-0.72, 2.35], 569 (28.4%)
-missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y42</td>
-<td align="left">16.62 (20.72); 27.03 [-7.99, 32.32], 2022 (25.3%)
-missing</td>
-<td align="left">35.33 (6.07); 34.86 [31.08, 38.96], 199 (9.9%)
-missing</td>
-<td align="left">-10.85 (3.89); -10.51 [-13.34, -8.02], 1282 (64.1%)
-missing</td>
-<td align="left">28.63 (3.53); 28.38 [26.11, 30.84]</td>
-<td align="left">-9.43 (3.15); -9.1 [-11.36, -7.25], 541 (27%)
-missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y43</td>
-<td align="left">25.38 (25.81); 37.1 [-5.29, 46.39], 2013 (25.2%)
-missing</td>
-<td align="left">38.94 (6.89); 38.4 [34.22, 42.96], 217 (10.8%)
-missing</td>
-<td align="left">-9.74 (3.42); -9.56 [-12.03, -7.25], 1242 (62.1%)
-missing</td>
-<td align="left">49.16 (6.44); 48.53 [44.48, 53.16]</td>
-<td align="left">-5.82 (2.54); -5.65 [-7.56, -3.91], 554 (27.7%)
-missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y44</td>
-<td align="left">30.33 (29.1); 35.89 [-2.97, 56.24], 2023 (25.3%)
-missing</td>
-<td align="left">37.26 (6.6); 36.58 [32.56, 41.32], 186 (9.3%)
-missing</td>
-<td align="left">-8.17 (3.15); -8.05 [-10.24, -5.94], 1280 (64%)
-missing</td>
-<td align="left">62.18 (8.63); 61.05 [55.99, 67.7]</td>
-<td align="left">-3.33 (2.17); -3.25 [-4.69, -1.83], 557 (27.9%)
-missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y45</td>
-<td align="left">33.81 (31.9); 37.45 [-2.93, 63.2], 2086 (26.1%)
-missing</td>
-<td align="left">38.57 (6.75); 37.9 [34.02, 42.57], 204 (10.2%)
-missing</td>
-<td align="left">-3.85 (2.5); -3.74 [-5.46, -2.19], 1305 (65.2%)
-missing</td>
-<td align="left">69.91 (9.98); 68.68 [62.6, 76.11]</td>
-<td align="left">-4.52 (2.45); -4.4 [-6.1, -2.82], 577 (28.9%)
-missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y51</td>
-<td align="left">0.95 (5.79); 1.8 [-3.64, 5.83], 2077 (26%) missing</td>
-<td align="left">-5.38 (3.58); -5.17 [-7.57, -2.96], 222 (11.1%)
-missing</td>
-<td align="left">-2.94 (3.05); -2.64 [-4.83, -0.93], 1279 (64%)
-missing</td>
-<td align="left">6.88 (1.91); 6.81 [5.59, 8.08]</td>
-<td align="left">2.48 (2.04); 2.58 [1.22, 3.88], 576 (28.8%)
-missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y52</td>
-<td align="left">16 (17.75); 24.85 [-5.06, 29.46], 2034 (25.4%)
-missing</td>
-<td align="left">32.07 (5.19); 31.6 [28.56, 35.22], 209 (10.4%)
-missing</td>
-<td align="left">-7.54 (3.37); -7.21 [-9.72, -5.21], 1283 (64.2%)
-missing</td>
-<td align="left">26.28 (3.07); 26.07 [24.08, 28.24]</td>
-<td align="left">-6.26 (2.73); -6.1 [-7.92, -4.34], 542 (27.1%)
-missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y53</td>
-<td align="left">23.58 (22.01); 33.75 [-2.69, 41.4], 1976 (24.7%)
-missing</td>
-<td align="left">35.23 (5.83); 34.78 [31.24, 38.69], 184 (9.2%)
-missing</td>
-<td align="left">-6.5 (3.01); -6.4 [-8.34, -4.35], 1243 (62.1%)
-missing</td>
-<td align="left">43.78 (5.51); 43.17 [39.8, 47.14]</td>
-<td align="left">-3.13 (2.22); -3.03 [-4.44, -1.72], 549 (27.4%)
-missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y54</td>
-<td align="left">27.66 (24.95); 32.59 [-0.7, 49.97], 2047 (25.6%)
-missing</td>
-<td align="left">33.71 (5.52); 33.14 [30.02, 36.9], 217 (10.8%)
-missing</td>
-<td align="left">-5.23 (2.74); -5.14 [-6.81, -3.45], 1281 (64%)
-missing</td>
-<td align="left">54.94 (7.4); 54 [49.67, 59.44]</td>
-<td align="left">-1.08 (1.92); -0.92 [-2.34, 0.24], 549 (27.4%)
-missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y55</td>
-<td align="left">30.49 (27.35); 33.72 [-0.86, 55.61], 2050 (25.6%)
-missing</td>
-<td align="left">34.83 (5.69); 34.24 [30.9, 38.23], 207 (10.3%)
-missing</td>
-<td align="left">-1.63 (2.14); -1.53 [-2.94, -0.28], 1292 (64.6%)
-missing</td>
-<td align="left">61.59 (8.52); 60.68 [55.39, 66.94]</td>
-<td align="left">-2.09 (2.15); -1.94 [-3.42, -0.68], 551 (27.6%)
-missing</td>
-</tr>
-</tbody>
-</table>
 <pre><code><span><span class="co">#&gt; Cluster dataset:</span></span>
 <span><span class="co">#&gt;  ClusterDataset(n_samples=8000, n_features=30, n_clusters=4)</span></span>
 <span><span class="co">#&gt;   • Original missing: 61800 / 200000 (30.90%)</span></span>
@@ -898,7 +1399,7 @@ missing</td>
 missingness patterns. This helps identify features that tend to be
 missing together systematically, which can improve imputation
 quality.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ciss-vae.github.io/rCISS-VAE">rCISSVAE</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">df_missing</span><span class="op">)</span></span>
@@ -911,228 +1412,657 @@ quality.</p>
 <span>  seed <span class="op">=</span> <span class="fl">42</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Cluster assignments for CISS-VAE:"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Cluster assignments for CISS-VAE:"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cluster_result</span><span class="op">$</span><span class="va">clusters</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    [1] 1 1 1 1 2 2 1 1 1 2 2 1 1 2 2 2 2 2 1 1 2 0 1 3 1 1 0 1 0 1 2 1 1 1 1 1 2</span></span>
-<span><span class="co">#&gt;   [38] 1 1 1 2 1 2 1 2 1 1 0 2 0 1 1 2 1 1 1 1 1 1 0 0 1 1 2 1 1 0 1 1 0 2 1 1 0</span></span>
-<span><span class="co">#&gt;   [75] 1 1 0 1 2 1 1 0 0 2 1 1 2 1 2 0 0 1 1 1 1 0 2 1 0 1 1 1 1 1 1 1 1 0 2 1 1</span></span>
-<span><span class="co">#&gt;  [112] 1 0 2 0 0 1 2 1 2 1 2 1 1 1 1 2 1 1 0 1 1 1 2 0 1 2 1 2 1 0 1 0 1 0 0 0 0</span></span>
-<span><span class="co">#&gt;  [149] 1 1 1 2 0 0 1 0 2 1 1 1 1 0 2 2 2 0 1 1 0 1 1 2 1 1 1 1 2 1 1 1 1 1 0 1 1</span></span>
-<span><span class="co">#&gt;  [186] 1 2 1 1 2 1 1 1 1 2 1 0 1 2 1 1 0 1 2 2 0 1 2 1 2 1 0 2 1 2 1 1 0 1 1 1 2</span></span>
-<span><span class="co">#&gt;  [223] 0 0 1 0 1 1 1 0 1 1 0 2 0 0 1 2 1 0 1 1 1 2 0 1 2 0 2 0 1 0 1 1 1 2 0 1 1</span></span>
-<span><span class="co">#&gt;  [260] 1 1 3 1 1 1 1 2 1 1 0 1 2 2 1 0 2 2 1 1 2 1 1 1 1 2 2 2 2 1 0 0 2 0 2 1 1</span></span>
-<span><span class="co">#&gt;  [297] 1 2 0 1 1 1 2 1 2 0 0 1 0 0 1 1 1 2 0 1 1 1 1 0 0 0 2 1 2 1 2 0 2 0 0 2 1</span></span>
-<span><span class="co">#&gt;  [334] 2 2 1 1 0 1 2 0 1 1 0 2 1 2 1 1 1 1 1 0 1 0 1 1 1 1 1 1 1 1 2 0 0 2 0 1 1</span></span>
-<span><span class="co">#&gt;  [371] 3 1 1 1 2 1 1 2 2 2 1 1 1 2 2 1 1 0 1 1 1 1 0 2 2 0 1 2 0 2 1 0 1 2 3 1 1</span></span>
-<span><span class="co">#&gt;  [408] 2 1 1 2 0 0 2 1 1 1 3 1 0 1 1 1 1 1 2 0 1 0 2 1 1 1 1 1 2 2 1 1 1 1 1 0 2</span></span>
-<span><span class="co">#&gt;  [445] 3 0 1 2 2 0 1 1 1 1 1 0 0 1 0 0 1 1 1 0 3 1 2 0 2 1 0 0 1 2 1 1 1 2 1 2 1</span></span>
-<span><span class="co">#&gt;  [482] 0 2 2 2 2 1 0 1 1 1 1 0 0 1 0 1 2 1 1 1 1 1 0 1 0 0 2 2 0 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt;  [519] 1 1 2 1 1 0 1 1 1 0 1 2 2 1 1 0 0 0 1 1 1 1 1 2 3 1 1 1 2 1 0 2 2 1 2 1 1</span></span>
-<span><span class="co">#&gt;  [556] 1 1 1 1 2 1 3 1 0 2 2 0 1 1 0 1 2 2 1 2 1 0 0 1 1 1 2 1 0 1 0 1 2 2 2 2 1</span></span>
-<span><span class="co">#&gt;  [593] 2 1 0 0 0 1 0 1 1 2 2 1 1 0 1 1 1 1 2 2 1 1 1 0 1 1 2 0 1 1 1 0 0 1 1 2 1</span></span>
-<span><span class="co">#&gt;  [630] 1 0 2 1 0 1 0 1 1 1 0 1 1 1 1 1 2 2 2 1 1 2 1 1 1 2 2 1 2 0 1 0 1 1 2 0 1</span></span>
-<span><span class="co">#&gt;  [667] 2 1 1 0 1 1 1 2 1 2 1 2 0 2 2 1 2 1 1 2 1 1 2 1 1 2 0 0 2 0 0 2 0 1 0 1 1</span></span>
-<span><span class="co">#&gt;  [704] 0 1 1 0 1 1 1 1 1 1 0 1 0 1 1 1 1 1 0 1 2 2 1 1 1 1 1 0 1 1 1 0 1 1 0 1 1</span></span>
-<span><span class="co">#&gt;  [741] 1 1 1 2 1 1 0 2 2 1 0 1 0 1 1 2 2 1 0 2 2 0 1 1 2 0 1 0 1 1 1 1 1 1 2 1 1</span></span>
-<span><span class="co">#&gt;  [778] 1 1 2 0 0 1 0 1 3 0 0 1 1 2 1 2 1 1 2 2 1 2 1 1 1 1 2 1 1 1 1 1 1 0 1 0 1</span></span>
-<span><span class="co">#&gt;  [815] 1 1 1 1 1 1 2 2 1 1 1 2 1 1 0 1 1 1 1 1 1 0 1 0 1 1 1 1 1 1 1 0 1 0 2 0 2</span></span>
-<span><span class="co">#&gt;  [852] 0 1 1 1 0 1 1 0 1 2 1 1 1 2 1 1 1 1 1 2 0 1 0 1 1 0 1 1 1 0 2 2 1 2 1 0 1</span></span>
-<span><span class="co">#&gt;  [889] 1 1 2 0 2 2 1 1 1 1 1 1 0 1 1 1 1 1 1 1 1 1 2 1 2 0 1 2 1 1 1 2 1 0 1 1 1</span></span>
-<span><span class="co">#&gt;  [926] 1 0 0 0 1 1 2 1 2 1 2 0 1 2 1 1 1 2 1 1 1 1 2 1 0 1 0 1 1 1 1 1 0 2 1 1 2</span></span>
-<span><span class="co">#&gt;  [963] 0 1 1 2 1 1 2 1 1 1 1 1 1 1 1 1 0 1 0 1 1 0 2 0 1 2 2 1 1 0 1 0 1 1 1 0 2</span></span>
-<span><span class="co">#&gt; [1000] 1 2 1 1 1 1 2 2 2 2 0 0 2 2 1 1 1 1 1 0 1 0 2 3 1 0 1 1 1 2 0 1 2 0 1 0 1</span></span>
-<span><span class="co">#&gt; [1037] 1 0 1 0 1 1 1 2 1 1 2 1 1 0 1 1 2 1 1 2 0 1 1 1 1 1 1 0 2 0 1 1 0 0 2 3 3</span></span>
-<span><span class="co">#&gt; [1074] 1 2 1 0 2 1 1 1 1 1 1 1 1 1 0 2 3 2 1 2 1 2 1 1 0 1 1 1 2 2 0 0 0 2 2 1 2</span></span>
-<span><span class="co">#&gt; [1111] 1 1 1 0 1 0 1 1 0 0 1 1 0 1 1 2 2 2 1 0 1 2 1 2 1 1 1 1 1 1 0 2 1 0 0 2 1</span></span>
-<span><span class="co">#&gt; [1148] 2 1 0 1 1 1 1 1 1 1 1 1 2 2 1 1 1 1 1 1 1 1 1 1 1 0 0 1 1 1 1 2 0 0 1 1 1</span></span>
-<span><span class="co">#&gt; [1185] 0 2 0 1 1 0 1 0 1 1 1 1 0 1 1 2 0 1 0 1 1 1 1 0 0 1 1 2 1 0 0 1 0 1 1 0 2</span></span>
-<span><span class="co">#&gt; [1222] 2 1 1 0 2 2 0 0 2 0 1 1 2 2 0 0 1 1 0 2 0 1 1 1 0 0 0 2 1 1 0 1 2 3 1 0 0</span></span>
-<span><span class="co">#&gt; [1259] 1 1 1 1 1 0 2 0 1 1 1 1 2 0 1 1 1 0 2 2 2 2 1 0 1 0 1 1 1 2 1 0 1 2 2 1 1</span></span>
-<span><span class="co">#&gt; [1296] 2 1 1 1 1 1 1 1 2 1 1 2 1 2 1 2 0 1 2 1 1 1 1 1 2 1 1 2 1 1 0 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [1333] 1 1 1 1 1 0 2 2 0 1 2 0 3 1 1 0 1 1 1 2 1 0 1 1 0 1 1 1 1 0 0 0 1 0 1 2 0</span></span>
-<span><span class="co">#&gt; [1370] 1 0 2 1 1 0 1 1 1 1 0 2 0 1 2 2 1 0 0 1 1 2 0 3 2 1 2 0 0 1 1 1 1 2 1 1 0</span></span>
-<span><span class="co">#&gt; [1407] 1 1 1 2 1 1 1 2 1 0 2 0 2 1 0 1 1 0 1 1 1 2 1 1 2 0 1 1 0 1 1 0 0 2 2 2 1</span></span>
-<span><span class="co">#&gt; [1444] 1 1 1 1 1 0 1 2 2 1 1 1 1 1 1 0 1 1 1 2 2 1 1 0 0 2 2 1 2 2 1 0 2 1 1 1 0</span></span>
-<span><span class="co">#&gt; [1481] 3 2 0 0 1 2 0 1 1 0 0 2 1 2 1 2 0 2 2 0 1 0 1 1 0 0 2 2 1 1 1 2 1 2 3 0 1</span></span>
-<span><span class="co">#&gt; [1518] 0 2 1 0 1 2 1 2 1 0 1 2 0 2 2 1 2 1 1 2 1 0 1 1 1 1 1 2 0 0 1 0 0 1 0 2 1</span></span>
-<span><span class="co">#&gt; [1555] 1 1 0 1 0 0 1 0 1 2 2 2 0 1 1 0 1 1 1 1 1 2 1 1 0 2 1 1 1 1 2 2 1 2 1 0 1</span></span>
-<span><span class="co">#&gt; [1592] 1 1 2 2 1 1 0 0 1 1 2 2 1 1 1 1 2 1 1 0 2 1 0 2 1 1 1 1 2 1 1 0 2 0 1 1 1</span></span>
-<span><span class="co">#&gt; [1629] 1 1 1 0 1 2 0 1 0 0 1 2 1 0 2 1 1 2 1 1 0 1 2 1 1 0 0 1 1 0 1 1 1 0 1 1 2</span></span>
-<span><span class="co">#&gt; [1666] 1 2 1 1 3 1 1 2 0 1 1 2 1 1 1 1 1 1 1 1 0 1 1 2 2 1 1 1 0 1 1 0 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [1703] 2 2 1 0 2 1 1 0 1 1 1 1 1 0 0 1 1 1 1 0 2 1 0 1 2 1 0 1 2 0 1 0 1 1 0 0 2</span></span>
-<span><span class="co">#&gt; [1740] 1 2 0 0 2 1 3 1 0 1 1 1 1 2 1 1 1 0 1 1 1 1 2 1 1 2 0 1 1 1 0 0 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [1777] 1 1 1 0 1 1 1 1 1 1 0 0 1 1 0 0 1 0 1 2 2 0 1 0 0 2 2 1 0 1 1 2 2 1 0 2 0</span></span>
-<span><span class="co">#&gt; [1814] 0 1 1 0 1 1 1 1 1 2 1 1 0 0 2 1 1 1 1 2 1 1 1 2 1 1 1 1 0 1 2 1 0 1 1 1 1</span></span>
-<span><span class="co">#&gt; [1851] 2 0 1 1 0 2 2 0 0 0 1 1 0 1 1 1 2 0 2 3 1 1 2 1 1 1 1 1 2 2 0 1 1 2 1 1 0</span></span>
-<span><span class="co">#&gt; [1888] 1 0 2 2 1 0 0 1 1 1 1 2 1 1 1 1 1 0 1 1 1 1 1 1 0 1 0 0 2 2 2 1 1 1 1 1 2</span></span>
-<span><span class="co">#&gt; [1925] 1 0 2 1 1 0 1 0 2 2 1 0 1 0 1 1 1 2 0 2 2 1 1 1 1 0 1 1 1 2 2 1 0 1 2 1 1</span></span>
-<span><span class="co">#&gt; [1962] 1 2 2 1 1 1 1 1 1 2 2 1 1 0 1 0 2 1 1 2 0 0 1 1 1 1 1 1 0 0 2 0 2 1 1 0 1</span></span>
-<span><span class="co">#&gt; [1999] 2 1 0 2 3 3 3 0 2 2 0 3 3 2 3 0 2 3 2 0 0 3 3 2 2 3 0 2 3 3 0 0 2 3 2 3 0</span></span>
-<span><span class="co">#&gt; [2036] 2 3 2 2 2 3 2 2 3 2 2 0 0 2 0 2 0 3 2 2 3 2 2 3 3 3 2 3 3 0 2 2 3 2 2 3 3</span></span>
-<span><span class="co">#&gt; [2073] 3 0 2 3 2 0 0 2 2 3 2 2 2 0 0 0 3 0 2 0 3 2 3 3 2 3 2 3 0 2 3 0 2 2 0 3 3</span></span>
-<span><span class="co">#&gt; [2110] 3 0 0 0 3 2 2 2 3 2 0 3 0 3 3 0 2 0 0 3 3 0 0 3 3 2 2 0 3 0 3 2 0 3 2 0 3</span></span>
-<span><span class="co">#&gt; [2147] 3 0 3 0 3 2 3 3 0 3 2 2 3 3 2 3 3 3 3 0 3 3 3 0 3 2 3 3 2 0 3 3 3 0 0 3 3</span></span>
-<span><span class="co">#&gt; [2184] 3 2 0 2 3 0 2 2 0 3 3 3 0 2 3 3 3 3 0 2 3 2 0 2 2 3 3 0 0 3 3 3 3 3 3 2 3</span></span>
-<span><span class="co">#&gt; [2221] 3 2 3 3 2 2 2 0 3 2 3 3 0 2 2 3 3 2 2 2 3 2 2 2 3 0 3 3 3 3 3 0 3 0 2 2 0</span></span>
-<span><span class="co">#&gt; [2258] 3 3 3 3 0 3 2 3 2 2 3 2 2 2 3 0 2 3 3 2 0 3 2 3 3 2 3 3 0 0 3 2 3 0 3 3 0</span></span>
-<span><span class="co">#&gt; [2295] 0 3 3 0 3 3 2 2 2 3 2 2 0 2 0 3 0 0 3 3 3 3 2 3 3 2 3 2 0 3 3 0 3 2 3 3 3</span></span>
-<span><span class="co">#&gt; [2332] 0 0 2 2 3 2 0 2 0 0 0 0 0 2 0 0 0 3 0 0 2 2 2 3 2 3 2 3 0 3 0 3 3 0 2 0 3</span></span>
-<span><span class="co">#&gt; [2369] 0 2 3 0 3 3 2 3 2 2 3 2 0 3 2 0 3 2 3 0 2 3 0 0 2 3 2 3 2 2 3 0 0 0 2 3 0</span></span>
-<span><span class="co">#&gt; [2406] 3 0 3 3 0 0 0 3 3 2 2 3 3 0 3 0 0 3 0 3 2 2 2 0 0 2 0 2 3 0 0 3 3 0 2 2 2</span></span>
-<span><span class="co">#&gt; [2443] 3 0 3 2 3 0 0 2 2 3 2 2 3 2 0 0 3 0 3 3 3 3 2 3 3 0 0 0 0 2 3 3 2 3 3 3 3</span></span>
-<span><span class="co">#&gt; [2480] 0 2 0 3 0 3 2 0 3 0 3 0 2 0 2 2 3 3 3 3 0 0 0 0 0 2 3 2 2 0 0 2 3 0 3 0 0</span></span>
-<span><span class="co">#&gt; [2517] 3 3 0 0 3 2 2 2 0 2 2 2 3 3 2 3 2 0 0 2 2 2 3 2 2 3 0 3 0 0 0 0 0 3 2 3 2</span></span>
-<span><span class="co">#&gt; [2554] 0 0 0 3 3 3 0 3 0 2 3 2 2 2 3 3 2 3 3 3 0 0 0 3 3 3 3 0 2 3 2 3 3 0 3 3 2</span></span>
-<span><span class="co">#&gt; [2591] 0 3 3 3 0 0 3 3 3 2 3 0 2 2 0 2 0 3 0 3 0 2 2 2 3 3 3 3 0 3 3 3 0 2 2 3 0</span></span>
-<span><span class="co">#&gt; [2628] 3 0 0 3 2 0 3 3 2 0 3 0 0 2 3 3 2 2 3 2 3 3 2 0 2 2 3 2 3 0 3 0 0 3 2 3 3</span></span>
-<span><span class="co">#&gt; [2665] 2 2 2 2 3 0 2 2 3 2 2 0 0 0 3 3 0 0 0 2 0 0 0 0 3 3 2 0 3 3 0 2 2 2 2 3 3</span></span>
-<span><span class="co">#&gt; [2702] 2 2 3 2 2 2 0 3 0 0 0 3 2 3 0 2 2 3 2 0 0 2 0 2 3 0 0 3 3 2 0 2 2 3 0 0 3</span></span>
-<span><span class="co">#&gt; [2739] 3 3 2 0 3 2 0 2 0 3 3 3 3 0 3 2 3 2 0 0 3 3 3 2 0 0 0 2 3 3 0 0 3 0 0 3 0</span></span>
-<span><span class="co">#&gt; [2776] 2 0 3 3 3 2 0 3 2 2 0 2 3 3 3 0 2 3 0 2 3 3 2 2 2 0 3 2 2 3 2 2 2 3 0 0 3</span></span>
-<span><span class="co">#&gt; [2813] 0 3 2 0 0 3 3 0 3 2 2 0 2 3 3 2 2 0 2 0 3 2 0 3 0 3 3 3 0 3 3 3 3 3 2 2 2</span></span>
-<span><span class="co">#&gt; [2850] 3 0 0 3 3 3 2 3 3 3 3 0 2 3 2 0 3 0 3 0 3 2 3 3 3 0 3 3 2 2 3 2 3 2 2 0 3</span></span>
-<span><span class="co">#&gt; [2887] 0 2 3 2 0 2 0 2 2 3 3 2 3 0 2 3 2 0 3 0 3 0 3 0 2 0 3 3 0 0 0 0 0 2 2 2 0</span></span>
-<span><span class="co">#&gt; [2924] 2 3 0 2 3 2 3 3 0 3 2 2 2 2 0 2 3 2 0 0 0 2 0 0 3 2 0 3 2 2 3 2 0 3 3 3 0</span></span>
-<span><span class="co">#&gt; [2961] 0 3 3 2 2 2 3 2 2 3 3 0 2 2 3 2 3 3 3 0 3 3 3 0 3 0 3 3 2 0 3 3 3 0 3 3 0</span></span>
-<span><span class="co">#&gt; [2998] 0 2 0 3 3 2 0 0 2 2 0 0 2 0 2 2 0 2 3 3 2 2 3 3 3 0 2 2 0 3 3 3 0 0 2 0 2</span></span>
-<span><span class="co">#&gt; [3035] 2 3 3 2 2 2 0 2 0 0 2 3 2 0 0 2 0 0 0 0 3 2 3 3 0 3 3 3 2 2 3 3 0 2 0 3 2</span></span>
-<span><span class="co">#&gt; [3072] 3 3 0 3 2 2 0 2 3 3 3 0 2 2 0 2 3 2 0 3 3 0 0 3 3 0 0 3 0 3 3 0 3 3 0 0 3</span></span>
-<span><span class="co">#&gt; [3109] 0 0 0 2 2 3 3 0 2 3 3 2 0 2 2 3 3 0 3 3 2 3 3 2 3 0 3 2 3 3 2 3 3 2 0 0 3</span></span>
-<span><span class="co">#&gt; [3146] 3 2 3 2 3 3 3 3 0 2 2 3 3 3 3 0 3 3 2 3 0 0 2 0 3 3 0 3 0 2 0 0 2 3 2 0 0</span></span>
-<span><span class="co">#&gt; [3183] 2 2 0 2 0 2 0 0 2 2 3 2 3 2 3 3 0 2 2 3 2 2 3 2 3 2 0 3 3 2 2 0 3 3 0 3 0</span></span>
-<span><span class="co">#&gt; [3220] 2 0 3 3 2 2 2 2 2 2 3 0 3 3 0 3 0 2 2 2 3 0 3 2 2 0 2 3 0 3 3 0 2 3 3 0 0</span></span>
-<span><span class="co">#&gt; [3257] 2 3 3 0 0 0 2 2 3 3 3 2 2 0 0 0 2 3 2 3 2 0 3 0 0 3 2 3 3 3 3 3 2 3 0 3 2</span></span>
-<span><span class="co">#&gt; [3294] 0 3 2 0 0 0 0 3 2 2 3 2 3 2 2 0 3 0 0 0 0 0 3 0 3 3 0 0 2 2 3 3 0 2 2 3 0</span></span>
-<span><span class="co">#&gt; [3331] 3 3 2 2 0 3 3 0 2 3 2 3 3 0 0 2 0 3 0 2 2 2 3 2 3 0 3 3 0 0 0 3 2 3 3 3 0</span></span>
-<span><span class="co">#&gt; [3368] 0 2 2 2 0 2 3 0 2 3 3 2 3 3 3 3 3 2 0 3 3 2 3 2 2 0 2 0 0 3 3 0 2 0 3 0 0</span></span>
-<span><span class="co">#&gt; [3405] 2 0 0 0 3 2 3 3 0 3 3 3 3 3 0 0 2 3 3 2 3 0 3 2 3 3 0 0 0 0 3 0 3 2 2 2 3</span></span>
-<span><span class="co">#&gt; [3442] 0 3 0 3 3 2 0 2 0 0 0 3 3 2 0 2 3 2 3 0 3 0 2 0 3 2 2 2 2 2 3 3 0 2 2 2 2</span></span>
-<span><span class="co">#&gt; [3479] 2 0 0 0 2 2 2 3 0 2 3 3 3 2 3 0 0 0 3 3 0 0 0 3 2 3 3 2 3 2 0 3 0 2 0 2 3</span></span>
-<span><span class="co">#&gt; [3516] 0 2 0 3 0 3 0 0 3 0 3 0 0 0 3 3 2 0 3 3 0 3 2 3 2 3 2 0 3 0 3 2 3 3 0 2 2</span></span>
-<span><span class="co">#&gt; [3553] 3 0 2 0 3 3 0 2 2 0 2 3 3 2 2 0 3 3 2 3 2 0 0 3 0 2 3 2 3 3 3 0 0 0 0 2 3</span></span>
-<span><span class="co">#&gt; [3590] 0 3 2 0 3 2 2 3 3 3 0 3 3 0 3 3 2 0 3 3 3 3 0 3 0 0 0 0 0 0 0 2 3 3 3 3 2</span></span>
-<span><span class="co">#&gt; [3627] 3 3 0 3 2 0 3 3 3 3 2 3 0 0 3 3 2 3 2 3 0 3 3 3 2 3 3 3 0 3 3 3 3 2 3 3 3</span></span>
-<span><span class="co">#&gt; [3664] 2 2 2 0 2 2 0 0 3 2 0 2 2 3 0 2 3 2 0 0 0 0 3 3 2 3 3 0 2 3 3 3 0 2 3 2 2</span></span>
-<span><span class="co">#&gt; [3701] 3 0 0 2 0 3 2 0 2 3 0 2 2 2 2 3 0 0 0 3 0 2 0 2 3 3 0 2 2 0 3 3 0 2 2 0 2</span></span>
-<span><span class="co">#&gt; [3738] 3 3 3 0 3 0 3 2 0 3 3 3 3 0 2 2 0 0 3 3 2 3 3 0 3 3 3 2 2 3 3 3 0 0 3 2 2</span></span>
-<span><span class="co">#&gt; [3775] 2 2 3 2 0 3 2 0 0 3 0 3 0 2 3 0 3 3 3 0 3 3 2 2 3 0 2 3 3 2 0 3 2 2 3 3 2</span></span>
-<span><span class="co">#&gt; [3812] 0 2 2 0 0 0 3 3 0 3 0 0 0 3 3 0 0 2 0 3 2 2 2 0 3 2 0 3 0 2 2 3 2 3 0 2 2</span></span>
-<span><span class="co">#&gt; [3849] 3 2 3 3 3 0 0 0 2 0 0 3 2 3 2 2 3 0 2 3 2 3 3 2 0 0 3 0 2 3 2 0 3 3 3 3 0</span></span>
-<span><span class="co">#&gt; [3886] 0 3 0 3 2 2 2 3 0 0 2 3 3 2 0 2 0 0 2 3 3 3 0 3 2 2 0 3 2 3 0 2 3 0 3 0 3</span></span>
-<span><span class="co">#&gt; [3923] 3 0 3 0 2 0 0 3 3 0 2 0 2 0 3 0 2 3 0 3 0 3 0 2 0 3 2 3 2 3 3 0 3 3 3 2 0</span></span>
-<span><span class="co">#&gt; [3960] 2 3 0 2 0 0 2 0 2 3 2 2 3 3 3 0 0 2 2 3 3 3 0 2 3 0 3 3 2 0 2 2 3 0 0 2 2</span></span>
-<span><span class="co">#&gt; [3997] 3 2 2 3 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 1 2 1 1 1 1 1 1 1 0 1 1 1 1 1 1 2 1</span></span>
-<span><span class="co">#&gt; [4034] 1 1 1 1 2 1 1 1 1 1 1 2 1 1 1 1 1 1 1 2 1 2 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1</span></span>
-<span><span class="co">#&gt; [4071] 2 1 1 0 1 0 1 1 1 1 1 1 1 1 1 1 1 2 1 0 1 2 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [4108] 1 1 1 1 2 0 1 1 1 1 2 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [4145] 1 2 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 0 1 0 2 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [4182] 1 1 1 1 1 1 1 1 1 1 1 2 1 2 1 1 1 1 1 1 2 1 1 1 1 2 1 1 1 1 1 0 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [4219] 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 1 1 1 1 3 1 1 1 1 1 1 1 2 1 1 1 1 1 1 2 1 1</span></span>
-<span><span class="co">#&gt; [4256] 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 0 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [4293] 0 0 1 1 1 1 1 0 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 2 1 1 2 1 1 1 1 1 1 0 1 1 1</span></span>
-<span><span class="co">#&gt; [4330] 1 2 1 1 1 1 1 2 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 1 1</span></span>
-<span><span class="co">#&gt; [4367] 1 1 1 1 1 1 1 1 2 1 1 1 1 1 2 1 1 1 0 0 1 1 1 1 1 1 1 2 1 1 1 2 2 0 0 1 1</span></span>
-<span><span class="co">#&gt; [4404] 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 2 1 1 1 0 1 1 1 1 1 2 1 2 1 1 1 1</span></span>
-<span><span class="co">#&gt; [4441] 2 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 0 1 1 2 1 1 2 2 1 1 1 2 1</span></span>
-<span><span class="co">#&gt; [4478] 1 1 1 2 1 2 2 1 1 2 1 1 1 1 1 1 0 1 1 1 1 1 1 1 1 1 2 1 1 1 2 1 1 1 1 0 1</span></span>
-<span><span class="co">#&gt; [4515] 1 1 1 1 1 1 2 1 1 1 1 2 1 1 1 1 1 1 1 1 1 3 2 1 1 1 1 1 1 1 1 1 1 2 1 1 1</span></span>
-<span><span class="co">#&gt; [4552] 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 2 2 1</span></span>
-<span><span class="co">#&gt; [4589] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 0 1 1 1 1 1 1 1 1 1 2</span></span>
-<span><span class="co">#&gt; [4626] 1 1 1 1 1 1 2 1 2 1 1 1 2 1 1 1 1 1 2 1 1 1 1 1 2 2 1 1 1 1 2 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [4663] 1 1 1 1 1 1 1 2 1 1 1 2 1 2 2 1 1 1 1 1 1 1 2 2 1 1 1 1 1 1 2 1 3 1 1 1 1</span></span>
-<span><span class="co">#&gt; [4700] 2 1 2 1 2 1 1 2 1 1 1 1 1 1 1 1 1 1 0 2 1 1 1 1 1 1 2 1 1 1 1 1 0 2 1 1 1</span></span>
-<span><span class="co">#&gt; [4737] 1 1 1 1 1 1 1 1 1 2 2 1 2 1 1 1 1 1 1 1 1 1 1 1 1 3 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [4774] 1 1 1 1 1 1 0 1 1 1 1 1 2 1 1 1 1 2 1 1 0 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [4811] 1 0 0 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 0 2 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [4848] 2 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [4885] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 2 1 1 1 1 1 2 1 1 1 1 1 1 2</span></span>
-<span><span class="co">#&gt; [4922] 2 1 2 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 2 1 1 1 2</span></span>
-<span><span class="co">#&gt; [4959] 2 1 1 1 1 1 1 1 1 0 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [4996] 1 1 2 1 1 1 1 1 1 2 1 1 1 1 1 1 1 2 1 1 1 2 1 1 1 1 1 1 1 0 1 1 2 1 1 1 1</span></span>
-<span><span class="co">#&gt; [5033] 2 1 1 1 1 0 1 1 1 0 3 1 1 1 1 1 1 1 0 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [5070] 1 1 1 1 2 1 1 2 1 0 1 1 1 1 1 2 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [5107] 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 2 1 1 2 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [5144] 1 2 1 1 1 1 1 0 1 1 2 1 1 1 1 1 1 1 1 2 1 2 1 1 1 1 1 1 1 2 1 1 1 1 1 1 2</span></span>
-<span><span class="co">#&gt; [5181] 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 2 1 1 1 1 3 1 1 1 2 1 1</span></span>
-<span><span class="co">#&gt; [5218] 1 1 1 2 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [5255] 2 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 0 2 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [5292] 1 2 1 2 1 1 1 1 1 1 3 1 1 1 2 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 3 1 2 1 2 1</span></span>
-<span><span class="co">#&gt; [5329] 1 1 1 1 0 1 1 1 0 1 1 1 0 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 2 1</span></span>
-<span><span class="co">#&gt; [5366] 1 1 1 1 1 3 1 2 2 2 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 0 1 2 2 2 2 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [5403] 1 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1 2 1 1 1 1 1 1 1 2 1 2 1 1 1 1</span></span>
-<span><span class="co">#&gt; [5440] 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 2 1 2 2 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [5477] 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 3 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [5514] 2 2 1 2 1 1 1 2 1 1 1 2 0 1 1 1 1 1 1 1 1 1 1 1 0 3 1 1 1 1 2 1 2 1 1 2 1</span></span>
-<span><span class="co">#&gt; [5551] 1 1 1 1 1 1 1 1 2 2 0 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [5588] 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 2 1 1 1 1 2 1 1 1 1</span></span>
-<span><span class="co">#&gt; [5625] 1 1 1 1 1 1 2 2 1 1 2 1 2 1 1 3 1 1 2 1 1 1 1 1 1 1 1 0 1 2 1 1 1 1 1 2 1</span></span>
-<span><span class="co">#&gt; [5662] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 0 1 2 1 1 1 1 2 1 2 2</span></span>
-<span><span class="co">#&gt; [5699] 1 1 1 1 1 1 1 2 1 1 0 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [5736] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 2 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [5773] 1 1 1 1 1 3 1 1 1 1 1 1 1 0 2 1 1 1 1 1 2 1 1 2 1 1 1 2 1 1 1 2 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [5810] 1 2 1 2 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 2 1 2 1 1 1 1 2 1 2 1</span></span>
-<span><span class="co">#&gt; [5847] 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 0 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [5884] 1 1 1 1 2 1 1 1 1 1 1 1 2 1 1 1 1 1 2 1 1 1 1 1 1 1 2 1 1 1 1 2 1 2 1 1 1</span></span>
-<span><span class="co">#&gt; [5921] 1 2 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 0 1 1 1 1 2 1 1 1 0 1 1 1</span></span>
-<span><span class="co">#&gt; [5958] 2 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 2 1 1 3 1 1 1 1 1 1 1 1 1 1 2 1 1 1</span></span>
-<span><span class="co">#&gt; [5995] 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6032] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6069] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6106] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6143] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6180] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6217] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6254] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6291] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6328] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6365] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6402] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6439] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6476] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6513] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6550] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6587] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6624] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6661] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6698] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6735] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6772] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6809] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6846] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6883] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6920] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6957] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [6994] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7031] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7068] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7105] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7142] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7179] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7216] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7253] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7290] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7327] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7364] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7401] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7438] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7475] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7512] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7549] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7586] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7623] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7660] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7697] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7734] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7771] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7808] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7845] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7882] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7919] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7956] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; [7993] 1 1 1 1 1 1 1 1</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Clustering quality (silhouette):"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">cluster_result</span><span class="op">$</span><span class="va">silhouette</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Clustering quality (silhouette): 0.135"</span></span>
+<span><span class="fu">cluster_summary</span><span class="op">(</span><span class="va">df_missing</span>, <span class="va">cluster_result</span><span class="op">$</span><span class="va">clusters</span>, index_col <span class="op">=</span> <span class="st">"index"</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">kable</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">kable_styling</span><span class="op">(</span>font_size <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Processing continuous variables: Age, Salary, ZipCode10001, ZipCode20002, ZipCode30003, Y11, Y12, Y13, Y14, Y15, Y21, Y22, Y23, Y24, Y25, Y31, Y32, Y33, Y34, Y35, Y41, Y42, Y43, Y44, Y45, Y51, Y52, Y53, Y54, Y55 </span></span>
+<span><span class="co">#&gt; Processing categorical variables:</span></span></code></pre></div>
+<table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead><tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:left;">
+Overall
+</th>
+<th style="text-align:left;">
+Cluster 0
+</th>
+<th style="text-align:left;">
+Cluster 1
+</th>
+<th style="text-align:left;">
+Cluster 2
+</th>
+<th style="text-align:left;">
+Cluster 3
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:left;">
+8000
+</td>
+<td style="text-align:left;">
+1089
+</td>
+<td style="text-align:left;">
+4827
+</td>
+<td style="text-align:left;">
+1251
+</td>
+<td style="text-align:left;">
+833
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:left;">
+10.2 (2.08); 9.99 [8.73, 11.44]
+</td>
+<td style="text-align:left;">
+10.2 (2.04); 9.97 [8.74, 11.3]
+</td>
+<td style="text-align:left;">
+10.19 (2.09); 9.97 [8.72, 11.44]
+</td>
+<td style="text-align:left;">
+10.23 (2.09); 10.01 [8.77, 11.52]
+</td>
+<td style="text-align:left;">
+10.22 (2.05); 10.07 [8.74, 11.46]
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Salary
+</td>
+<td style="text-align:left;">
+5.82 (0.61); 5.7 [5.34, 6.17]
+</td>
+<td style="text-align:left;">
+5.85 (0.63); 5.73 [5.37, 6.22]
+</td>
+<td style="text-align:left;">
+5.82 (0.61); 5.7 [5.33, 6.17]
+</td>
+<td style="text-align:left;">
+5.81 (0.59); 5.7 [5.35, 6.16]
+</td>
+<td style="text-align:left;">
+5.8 (0.61); 5.68 [5.3, 6.12]
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ZipCode10001
+</td>
+<td style="text-align:left;">
+0.33 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.34 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.33 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.32 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.35 (0.48); 0 [0, 1]
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ZipCode20002
+</td>
+<td style="text-align:left;">
+0.34 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.32 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.34 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.33 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.33 (0.47); 0 [0, 1]
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ZipCode30003
+</td>
+<td style="text-align:left;">
+0.33 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.34 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.33 (0.47); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.35 (0.48); 0 [0, 1]
+</td>
+<td style="text-align:left;">
+0.32 (0.47); 0 [0, 1]
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y11
+</td>
+<td style="text-align:left;">
+-2.82 (13.25); -0.41 [-11.13, 7.24], 3122 (39%) missing
+</td>
+<td style="text-align:left;">
+-2.5 (5.49); -2.31 [-5.81, 1.9], 1072 (98.4%) missing
+</td>
+<td style="text-align:left;">
+-0.08 (12.9); 3.12 [-5.98, 8.89], 1108 (23%) missing
+</td>
+<td style="text-align:left;">
+-4.23 (7.41); -2.87 [-7.4, 0.52], 856 (68.4%) missing
+</td>
+<td style="text-align:left;">
+-15.73 (9.07); -14.7 [-21.41, -9.45], 86 (10.3%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y12
+</td>
+<td style="text-align:left;">
+22.23 (42.54); 48.6 [-22.37, 58.35], 3118 (39%) missing
+</td>
+<td style="text-align:left;">
+-21.45 (18.4); -23.02 [-29.4, -17.9], 520 (47.8%) missing
+</td>
+<td style="text-align:left;">
+41.4 (34.54); 54.23 [46.57, 60.76], 1570 (32.5%) missing
+</td>
+<td style="text-align:left;">
+-11.17 (34.82); -22.24 [-29.19, -15.66], 379 (30.3%) missing
+</td>
+<td style="text-align:left;">
+-23.67 (17.98); -25.5 [-31.79, -19.35], 649 (77.9%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y13
+</td>
+<td style="text-align:left;">
+42.75 (57.09); 72.43 [-17.25, 94.71], 3110 (38.9%) missing
+</td>
+<td style="text-align:left;">
+-16.71 (17.7); -17.78 [-24.21, -12.6], 512 (47%) missing
+</td>
+<td style="text-align:left;">
+70.19 (46.94); 88.92 [67.44, 100.37], 1555 (32.2%) missing
+</td>
+<td style="text-align:left;">
+-7.1 (34.73); -18.1 [-24.61, -11.72], 418 (33.4%) missing
+</td>
+<td style="text-align:left;">
+-24.19 (13.31); -24.07 [-30.03, -19.11], 625 (75%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y14
+</td>
+<td style="text-align:left;">
+55.55 (66.05); 69.08 [-11.98, 118.98], 3129 (39.1%) missing
+</td>
+<td style="text-align:left;">
+-11.33 (22.61); -14.7 [-21.68, -9.21], 94 (8.6%) missing
+</td>
+<td style="text-align:left;">
+77.71 (60.24); 104.8 [-4.66, 125.02], 1151 (23.8%) missing
+</td>
+<td style="text-align:left;">
+-1.72 (29.31); -9.94 [-15.23, -6.06], 1244 (99.4%) missing
+</td>
+<td style="text-align:left;">
+-19.61 (11.71); -19.43 [-26.27, -14.6], 640 (76.8%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y15
+</td>
+<td style="text-align:left;">
+63.77 (72.61); 72.28 [-11.56, 134.28], 3141 (39.3%) missing
+</td>
+<td style="text-align:left;">
+-9.57 (17.52); -11.83 [-16.06, -7.9], 530 (48.7%) missing
+</td>
+<td style="text-align:left;">
+97.97 (63.61); 124.38 [68.35, 143.58], 1590 (32.9%) missing
+</td>
+<td style="text-align:left;">
+0.25 (32.9); -11.3 [-16.22, -5.94], 386 (30.9%) missing
+</td>
+<td style="text-align:left;">
+-10.88 (11.75); -11.09 [-16.13, -7.22], 635 (76.2%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y21
+</td>
+<td style="text-align:left;">
+-12.23 (15.68); -9.48 [-22.1, -0.1], 3135 (39.2%) missing
+</td>
+<td style="text-align:left;">
+-12.51 (7.5); -11.49 [-16.82, -8.18], 1073 (98.5%) missing
+</td>
+<td style="text-align:left;">
+-9.09 (15.36); -5.34 [-16.54, 1.83], 1111 (23%) missing
+</td>
+<td style="text-align:left;">
+-13.64 (8.59); -12.46 [-17.44, -7.71], 860 (68.7%) missing
+</td>
+<td style="text-align:left;">
+-27.2 (10.77); -26.28 [-34.22, -19.29], 91 (10.9%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y22
+</td>
+<td style="text-align:left;">
+16.04 (48.68); 47.36 [-34.6, 57.56], 3094 (38.7%) missing
+</td>
+<td style="text-align:left;">
+-33.57 (21.45); -35.48 [-42.78, -28.77], 530 (48.7%) missing
+</td>
+<td style="text-align:left;">
+38.02 (39.56); 53.49 [45.44, 59.98], 1552 (32.2%) missing
+</td>
+<td style="text-align:left;">
+-22.93 (38.96); -34.64 [-43.49, -26.51], 361 (28.9%) missing
+</td>
+<td style="text-align:left;">
+-36.52 (21.19); -38.24 [-45.52, -31.57], 651 (78.2%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y23
+</td>
+<td style="text-align:left;">
+39.92 (65.7); 74.15 [-29.16, 99.94], 3098 (38.7%) missing
+</td>
+<td style="text-align:left;">
+-28.12 (21.91); -29.81 [-37.64, -23.64], 504 (46.3%) missing
+</td>
+<td style="text-align:left;">
+71.7 (53.7); 93.68 [68.23, 105.94], 1550 (32.1%) missing
+</td>
+<td style="text-align:left;">
+-18.01 (39.86); -29.79 [-37.96, -22.43], 412 (32.9%) missing
+</td>
+<td style="text-align:left;">
+-38.22 (13.56); -37.89 [-45.79, -31.44], 632 (75.9%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y24
+</td>
+<td style="text-align:left;">
+55.14 (75.63); 71.14 [-22.44, 128.49], 3146 (39.3%) missing
+</td>
+<td style="text-align:left;">
+-21.53 (26.21); -25.58 [-33.71, -18.66], 97 (8.9%) missing
+</td>
+<td style="text-align:left;">
+80.77 (68.85); 113.06 [-13.45, 134.74], 1176 (24.4%) missing
+</td>
+<td style="text-align:left;">
+5.64 (47.55); -15.92 [-28.03, 41.51], 1237 (98.9%) missing
+</td>
+<td style="text-align:left;">
+-30.21 (15.33); -31.15 [-36.98, -25.06], 636 (76.4%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y25
+</td>
+<td style="text-align:left;">
+63.86 (83.02); 73.21 [-21.76, 145.23], 3106 (38.8%) missing
+</td>
+<td style="text-align:left;">
+-19.73 (20.2); -22.31 [-27.82, -17.28], 530 (48.7%) missing
+</td>
+<td style="text-align:left;">
+102.28 (73.16); 134.17 [68.37, 155.24], 1548 (32.1%) missing
+</td>
+<td style="text-align:left;">
+-8.94 (37.19); -21.48 [-27.54, -14.88], 387 (30.9%) missing
+</td>
+<td style="text-align:left;">
+-21.31 (13.85); -21.07 [-27.56, -17.46], 641 (77%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y31
+</td>
+<td style="text-align:left;">
+-2.38 (15.47); -0.44 [-14.24, 10.52], 2067 (25.8%) missing
+</td>
+<td style="text-align:left;">
+-12.43 (11.83); -12.87 [-19.25, -3.43], 1029 (94.5%) missing
+</td>
+<td style="text-align:left;">
+-0.12 (15.89); 3.73 [-12.19, 12.61], 255 (5.3%) missing
+</td>
+<td style="text-align:left;">
+-5.83 (11.7); -2.65 [-13.57, 2.66], 697 (55.7%) missing
+</td>
+<td style="text-align:left;">
+-12.84 (9.34); -11.97 [-18.61, -6.67], 86 (10.3%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y32
+</td>
+<td style="text-align:left;">
+35.48 (44.33); 59.39 [-16.84, 69.12], 2056 (25.7%) missing
+</td>
+<td style="text-align:left;">
+-14.64 (26.06); -19.54 [-25.64, -14.04], 502 (46.1%) missing
+</td>
+<td style="text-align:left;">
+53.2 (34.11); 63.49 [55.75, 71.56], 607 (12.6%) missing
+</td>
+<td style="text-align:left;">
+-1.64 (41.09); -18.46 [-26.42, -8.67], 302 (24.1%) missing
+</td>
+<td style="text-align:left;">
+-18.45 (25.23); -23.3 [-29.39, -16.25], 645 (77.4%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y33
+</td>
+<td style="text-align:left;">
+54.8 (56.83); 80.92 [-12.68, 101.36], 2013 (25.2%) missing
+</td>
+<td style="text-align:left;">
+-8.91 (29.43); -14.94 [-21.93, -9.48], 472 (43.3%) missing
+</td>
+<td style="text-align:left;">
+78.75 (44.63); 92.75 [74.18, 107.01], 572 (11.9%) missing
+</td>
+<td style="text-align:left;">
+2.93 (43.14); -14.79 [-22.03, -6.22], 339 (27.1%) missing
+</td>
+<td style="text-align:left;">
+-20.56 (20.05); -22.05 [-29.95, -16.63], 630 (75.6%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y34
+</td>
+<td style="text-align:left;">
+66.6 (63.23); 79.15 [-6.08, 124.15], 2051 (25.6%) missing
+</td>
+<td style="text-align:left;">
+-6.86 (24.06); -10.79 [-17.7, -5.15], 109 (10%) missing
+</td>
+<td style="text-align:left;">
+85.17 (56.91); 91.75 [64.94, 131.28], 216 (4.5%) missing
+</td>
+<td style="text-align:left;">
+79.3 (18.82); 80.95 [71.9, 88.92], 1095 (87.5%) missing
+</td>
+<td style="text-align:left;">
+-10.85 (23.65); -15.14 [-20.07, -10.52], 631 (75.8%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y35
+</td>
+<td style="text-align:left;">
+73.13 (69.46); 80.88 [-5.82, 138.75], 2054 (25.7%) missing
+</td>
+<td style="text-align:left;">
+-1.76 (25.79); -8.02 [-12.53, -3.49], 497 (45.6%) missing
+</td>
+<td style="text-align:left;">
+101.32 (60.1); 102.55 [74.41, 149.56], 611 (12.7%) missing
+</td>
+<td style="text-align:left;">
+10.18 (38.83); -6.76 [-12.08, 0.68], 311 (24.9%) missing
+</td>
+<td style="text-align:left;">
+-4.17 (18.8); -6.55 [-11.91, -3.17], 635 (76.2%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y41
+</td>
+<td style="text-align:left;">
+-1.03 (6.75); -0.06 [-6.42, 4.78], 2032 (25.4%) missing
+</td>
+<td style="text-align:left;">
+-5.57 (5.86); -5.52 [-9.37, -0.38], 1042 (95.7%) missing
+</td>
+<td style="text-align:left;">
+-0.08 (7.01); 1.86 [-5.8, 5.65], 234 (4.8%) missing
+</td>
+<td style="text-align:left;">
+-2.57 (5.18); -1.01 [-6.17, 1.27], 678 (54.2%) missing
+</td>
+<td style="text-align:left;">
+-5.36 (3.51); -5.13 [-7.66, -2.94], 78 (9.4%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y42
+</td>
+<td style="text-align:left;">
+16.62 (20.72); 27.03 [-7.99, 32.32], 2022 (25.3%) missing
+</td>
+<td style="text-align:left;">
+-5.94 (13.11); -9.05 [-11.77, -6.75], 489 (44.9%) missing
+</td>
+<td style="text-align:left;">
+24.74 (16.2); 29.27 [25.13, 33.7], 590 (12.2%) missing
+</td>
+<td style="text-align:left;">
+-0.49 (19.22); -8.68 [-11.67, -4.71], 296 (23.7%) missing
+</td>
+<td style="text-align:left;">
+-7.92 (11.43); -10.09 [-12.95, -7.21], 647 (77.7%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y43
+</td>
+<td style="text-align:left;">
+25.38 (25.81); 37.1 [-5.29, 46.39], 2013 (25.2%) missing
+</td>
+<td style="text-align:left;">
+-3.52 (12.92); -6.27 [-8.98, -3.94], 461 (42.3%) missing
+</td>
+<td style="text-align:left;">
+36.46 (20.24); 42.65 [33.89, 49.01], 606 (12.6%) missing
+</td>
+<td style="text-align:left;">
+2.21 (19.59); -6.23 [-8.91, -2.8], 329 (26.3%) missing
+</td>
+<td style="text-align:left;">
+-8.26 (8.77); -9.62 [-12, -6.84], 617 (74.1%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y44
+</td>
+<td style="text-align:left;">
+30.33 (29.1); 35.89 [-2.97, 56.24], 2023 (25.3%) missing
+</td>
+<td style="text-align:left;">
+-3.52 (10.75); -5.3 [-8.28, -2.95], 104 (9.6%) missing
+</td>
+<td style="text-align:left;">
+38.94 (26.15); 42.41 [28.67, 59.69], 204 (4.2%) missing
+</td>
+<td style="text-align:left;">
+36.09 (10.23); 36.74 [32.51, 41.42], 1084 (86.7%) missing
+</td>
+<td style="text-align:left;">
+-6.45 (8.99); -7.91 [-10.28, -5.41], 631 (75.8%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y45
+</td>
+<td style="text-align:left;">
+33.81 (31.9); 37.45 [-2.93, 63.2], 2086 (26.1%) missing
+</td>
+<td style="text-align:left;">
+-0.73 (12.19); -3.79 [-5.65, -1.95], 508 (46.6%) missing
+</td>
+<td style="text-align:left;">
+46.67 (27.58); 49 [34.02, 68.11], 628 (13%) missing
+</td>
+<td style="text-align:left;">
+5.21 (18.26); -3.26 [-5.42, 0.06], 314 (25.1%) missing
+</td>
+<td style="text-align:left;">
+-2.3 (8.51); -3.68 [-5.54, -2.05], 636 (76.4%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y51
+</td>
+<td style="text-align:left;">
+0.95 (5.79); 1.8 [-3.64, 5.83], 2077 (26%) missing
+</td>
+<td style="text-align:left;">
+-3.91 (4.47); -4.64 [-6.98, -1.35], 1040 (95.5%) missing
+</td>
+<td style="text-align:left;">
+1.77 (5.98); 3.4 [-2.98, 6.53], 252 (5.2%) missing
+</td>
+<td style="text-align:left;">
+-0.3 (4.42); 1.05 [-3.4, 3.03], 707 (56.5%) missing
+</td>
+<td style="text-align:left;">
+-2.81 (3.15); -2.55 [-4.76, -0.78], 78 (9.4%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y52
+</td>
+<td style="text-align:left;">
+16 (17.75); 24.85 [-5.06, 29.46], 2034 (25.4%) missing
+</td>
+<td style="text-align:left;">
+-3.48 (10.92); -5.85 [-8.18, -4.03], 495 (45.5%) missing
+</td>
+<td style="text-align:left;">
+23 (13.88); 26.85 [23.19, 30.72], 584 (12.1%) missing
+</td>
+<td style="text-align:left;">
+1.08 (16.13); -5.75 [-8.01, -2.73], 303 (24.2%) missing
+</td>
+<td style="text-align:left;">
+-5.97 (8.45); -7.16 [-9.49, -4.88], 652 (78.3%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y53
+</td>
+<td style="text-align:left;">
+23.58 (22.01); 33.75 [-2.69, 41.4], 1976 (24.7%) missing
+</td>
+<td style="text-align:left;">
+-1.15 (11.07); -3.54 [-5.82, -1.52], 464 (42.6%) missing
+</td>
+<td style="text-align:left;">
+33.01 (17.23); 38.25 [31, 43.61], 579 (12%) missing
+</td>
+<td style="text-align:left;">
+3.92 (16.92); -3.53 [-5.91, -0.45], 315 (25.2%) missing
+</td>
+<td style="text-align:left;">
+-5.12 (8.39); -6.56 [-8.55, -4.2], 618 (74.2%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y54
+</td>
+<td style="text-align:left;">
+27.66 (24.95); 32.59 [-0.7, 49.97], 2047 (25.6%) missing
+</td>
+<td style="text-align:left;">
+-1.17 (9.43); -2.83 [-5.39, -0.52], 102 (9.4%) missing
+</td>
+<td style="text-align:left;">
+35.06 (22.39); 38.07 [26.08, 52.64], 203 (4.2%) missing
+</td>
+<td style="text-align:left;">
+32 (8.73); 32.59 [29.27, 37.23], 1114 (89%) missing
+</td>
+<td style="text-align:left;">
+-3.41 (8.35); -4.74 [-6.81, -3.09], 628 (75.4%) missing
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Y55
+</td>
+<td style="text-align:left;">
+30.49 (27.35); 33.72 [-0.86, 55.61], 2050 (25.6%) missing
+</td>
+<td style="text-align:left;">
+1.34 (10.71); -1.58 [-3.07, 0.08], 498 (45.7%) missing
+</td>
+<td style="text-align:left;">
+41.61 (23.68); 43.58 [30.77, 59.96], 618 (12.8%) missing
+</td>
+<td style="text-align:left;">
+5.85 (15.36); -1.16 [-2.91, 1.57], 300 (24%) missing
+</td>
+<td style="text-align:left;">
+-0.25 (7.18); -1.44 [-2.93, -0.04], 634 (76.1%) missing
+</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Clustering quality (silhouette):"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">cluster_result</span><span class="op">$</span><span class="va">silhouette</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Clustering quality (silhouette): 0.135</span></span>
 <span></span>
 <span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_cissvae.html">run_cissvae</a></span><span class="op">(</span></span>
@@ -1195,7 +2125,7 @@ layers evenly throughout the architecture</li>
 <strong><code>"random"</code></strong>: Uses random placement of
 shared layers (with reproducible seed)</li>
 </ul>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ciss-vae.github.io/rCISS-VAE">rCISSVAE</a></span><span class="op">)</span></span>
@@ -1213,7 +2143,7 @@ shared layers (with reproducible seed)</li>
 <span>  n_trials <span class="op">=</span> <span class="fl">3</span>, <span class="co">## Using low number of trials for demo</span></span>
 <span>  study_name <span class="op">=</span> <span class="st">"comprehensive_vae_autotune"</span>,</span>
 <span>  device_preference <span class="op">=</span> <span class="st">"cpu"</span>,</span>
-<span>  show_progress <span class="op">=</span> <span class="cn">TRUE</span>,  <span class="co"># Rich progress bars with training visualization</span></span>
+<span>  show_progress <span class="op">=</span> <span class="cn">FALSE</span>,  <span class="co"># Set true for Rich progress bars with training visualization</span></span>
 <span>  optuna_dashboard_db <span class="op">=</span> <span class="st">"sqlite:///optuna_study.db"</span>,  <span class="co"># Save results to database</span></span>
 <span>  load_if_exists <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">42</span>, </span>
@@ -1256,77 +2186,1144 @@ shared layers (with reproducible seed)</li>
 <span></span>
 <span><span class="co"># View best hyperparameters</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Best validation MSE:"</span>, <span class="va">study</span><span class="op">$</span><span class="va">best_value</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Best trial parameters:"</span><span class="op">)</span></span>
-<span><span class="va">best_trial</span> <span class="op">&lt;-</span> <span class="va">results</span><span class="op">[</span><span class="va">results</span><span class="op">$</span><span class="va">trial_number</span> <span class="op">==</span> <span class="va">study</span><span class="op">$</span><span class="va">best_trial</span><span class="op">$</span><span class="va">number</span>, <span class="op">]</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">best_trial</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"latent_dim"</span>, <span class="st">"lr"</span>, <span class="st">"encoder_shared_placement"</span>, <span class="st">"decoder_shared_placement"</span>, <span class="st">"val_mse"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Trial results:"</span><span class="op">)</span></span>
+<span><span class="va">results</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">kable</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">kable_styling</span><span class="op">(</span>font_size<span class="op">=</span><span class="fl">12</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Plot model architecture</span></span>
 <span><span class="fu"><a href="../reference/plot_vae_architecture.html">plot_vae_architecture</a></span><span class="op">(</span><span class="va">best_model</span>, title <span class="op">=</span> <span class="st">"Optimized CISSVAE Architecture"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Starting Optuna optimization with 3 trials...</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Trial 13/3</span></span>
-<span><span class="co">#&gt; Parameters: layers=2, latent_dim=100, lr=1.00e-02, batch_size=4000</span></span>
-<span><span class="co">#&gt; Initial training ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:01</span></span>
-<span><span class="co">#&gt; Refit loops ━━━╸                                      10% 0:01:28</span></span>
-<span><span class="co">#&gt; ✓ Trial 13 complete - MSE: 31.1421</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Trial 14/3</span></span>
-<span><span class="co">#&gt; Parameters: layers=2, latent_dim=10, lr=1.00e-02, batch_size=4000</span></span>
-<span><span class="co">#&gt; Initial training ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:02</span></span>
-<span><span class="co">#&gt; Refit loops ━━━━━━━━━━                                26% 0:02:39</span></span>
-<span><span class="co">#&gt; ✓ Trial 14 complete - MSE: 26.9059</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Trial 15/3</span></span>
-<span><span class="co">#&gt; Parameters: layers=2, latent_dim=10, lr=1.00e-02, batch_size=1000</span></span>
-<span><span class="co">#&gt; Initial training ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:02</span></span>
-<span><span class="co">#&gt; Refit loops ━━━━━━━━━━                                26% 0:02:39</span></span>
-<span><span class="co">#&gt; ✓ Trial 15 complete - MSE: 35.4452</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ✓ Optimization complete!</span></span>
-<span><span class="co">#&gt; Best trial: 3 (MSE: 9.621054)</span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Optimization complete. Best trial: 3 (MSE: 9.621054)</span></span>
 <span><span class="co">#&gt; Training final model with best parameters...</span></span>
-<span><span class="co">#&gt; Final initial training ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:02</span></span>
-<span><span class="co">#&gt; ✓ Final model training complete!</span></span>
-<span><span class="co">#&gt; Final refit loops ╸                                          2% 0:04:05</span></span>
+<span><span class="co">#&gt; Final model training complete.</span></span>
 <span><span class="co">#&gt; Best validation MSE: 9.621054</span></span>
-<span><span class="co">#&gt; [1] "Trial results:"</span></span>
-<span><span class="co">#&gt;   trial_number    val_mse num_hidden_layers hidden_dim_0 hidden_dim_1</span></span>
-<span><span class="co">#&gt; 1            0  65.753204                 5          512          512</span></span>
-<span><span class="co">#&gt; 2            1  28.920498                 5           64           64</span></span>
-<span><span class="co">#&gt; 3            2 449.029846                 2          512           64</span></span>
-<span><span class="co">#&gt; 4            3   9.621054                 2          512          512</span></span>
-<span><span class="co">#&gt; 5            4  19.456476                 2          512           64</span></span>
-<span><span class="co">#&gt; 6            5  11.771402                 2          512           64</span></span>
-<span><span class="co">#&gt;   hidden_dim_2 hidden_dim_3 hidden_dim_4 latent_dim latent_shared output_shared</span></span>
-<span><span class="co">#&gt; 1          512          512          512         10         FALSE          TRUE</span></span>
-<span><span class="co">#&gt; 2          512           64           64         10         FALSE         FALSE</span></span>
-<span><span class="co">#&gt; 3          NaN          NaN          NaN        100          TRUE          TRUE</span></span>
-<span><span class="co">#&gt; 4          NaN          NaN          NaN        100         FALSE         FALSE</span></span>
-<span><span class="co">#&gt; 5          NaN          NaN          NaN        100         FALSE          TRUE</span></span>
-<span><span class="co">#&gt; 6          NaN          NaN          NaN         10          TRUE          TRUE</span></span>
-<span><span class="co">#&gt;   batch_size num_shared_encode num_shared_decode encoder_shared_placement</span></span>
-<span><span class="co">#&gt; 1       4000                 1                 0                 at_start</span></span>
-<span><span class="co">#&gt; 2       1000                 1                 2                 at_start</span></span>
-<span><span class="co">#&gt; 3       1000                 3                 3                   at_end</span></span>
-<span><span class="co">#&gt; 4       1000                 2                 3                   at_end</span></span>
-<span><span class="co">#&gt; 5       4000                 1                 3                   at_end</span></span>
-<span><span class="co">#&gt; 6       4000                 2                 1              alternating</span></span>
-<span><span class="co">#&gt;   decoder_shared_placement reset_lr_refit layer_order_enc_used</span></span>
-<span><span class="co">#&gt; 1              alternating          FALSE            S,U,U,U,U</span></span>
-<span><span class="co">#&gt; 2                   random           TRUE            S,U,U,U,U</span></span>
-<span><span class="co">#&gt; 3              alternating          FALSE                  S,S</span></span>
-<span><span class="co">#&gt; 4              alternating           TRUE                  S,S</span></span>
-<span><span class="co">#&gt; 5              alternating          FALSE                  U,S</span></span>
-<span><span class="co">#&gt; 6                   random          FALSE                  S,S</span></span>
-<span><span class="co">#&gt;   layer_order_dec_used</span></span>
-<span><span class="co">#&gt; 1            U,U,U,U,U</span></span>
-<span><span class="co">#&gt; 2            U,U,S,S,U</span></span>
-<span><span class="co">#&gt; 3                  S,S</span></span>
-<span><span class="co">#&gt; 4                  S,S</span></span>
-<span><span class="co">#&gt; 5                  S,S</span></span>
-<span><span class="co">#&gt; 6                  U,S</span></span>
-<span><span class="co">#&gt; Plot saved to: autotune_vae_arch.png</span></span></code></pre>
+<span><span class="co">#&gt; [1] "Trial results:"</span></span></code></pre>
+<table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead><tr>
+<th style="text-align:right;">
+trial_number
+</th>
+<th style="text-align:right;">
+val_mse
+</th>
+<th style="text-align:right;">
+num_hidden_layers
+</th>
+<th style="text-align:right;">
+hidden_dim_0
+</th>
+<th style="text-align:right;">
+hidden_dim_1
+</th>
+<th style="text-align:right;">
+hidden_dim_2
+</th>
+<th style="text-align:right;">
+hidden_dim_3
+</th>
+<th style="text-align:right;">
+hidden_dim_4
+</th>
+<th style="text-align:right;">
+latent_dim
+</th>
+<th style="text-align:left;">
+latent_shared
+</th>
+<th style="text-align:left;">
+output_shared
+</th>
+<th style="text-align:right;">
+batch_size
+</th>
+<th style="text-align:right;">
+num_shared_encode
+</th>
+<th style="text-align:right;">
+num_shared_decode
+</th>
+<th style="text-align:left;">
+encoder_shared_placement
+</th>
+<th style="text-align:left;">
+decoder_shared_placement
+</th>
+<th style="text-align:left;">
+reset_lr_refit
+</th>
+<th style="text-align:left;">
+layer_order_enc_used
+</th>
+<th style="text-align:left;">
+layer_order_dec_used
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+65.753204
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:right;">
+4000
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+at_start
+</td>
+<td style="text-align:left;">
+alternating
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+S,U,U,U,U
+</td>
+<td style="text-align:left;">
+U,U,U,U,U
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+28.920498
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+at_start
+</td>
+<td style="text-align:left;">
+random
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+S,U,U,U,U
+</td>
+<td style="text-align:left;">
+U,U,S,S,U
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+449.029846
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+at_end
+</td>
+<td style="text-align:left;">
+alternating
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+9.621054
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+at_end
+</td>
+<td style="text-align:left;">
+alternating
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+19.456476
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:right;">
+4000
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+at_end
+</td>
+<td style="text-align:left;">
+alternating
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+U,S
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+11.771402
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:right;">
+4000
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+alternating
+</td>
+<td style="text-align:left;">
+random
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+<td style="text-align:left;">
+U,S
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+14.755737
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:right;">
+4000
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+at_start
+</td>
+<td style="text-align:left;">
+alternating
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+S,U
+</td>
+<td style="text-align:left;">
+S,U
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+63.291035
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+random
+</td>
+<td style="text-align:left;">
+random
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+U,U,S,U,U
+</td>
+<td style="text-align:left;">
+U,U,U,S,U
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+63.613548
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+alternating
+</td>
+<td style="text-align:left;">
+at_end
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+S,U,U,U,U
+</td>
+<td style="text-align:left;">
+U,U,U,S,S
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+22.594179
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+random
+</td>
+<td style="text-align:left;">
+at_end
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+U,U,S,S,U
+</td>
+<td style="text-align:left;">
+U,U,S,S,S
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+16.619179
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+at_end
+</td>
+<td style="text-align:left;">
+at_start
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+U,U
+</td>
+<td style="text-align:left;">
+U,U
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+69.474670
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+4000
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+alternating
+</td>
+<td style="text-align:left;">
+random
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+<td style="text-align:left;">
+U,S
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+31.142126
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+4000
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+alternating
+</td>
+<td style="text-align:left;">
+at_start
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+<td style="text-align:left;">
+S,U
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+26.905947
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+4000
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+at_end
+</td>
+<td style="text-align:left;">
+random
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+35.445190
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+alternating
+</td>
+<td style="text-align:left;">
+alternating
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+51.274338
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+4000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+alternating
+</td>
+<td style="text-align:left;">
+random
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+U,U
+</td>
+<td style="text-align:left;">
+U,S
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+22.604393
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+at_end
+</td>
+<td style="text-align:left;">
+at_start
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+<td style="text-align:left;">
+U,U
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+117.297325
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+4000
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+random
+</td>
+<td style="text-align:left;">
+at_end
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+</tr>
+</tbody>
+</table>
+<pre><code><span><span class="co">#&gt; Plot saved to: autotune_vae_arch.png</span></span></code></pre>
 <div class="figure">
 <img src="autotune_vae_arch.png" alt=""><p class="caption">Autotuned VAE Architecture</p>
 </div>
@@ -1340,7 +3337,7 @@ yet<a class="anchor" aria-label="anchor" href="#using-pre-computed-missingness-p
 <p>For advanced control over the clustering process, you can provide a
 pre-computed missingness proportion matrix directly to
 <code><a href="../reference/run_cissvae.html">run_cissvae()</a></code>:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Standardize df_missing column names to feature_timepoint format</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">df_missing</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'index'</span>, <span class="st">'Age'</span>, <span class="st">'Salary'</span>, <span class="st">'ZipCode10001'</span>, <span class="st">'ZipCode20002'</span>, <span class="st">'ZipCode30003'</span>, <span class="st">'Y1_1'</span>, <span class="st">'Y1_2'</span>, <span class="st">'Y1_3'</span>, <span class="st">'Y1_4'</span>, <span class="st">'Y1_5'</span>, <span class="st">'Y2_1'</span>, <span class="st">'Y2_2'</span>, <span class="st">'Y2_3'</span>, <span class="st">'Y2_4'</span>, <span class="st">'Y2_5'</span>, <span class="st">'Y3_1'</span>, <span class="st">'Y3_2'</span>, <span class="st">'Y3_3'</span>, <span class="st">'Y3_4'</span>, <span class="st">'Y3_5'</span>, <span class="st">'Y4_1'</span>, <span class="st">'Y4_2'</span>, <span class="st">'Y4_3'</span>, <span class="st">'Y4_4'</span>, <span class="st">'Y4_5'</span>, <span class="st">'Y5_1'</span>, <span class="st">'Y5_2'</span>, <span class="st">'Y5_3'</span>, <span class="st">'Y5_4'</span>, <span class="st">'Y5_5'</span><span class="op">)</span></span>
 <span></span>

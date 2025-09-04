@@ -25,6 +25,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+library(kableExtra)
 ```
 
 ## Installing package
@@ -122,7 +124,8 @@ data(df_missing)
 data(clusters)
 
 tbl_summary(df_missing, include = -"index") %>%
-   as_kable()
+   as_kable() %>%
+  kable_styling(font_size = 12)
 ```
 
 Age, Salary and ZipCode columns represent demographic data with no missingness and columns Y1t-Y5t represent biomarker data obtained at different timepoints t. 
@@ -183,7 +186,7 @@ The `run_cissvae()` function is a comprehensive wrapper for all basic steps in r
 
 ### Running the imputation
 
-To run the imputation model, first load your data. 
+To run the imputation model, first load your data. You can use the `cluster_summary()` function to visualize the missingness by cluster. 
 
 ```{r eval=FALSE, message=FALSE, warning=FALSE}
 suppressPackageStartupMessages({
@@ -199,8 +202,27 @@ reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
 data(df_missing)
 data(clusters) ## actual cluster labels in clusters$clusters (other column is index)
 
-cluster_summary(df_missing, clusters$clusters, index_col = "index")  %>% kable()
+cluster_summary(df_missing, clusters$clusters, index_col = "index")  %>% kable()  %>%
+  kable_styling(font_size = 12)
+```
 
+```{r showruncissvae2, echo=FALSE}
+library(tidyverse)
+library(reticulate)
+library(rCISSVAE)
+library(kableExtra)
+
+data(df_missing)
+data(clusters)
+
+cluster_summary(df_missing, clusters$clusters, index_col = "index")  %>% kable()  %>%
+  kable_styling(font_size = 12)
+
+```
+
+Then, plug your data and clusters into the `run_cissvae()` function. 
+
+```{r eval=FALSE, message=FALSE, warning=FALSE}
 ## Run the imputation model. 
 dat = run_cissvae(
   data = df_missing,
@@ -234,16 +256,6 @@ plot_vae_architecture(model = dat$model, save_path = "test_plot_arch.png")
 ```
 
 ```{r showruncissvae, echo=FALSE}
-library(tidyverse)
-library(reticulate)
-library(rCISSVAE)
-library(kableExtra)
-
-data(df_missing)
-data(clusters)
-
-cluster_summary(df_missing, clusters$clusters, index_col = "index")  %>% kable()
-
 dat = run_cissvae(
   data = df_missing,
   index_col = "index",
@@ -295,9 +307,9 @@ cluster_result <- cluster_on_missing(
   seed = 42
 )
 
-print("Cluster assignments for CISS-VAE:")
-print(cluster_result$clusters)
-print(paste("Clustering quality (silhouette):", round(cluster_result$silhouette, 3)))
+cluster_summary(df_missing, cluster_result$clusters, index_col = "index")  %>% kable() %>%
+  kable_styling(font_size = 12)
+cat(paste("Clustering quality (silhouette):", round(cluster_result$silhouette, 3)))
 
 
 result <- run_cissvae(
@@ -350,7 +362,7 @@ aut <- autotune_cissvae(
   n_trials = 3, ## Using low number of trials for demo
   study_name = "comprehensive_vae_autotune",
   device_preference = "cpu",
-  show_progress = TRUE,  # Rich progress bars with training visualization
+  show_progress = FALSE,  # Set true for Rich progress bars with training visualization
   optuna_dashboard_db = "sqlite:///optuna_study.db",  # Save results to database
   load_if_exists = TRUE,
   seed = 42, 
@@ -393,9 +405,9 @@ results <- aut$results
 
 # View best hyperparameters
 cat("Best validation MSE:", study$best_value, "\n")
-print("Best trial parameters:")
-best_trial <- results[results$trial_number == study$best_trial$number, ]
-print(best_trial[, c("latent_dim", "lr", "encoder_shared_placement", "decoder_shared_placement", "val_mse")])
+print("Trial results:")
+results %>% kable() %>%
+  kable_styling(font_size=12)
 
 # Plot model architecture
 plot_vae_architecture(best_model, title = "Optimized CISSVAE Architecture")
@@ -418,7 +430,7 @@ aut <- autotune_cissvae(
   n_trials = 3, ## Using low number of trials for demo
   study_name = "comprehensive_vae_autotune",
   device_preference = "cpu",
-  show_progress = TRUE,  # Rich progress bars with training visualization
+  show_progress = FALSE,  # Rich progress bars with training visualization
   optuna_dashboard_db = "sqlite:///optuna_study.db",  # Save results to database
   load_if_exists = TRUE,
   seed = 42, 
@@ -460,7 +472,8 @@ results <- aut$results
 
 cat("Best validation MSE:", study$best_value, "\n")
 print("Trial results:")
-print(head(results))
+results %>% kable() %>%
+  kable_styling(font_size=12)
 
 plot_vae_architecture(best_model, title = "Optimized CISSVAE Architecture", save_path = "autotune_vae_arch.png")
 ```

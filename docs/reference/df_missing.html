@@ -104,74 +104,40 @@ demonstrate imputation workflows.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ Y53         : num [1:8000] -4.68 -2.29 -5.43 -5.73 -1.92 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ Y54         : num [1:8000] -2.248 -0.887 -1.33 -1.64 NA ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ Y55         : num [1:8000] -2.679 0.563 -2.324 -4.446 0.103 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "spec")=List of 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ cols   :List of 31</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ ...1        : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Age         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Salary      : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ ZipCode10001: list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ ZipCode20002: list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ ZipCode30003: list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y11         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y12         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y13         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y14         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y15         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y21         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y22         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y23         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y24         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y25         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y31         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y32         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y33         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y34         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y35         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y41         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y42         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y43         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y44         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y45         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y51         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y52         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y53         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y54         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ Y55         : list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "collector_double" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ default: list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..- attr(*, "class")= chr [1:2] "collector_guess" "collector"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ delim  : chr ","</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "class")= chr "col_spec"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "spec")=</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. cols(</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   ...1 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Age = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Salary = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   ZipCode10001 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   ZipCode20002 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   ZipCode30003 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y11 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y12 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y13 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y14 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y15 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y21 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y22 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y23 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y24 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y25 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y31 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y32 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y33 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y34 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y35 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y41 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y42 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y43 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y44 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y45 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y51 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y52 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y53 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y54 = <span style="color: #00BB00;">col_double()</span>,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..   Y55 = <span style="color: #00BB00;">col_double()</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. )</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "problems")=&lt;externalptr&gt; </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">df_missing</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      index           Age             Salary       ZipCode10001   </span>

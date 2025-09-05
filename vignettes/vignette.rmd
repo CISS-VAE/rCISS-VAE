@@ -480,11 +480,13 @@ plot_vae_architecture(best_model, title = "Optimized CISSVAE Architecture", save
 
 ![Autotuned VAE Architecture](autotune_vae_arch.png)
 
+
+
+```{r eval=FALSE, echo = FALSE}
 ## Using Pre-computed Missingness Proportion Matrix -- not quite working yet
 
-For advanced control over the clustering process, you can provide a pre-computed missingness proportion matrix directly to `run_cissvae()`:
+##For advanced control over the clustering process, you can provide a pre-computed missingness proportion matrix directly to `run_cissvae()`:
 
-```{r eval=FALSE}
 ## Standardize df_missing column names to feature_timepoint format
 colnames(df_missing) = c('index', 'Age', 'Salary', 'ZipCode10001', 'ZipCode20002', 'ZipCode30003', 'Y1_1', 'Y1_2', 'Y1_3', 'Y1_4', 'Y1_5', 'Y2_1', 'Y2_2', 'Y2_3', 'Y2_4', 'Y2_5', 'Y3_1', 'Y3_2', 'Y3_3', 'Y3_4', 'Y3_5', 'Y4_1', 'Y4_2', 'Y4_3', 'Y4_4', 'Y4_5', 'Y5_1', 'Y5_2', 'Y5_3', 'Y5_4', 'Y5_5')
 

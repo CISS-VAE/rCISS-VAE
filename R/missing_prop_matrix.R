@@ -1,10 +1,10 @@
 #' Create Missingness Proportion Matrix
 #'
 #' Creates a matrix where each entry represents the proportion of missing values
-#' for each feature across multiple timepoints per sample. Each sample will have
-#' one proportion value for each feature. Features may have multiple time points
+#' for each sample–feature combination across multiple timepoints. Each sample will have
+#' one proportion value per feature. Features may have repeated time points
 #' (columns named like `feature_1`, `feature_2`, ...). This matrix can be used
-#' with `cluster_on_missing_prop` to identify features with similar missingness patterns.
+#' with `cluster_on_missing_prop()` to group samples with similar missingness patterns.
 #'
 #' @param data Data frame or matrix containing the input data with potential missing values.
 #' @param index_col Character scalar. Name of an index column to exclude from analysis (optional).
@@ -121,7 +121,7 @@ create_missingness_prop_matrix <- function(
 
       these <- grep(pat, feature_candidate_cols, value = TRUE)
       if (length(these) == 0) {
-        stop("aaaaAAAAAAAAAaaaaah")
+        stop("No columns found for repeated features using current pattern. Please ensure columns are named according to pattern.")
         # stop(sprintf(
         #   "No columns found for repeated feature '%s' using pattern '%s'. " %+%
         #   "Ensure columns are named like '%s_1', '%s_2', ...",

@@ -74,56 +74,53 @@ cluster_on_missing <- function(
 
 
 
-
-#' Cluster Features Based on Missingness Proportions
+#' Cluster Samples Based on Missingness Proportions
 #'
-#' Groups features with similar patterns of missingness across samples using either
-#' K-means clustering (when n_clusters is specified) or HDBSCAN (when n_clusters is NULL).
-#' This helps identify features that tend to be missing together systematically.
-#' 
+#' Groups **samples** with similar patterns of missingness across features using either
+#' K-means clustering (when `n_clusters` is specified) or HDBSCAN (when `n_clusters` is `NULL`).
+#' This is useful for detecting cohorts with shared missing-data behavior (e.g., site/batch effects).
 #'
-#' @param prop_matrix Matrix or data frame where rows are samples, columns are features, 
-#'   entries are missingness proportions [0,1]. Can be created with create_missingness_prop_matrix().
-#' @param n_clusters Number of clusters for KMeans; if NULL, uses HDBSCAN (default: NULL)
-#' @param seed Random seed for KMeans reproducibility (default: NULL)
-#' @param min_cluster_size HDBSCAN minimum cluster size; if NULL, uses max(2, n_features/25) (default: NULL)
-#' @param cluster_selection_epsilon HDBSCAN cluster selection threshold (default: 0.25)
-#' @param metric Distance metric - "euclidean" or "cosine" (default: "euclidean")
-#' @param scale_features Whether to standardize feature vectors before clustering (default: FALSE)
-#' @param handle_noise How to handle HDBSCAN noise points: "keep" (default), "separate", or "merge"
+#' @param prop_matrix Matrix or data frame where **rows are samples** and **columns are features**,
+#'   entries are missingness proportions in [0,1]. Can be created with `create_missingness_prop_matrix()`.
+#' @param n_clusters Integer; number of clusters for KMeans. If `NULL`, uses HDBSCAN (default: `NULL`).
+#' @param seed Integer; random seed for KMeans reproducibility (default: `NULL`).
+#' @param min_cluster_size Integer; HDBSCAN minimum cluster size. If `NULL`, Python default is used
+#'   (typically a function of the number of samples) (default: `NULL`).
+#' @param cluster_selection_epsilon Numeric; HDBSCAN cluster selection threshold (default: `0.25`).
+#' @param metric Character; distance metric `"euclidean"` or `"cosine"` (default: `"euclidean"`).
+#' @param scale_features Logical; whether to standardize **feature columns** before clustering samples (default: `FALSE`).
+#' @param handle_noise Character; how to handle HDBSCAN noise points (`-1`):
+#'   `"keep"` (each noise sample gets its own new cluster ID), `"separate"` (all noise samples share one new ID),
+#'   or `"merge"` (noise samples assigned to largest existing cluster) (default: `"keep"`).
 #'
-#' @return List containing:
-#'   - labels: Integer vector of cluster assignments for each feature (includes -1 for noise if HDBSCAN)
-#'   - labels_positive: Integer vector with noise points converted to positive cluster IDs
-#'   - silhouette_score: Silhouette score for clustering quality (NULL if not calculable)
-#'   - feature_names: Names of features corresponding to cluster labels
-#'   - n_noise: Number of features assigned to noise (HDBSCAN only)
-#' @export
+#' @return A list with:
+#' \itemize{
+#'   \item \code{clusters}: Integer vector of cluster assignments per **sample** (may include -1 for HDBSCAN noise).
+#'   \item \code{clusters_positive}: Integer vector with all labels non-negative after applying \code{handle_noise}.
+#'   \item \code{silhouette_score}: Numeric silhouette score, or \code{NULL} if not computable.
+#'   \item \code{sample_names}: Character vector of sample names corresponding to \code{clusters}.
+#'   \item \code{n_samples}: Integer; number of samples (rows).
+#'   \item \code{n_clusters_found}: Integer; number of clusters found (excluding noise).
+#'   \item \code{n_clusters_final}: Integer; final number of clusters after noise handling.
+#'   \item \code{n_noise}: Integer; number of samples assigned to noise (HDBSCAN only).
+#'   \item \code{handle_noise}: The noise handling mode used.
+#' }
 #'
 #' @examples
-#' # Create sample data with systematic missingness patterns
 #' set.seed(123)
-#' data <- data.frame(
-#'   sample_id = 1:100,
-#'   # Group 1: High missingness in first 50 samples
-#'   feat1 = c(rep(NA, 50), rnorm(50)),
-#'   feat2 = c(rep(NA, 45), rnorm(55)),
-#'   feat3 = c(rep(NA, 48), rnorm(52)),
-#'   # Group 2: High missingness in last 50 samples  
-#'   feat4 = c(rnorm(50), rep(NA, 50)),
-#'   feat5 = c(rnorm(52), rep(NA, 48)),
-#'   # Group 3: Low missingness throughout
-#'   feat6 = c(rnorm(90), rep(NA, 10)),
-#'   feat7 = c(rnorm(88), rep(NA, 12))
+#' dat <- data.frame(
+#'   sample_id = paste0("s", 1:12),
+#'   # Two features measured at 3 timepoints each → proportions by feature per sample
+#'   A_1 = c(NA, rnorm(11)), A_2 = c(NA, rnorm(11)), A_3 = rnorm(12),
+#'   B_1 = rnorm(12),        B_2 = c(rnorm(10), NA, NA), B_3 = rnorm(12)
 #' )
-#' 
-#' # Create proportion matrix
-#' prop_mat <- create_missingness_prop_matrix(data, index_col = "sample_id")
-#' 
-#' # Cluster features by missingness pattern
-#' clusters <- cluster_on_missing_prop(prop_mat, n_clusters = 3)
-#' print(clusters$labels)
-#' print(clusters$silhouette_score)
+#' pm <- create_missingness_prop_matrix(dat, index_col = "sample_id",
+#'                                      repeat_feature_names = c("A","B"))
+#' res <- cluster_on_missing_prop(pm, n_clusters = 2, metric = "cosine", scale_features = TRUE)
+#' table(res$clusters_positive)
+#' res$silhouette_score
+#'
+#' @export
 cluster_on_missing_prop <- function(
   prop_matrix,
   n_clusters = NULL,
@@ -134,53 +131,51 @@ cluster_on_missing_prop <- function(
   scale_features = FALSE,
   handle_noise = "keep"
 ) {
-  requireNamespace("reticulate", quietly = TRUE)
-  requireNamespace("dplyr", quietly = TRUE)
-  # Import Python clustering function
-  cluster_mod <- import("ciss_vae.utils.helpers", convert = FALSE)
-  cluster_func <- cluster_mod$cluster_on_missing_prop
-  np <- import("numpy", convert = FALSE)
-  
-  # Prepare data
-  if (is.data.frame(prop_matrix)) {
-    feature_names <- colnames(prop_matrix)
-    prop_py <- r_to_py(as.matrix(prop_matrix))
-  } else {
-    feature_names <- colnames(prop_matrix)
-    if (is.null(feature_names)) {
-      feature_names <- paste0("feature_", 1:ncol(prop_matrix))
-    }
-    prop_py <- r_to_py(prop_matrix)
+  # Dependencies
+  if (!requireNamespace("reticulate", quietly = TRUE)) {
+    stop("Package 'reticulate' is required. Install it to use this function.")
   }
-  
+
+  # Locate Python function
+  run_mod <- reticulate::import("ciss_vae.utils.run_cissvae", convert = FALSE)
+  cluster_func <- run_mod$cluster_on_missing_prop
+
+  # Prepare data for Python
+
+  if (is.data.frame(prop_matrix)) {
+    sample_names <- rownames(prop_matrix)
+    if (is.null(sample_names)) {
+      sample_names <- paste0("sample_", seq_len(nrow(prop_matrix)))
+    }
+    prop_py <- reticulate::r_to_py(as.matrix(prop_matrix))
+  } else if (is.matrix(prop_matrix)) {
+    sample_names <- rownames(prop_matrix)
+    if (is.null(sample_names)) {
+      sample_names <- paste0("sample_", seq_len(nrow(prop_matrix)))
+    }
+    prop_py <- reticulate::r_to_py(prop_matrix)
+  } else {
+    stop("`prop_matrix` must be a data.frame or matrix with rows = samples and columns = features.")
+  }
+
   # Validate inputs
   if (!is.null(n_clusters)) {
     n_clusters <- as.integer(n_clusters)
-    if (n_clusters < 2) {
-      stop("n_clusters must be >= 2")
-    }
+    if (n_clusters < 2) stop("n_clusters must be >= 2")
   }
-  
-  if (!is.null(seed)) {
-    seed <- as.integer(seed)
-  }
-  
+  if (!is.null(seed)) seed <- as.integer(seed)
   if (!is.null(min_cluster_size)) {
     min_cluster_size <- as.integer(min_cluster_size)
-    if (min_cluster_size < 2) {
-      stop("min_cluster_size must be >= 2")
-    }
+    if (min_cluster_size < 2) stop("min_cluster_size must be >= 2")
   }
-  
   if (!metric %in% c("euclidean", "cosine")) {
     stop("metric must be 'euclidean' or 'cosine'")
   }
-  
   if (!handle_noise %in% c("keep", "separate", "merge")) {
     stop("handle_noise must be 'keep', 'separate', or 'merge'")
   }
-  
-  # Build arguments
+
+  # Build Python args, drop NULLs
   args_py <- list(
     prop_matrix = prop_py,
     n_clusters = n_clusters,
@@ -190,62 +185,57 @@ cluster_on_missing_prop <- function(
     metric = metric,
     scale_features = scale_features
   )
-  
-  # Remove NULL values
-  args_py <- args_py[!sapply(args_py, is.null)]
-  
-  # Call Python function
+  args_py <- args_py[!vapply(args_py, is.null, logical(1))]
+
+  # Call Python and convert result
   result_py <- do.call(cluster_func, args_py)
-  
-  # Convert results back to R
-  result_list <- py_to_r(result_py)
-  labels <- as.integer(result_list[[1]])
+  result_list <- reticulate::py_to_r(result_py)
+
+  labels <- as.integer(result_list[[1]])          # per-sample labels
   silhouette_score <- result_list[[2]]
-  
-  # Handle noise points (HDBSCAN assigns -1 to noise)
-  n_noise <- sum(labels == -1)
-  
-  # Create positive labels for CISS-VAE (which expects non-negative cluster IDs)
+
+  # Noise handling (for HDBSCAN: -1 = noise)
+  n_noise <- sum(labels == -1L, na.rm = TRUE)
   labels_positive <- labels
-  if (n_noise > 0) {
-    max_cluster <- max(labels[labels >= 0])
-    
+
+  if (n_noise > 0L) {
+    max_cluster <- suppressWarnings(max(labels[labels >= 0L], na.rm = TRUE))
+    if (!is.finite(max_cluster)) max_cluster <- -1L
+
     if (handle_noise == "keep") {
-      # Give each noise point its own cluster ID
-      noise_indices <- which(labels == -1)
-      labels_positive[noise_indices] <- (max_cluster + 1):(max_cluster + n_noise)
-      
+      noise_idx <- which(labels == -1L)
+      labels_positive[noise_idx] <- seq.int(from = max_cluster + 1L,
+                                            length.out = length(noise_idx))
     } else if (handle_noise == "separate") {
-      # All noise points get the same new cluster ID
-      labels_positive[labels == -1] <- max_cluster + 1
-      
+      labels_positive[labels == -1L] <- max_cluster + 1L
     } else if (handle_noise == "merge") {
-      # Merge noise points with the largest existing cluster
-      if (max_cluster >= 0) {
-        cluster_counts <- table(labels[labels >= 0])
-        largest_cluster <- as.integer(names(cluster_counts)[which.max(cluster_counts)])
-        labels_positive[labels == -1] <- largest_cluster
+      if (max_cluster >= 0L) {
+        tab <- table(labels[labels >= 0L])
+        largest <- as.integer(names(tab)[which.max(tab)])
+        labels_positive[labels == -1L] <- largest
       } else {
-        # All points are noise - assign them all to cluster 0
-        labels_positive[labels == -1] <- 0
+        # all noise → assign cluster 0
+        labels_positive[labels == -1L] <- 0L
       }
     }
   }
-  
-  # Calculate statistics
-  unique_original <- unique(labels[labels >= 0])
+
+  # Stats
+  n_samples <- length(sample_names)
+  unique_original <- unique(labels[labels >= 0L])
   unique_positive <- unique(labels_positive)
-  
-  # Return structured result
-  list(
-    labels = labels,  # Original labels (may include -1 for noise)
-    labels_positive = labels_positive,  # All non-negative labels for CISS-VAE
+
+  outs = list(
+    clusters = labels,                          # may include -1 for noise
+    clusters_positive = labels_positive,        # non-negative labels after handling
     silhouette_score = silhouette_score,
-    feature_names = feature_names,
-    n_features = length(feature_names),
-    n_clusters_found = length(unique_original),  # Actual clusters found (excluding noise)
-    n_clusters_final = length(unique_positive),  # Final clusters after noise handling
+    sample_names = sample_names,
+    n_samples = n_samples,
+    n_clusters_found = length(unique_original),
+    n_clusters_final = length(unique_positive),
     n_noise = n_noise,
     handle_noise = handle_noise
   )
+
+  return(outs)
 }

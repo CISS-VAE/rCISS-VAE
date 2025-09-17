@@ -198,7 +198,6 @@ run_cissvae <- function(
   print_dataset          = TRUE,
   clusters               = NULL,
   n_clusters             = NULL,
-  cluster_selection_epsilon = 0.25,
   seed                   = 42,
   missingness_proportion_matrix = NULL,
   scale_features         = FALSE,
@@ -222,33 +221,70 @@ run_cissvae <- function(
   decay_factor_refit     = NULL,
   beta_refit             = NULL,
   verbose                = FALSE,
+  return_clusters        = FALSE,     # NEW
   return_silhouettes     = FALSE,
   return_history         = FALSE,
-  return_dataset         = FALSE  # Changed from return_valdata
+  return_dataset         = FALSE,
+  ## NEw stuff from the ptyhon update
+  do_not_impute_matrix   = NULL,
+  k_neighbors            = 15L,
+  leiden_resolution      = 0.5,
+  leiden_objective       = c("CPM", "RB", "Modularity"),
+  debug                  = FALSE
 ) {
-  
-  # ── 1) Coerce integer-only args ─────────────────────────────────────────
+  leiden_objective <- match.arg(leiden_objective)
+
+  # ---------- helpers ----------
+  `%||%` <- function(a, b) if (is.null(a)) b else a
+  is_py_obj <- function(x) inherits(x, "python.builtin.object")
+  accepts_arg <- function(py_callable, name) {
+    inspect <- reticulate::import("inspect", convert = FALSE)
+    ok <- FALSE
+    try({
+      sig <- inspect$signature(py_callable)
+      ok <- !is.null(sig$parameters$get(name))
+    }, silent = TRUE)
+    ok
+  }
+  to_r_df_safely <- function(x) {
+    if (is.data.frame(x)) return(x)
+    if (inherits(x, "python.builtin.object")) {
+      if (reticulate::py_has_attr(x, "to_dict")) {
+        out <- tryCatch(reticulate::py_to_r(x), error = function(e) NULL)
+        if (is.data.frame(out)) return(out)
+        if (is.list(out) && length(out) > 0L && length(unique(lengths(out))) == 1L)
+          return(as.data.frame(out, stringsAsFactors = FALSE))
+      }
+      if (reticulate::py_has_attr(x, "shape")) {
+        arr <- tryCatch(reticulate::py_to_r(x), error = function(e) NULL)
+        if (is.matrix(arr)) return(as.data.frame(arr, stringsAsFactors = FALSE))
+        if (is.vector(arr)) return(data.frame(arr, check.names = FALSE))
+      }
+      out <- tryCatch(reticulate::py_to_r(x), error = function(e) NULL)
+      if (is.data.frame(out)) return(out)
+      if (is.list(out) && length(out) > 0L && length(unique(lengths(out))) == 1L)
+        return(as.data.frame(out, stringsAsFactors = FALSE))
+      return(out)
+    }
+    if (is.list(x) && length(x) > 0L && length(unique(lengths(x))) == 1L)
+      return(as.data.frame(x, stringsAsFactors = FALSE))
+    x
+  }
+
+  # ---------- coerce numerics/ints ----------
   seed            <- as.integer(seed)
   latent_dim      <- as.integer(latent_dim)
   batch_size      <- as.integer(batch_size)
   epochs          <- as.integer(epochs)
   max_loops       <- as.integer(max_loops)
   patience        <- as.integer(patience)
-  
-  # Optional single values 
   n_clusters      <- if (!is.null(n_clusters)) as.integer(n_clusters) else NULL
   epochs_per_loop <- if (!is.null(epochs_per_loop)) as.integer(epochs_per_loop) else NULL
-  
-  initial_lr_refit    <- if (!is.null(initial_lr_refit)) as.numeric(initial_lr_refit) else NULL
-  decay_factor_refit  <- if (!is.null(decay_factor_refit)) as.numeric(decay_factor_refit) else NULL
-  beta_refit          <- if (!is.null(beta_refit)) as.numeric(beta_refit) else NULL
-  
-  # Vectors
   hidden_dims     <- as.integer(hidden_dims)
   layer_order_enc <- as.character(layer_order_enc)
   layer_order_dec <- as.character(layer_order_dec)
-  
-  # ── 2) Handle index_col ─────────────────────────────────────────────────
+
+  # ---------- index_col handling ----------
   if (!is.null(index_col)) {
     if (!index_col %in% colnames(data)) stop("`index_col` not found in data.")
     index_vals <- data[[index_col]]
@@ -256,203 +292,158 @@ run_cissvae <- function(
   } else {
     index_vals <- NULL
   }
-  
-  # ── 3) Capture original row/col names ───────────────────────────────────
   orig_rn <- if (is.data.frame(data) || is.matrix(data)) rownames(data) else NULL
   orig_cn <- if (is.data.frame(data) || is.matrix(data)) colnames(data) else NULL
-  
-  # ── 4) Convert to matrix ────────────────────────────────────────────────
-  mat <- if (is.data.frame(data)) as.matrix(data) else data
-  
-  # ── 5) Import Python modules ────────────────────────────────────────────
-  py_mod <- reticulate::import("ciss_vae.utils", convert = FALSE)
-  np     <- reticulate::import("numpy", convert = FALSE)
-  
-  # ── 6) Prepare clusters argument ────────────────────────────────────────
+
+  # ---------- imports ----------
+  run_mod <- reticulate::import("ciss_vae.utils.run_cissvae", convert = FALSE)
+  np      <- reticulate::import("numpy", convert = FALSE)
+  pd      <- reticulate::import("pandas", convert = FALSE)
+
+  # ---------- build pandas DataFrame for `data` (fixes .isna() error) ----------
+  if (is_py_obj(data)) {
+    # If it's already a pandas object with .isna, pass through
+    if (reticulate::py_has_attr(data, "isna")) {
+      data_py <- data
+    } else {
+      # Best effort: wrap into pandas DataFrame
+      data_py <- pd$DataFrame(reticulate::r_to_py(as.data.frame(data)))
+    }
+  } else if (is.data.frame(data)) {
+    data_py <- pd$DataFrame(reticulate::r_to_py(data))
+  } else if (is.matrix(data)) {
+    # Keep column names if present
+    df_tmp <- as.data.frame(data, stringsAsFactors = FALSE)
+    colnames(df_tmp) <- colnames(data)
+    data_py <- pd$DataFrame(reticulate::r_to_py(df_tmp))
+  } else {
+    # fallback
+    data_py <- pd$DataFrame(reticulate::r_to_py(as.data.frame(data)))
+  }
+
+  # ---------- prepare py args ----------
   if (!is.null(clusters)) {
     if (is.data.frame(clusters)) clusters <- clusters[[1]]
-    clusters    <- as.vector(clusters)
-    clusters_py <- np$array(clusters)
-  } else {
-    clusters_py <- NULL
-  }
-  
-  # ── 7) Prepare missingness proportion matrix ────────────────────────────
+    clusters <- as.vector(clusters)
+    clusters_py <- np$array(as.integer(clusters))
+  } else clusters_py <- NULL
+
+  # Pass through Python object if already Python; otherwise convert to numpy/pandas
   if (!is.null(missingness_proportion_matrix)) {
-    if (is.data.frame(missingness_proportion_matrix)) {
-      prop_matrix_py <- reticulate::r_to_py(as.matrix(missingness_proportion_matrix))
+    if (is_py_obj(missingness_proportion_matrix)) {
+      prop_matrix_py <- missingness_proportion_matrix
+    } else if (is.data.frame(missingness_proportion_matrix)) {
+      prop_matrix_py <- pd$DataFrame(reticulate::r_to_py(missingness_proportion_matrix))
     } else {
-      prop_matrix_py <- reticulate::r_to_py(missingness_proportion_matrix)
+      prop_matrix_py <- reticulate::r_to_py(as.matrix(missingness_proportion_matrix))
     }
-  } else {
-    prop_matrix_py <- NULL
-  }
-  
-  # ── 8) Build argument list ──────────────────────────────────────────────
+  } else prop_matrix_py <- NULL
+
+  if (!is.null(do_not_impute_matrix)) {
+    if (is_py_obj(do_not_impute_matrix)) {
+      dni_py <- do_not_impute_matrix
+    } else {
+      dni_py <- reticulate::r_to_py(as.matrix(do_not_impute_matrix))
+    }
+  } else dni_py <- NULL
+
   py_args <- list(
-    data                          = reticulate::r_to_py(mat),
-    val_proportion                = val_proportion,
-    replacement_value             = replacement_value,
-    columns_ignore                = if (is.null(columns_ignore)) NULL else reticulate::r_to_py(columns_ignore),
-    print_dataset                 = print_dataset,
-    clusters                      = clusters_py,
-    n_clusters                    = n_clusters,
-    cluster_selection_epsilon     = cluster_selection_epsilon,
-    seed                          = seed,
+    data                  = data_py,
+    val_proportion        = val_proportion,
+    replacement_value     = replacement_value,
+    columns_ignore        = if (is.null(columns_ignore)) NULL else reticulate::r_to_py(columns_ignore),
+    print_dataset         = print_dataset,
+    clusters              = clusters_py,
+    n_clusters            = n_clusters,
+    seed                  = seed,
     missingness_proportion_matrix = prop_matrix_py,
-    scale_features                = scale_features,
-    hidden_dims                   = reticulate::r_to_py(hidden_dims),
-    latent_dim                    = latent_dim,
-    layer_order_enc               = reticulate::r_to_py(layer_order_enc),
-    layer_order_dec               = reticulate::r_to_py(layer_order_dec),
-    latent_shared                 = latent_shared,
-    output_shared                 = output_shared,
-    batch_size                    = batch_size,
-    return_model                  = return_model,
-    epochs                        = epochs,
-    initial_lr                    = initial_lr,
-    decay_factor                  = decay_factor,
-    beta                          = beta,
-    device                        = device,
-    max_loops                     = max_loops,
-    patience                      = patience,
-    epochs_per_loop               = epochs_per_loop,
-    initial_lr_refit              = initial_lr_refit,
-    decay_factor_refit            = decay_factor_refit,
-    beta_refit                    = beta_refit,
-    verbose                       = verbose,
-    return_silhouettes            = return_silhouettes,
-    return_history                = return_history,
-    return_dataset                = return_dataset  # Now maps directly
+    scale_features        = scale_features,
+    hidden_dims           = reticulate::r_to_py(hidden_dims),
+    latent_dim            = latent_dim,
+    layer_order_enc       = reticulate::r_to_py(layer_order_enc),
+    layer_order_dec       = reticulate::r_to_py(layer_order_dec),
+    latent_shared         = latent_shared,
+    output_shared         = output_shared,
+    batch_size            = batch_size,
+    return_model          = return_model,
+    epochs                = epochs,
+    initial_lr            = initial_lr,
+    decay_factor          = decay_factor,
+    beta                  = beta,
+    device                = device,
+    max_loops             = max_loops,
+    patience              = patience,
+    epochs_per_loop       = epochs_per_loop,
+    initial_lr_refit      = initial_lr_refit,
+    decay_factor_refit    = decay_factor_refit,
+    beta_refit            = beta_refit,
+    verbose               = verbose,
+    return_clusters       = return_clusters,
+    return_silhouettes    = return_silhouettes,
+    return_history        = return_history,
+    return_dataset        = return_dataset
   )
-  
-  # Filter out NULLs
+
+  # Conditionally add NEW clustering & control args if Python actually accepts them
+  if (accepts_arg(run_mod$run_cissvae, "do_not_impute_matrix")) py_args$do_not_impute_matrix <- dni_py
+  if (accepts_arg(run_mod$run_cissvae, "k_neighbors"))          py_args$k_neighbors          <- as.integer(k_neighbors)
+  if (accepts_arg(run_mod$run_cissvae, "leiden_resolution"))    py_args$leiden_resolution    <- as.numeric(leiden_resolution)
+  if (accepts_arg(run_mod$run_cissvae, "leiden_objective"))     py_args$leiden_objective     <- as.character(leiden_objective)
+  if (accepts_arg(run_mod$run_cissvae, "debug"))                py_args$debug                <- isTRUE(debug)
+
+  # Drop NULLs
   py_args <- py_args[!vapply(py_args, is.null, logical(1))]
-  
-  # ── 9) Call Python function ─────────────────────────────────────────────
-  res_py <- do.call(py_mod$run_cissvae, py_args)
-  res    <- reticulate::py_to_r(res_py)
-  
-  # ── 10) Handle return values based on what was requested ────────────────
-  # Python returns in this exact order:
-  # 1. imputed_dataset (always)
-  # 2. vae (if return_model=True)
-  # 3. dataset (if return_dataset=True)
-  # 4. silh (if return_silhouettes=True) 
-  # 5. combined_history_df (if return_history=True)
-  
-  if (verbose) {
-    cat("Received", if(is.list(res)) length(res) else 1, "return values\n")
-    cat("Return flags: model =", return_model, ", dataset =", return_dataset, 
-        ", silhouettes =", return_silhouettes, ", history =", return_history, "\n")
+
+  # ---------- call python ----------
+  res_py <- do.call(run_mod$run_cissvae, py_args)
+
+  # ---------- parse return by flags/order ----------
+  is_seq <- inherits(res_py, "python.builtin.object") &&
+            reticulate::py_has_attr(res_py, "__len__") &&
+            reticulate::py_has_attr(res_py, "__getitem__")
+  geti <- function(x, i) if (is_seq) tryCatch(x[[i]], error = function(e) NULL) else if (i == 1L) x else NULL
+
+  idx <- 1L
+  imputed_py <- geti(res_py, idx); idx <- idx + 1L
+  if (is.null(imputed_py)) stop("run_cissvae(): imputed dataset missing from Python return.")
+
+  model_py    <- if (isTRUE(return_model))       { z <- geti(res_py, idx); idx <- idx + 1L; z } else NULL
+  dataset_py  <- if (isTRUE(return_dataset))     { z <- geti(res_py, idx); idx <- idx + 1L; z } else NULL
+  clusters_py <- if (isTRUE(return_clusters))    { z <- geti(res_py, idx); idx <- idx + 1L; z } else NULL
+  silh_py     <- if (isTRUE(return_silhouettes)) { z <- geti(res_py, idx); idx <- idx + 1L; z } else NULL
+  hist_py     <- if (isTRUE(return_history))     { z <- geti(res_py, idx); idx <- idx + 1L; z } else NULL
+
+  # ---------- convert/repair names ----------
+  imputed_df <- to_r_df_safely(imputed_py)
+  imputed_df <- as.data.frame(imputed_df, stringsAsFactors = FALSE)
+
+  rn_from_py <- NULL
+  if (inherits(imputed_py, "python.builtin.object") &&
+      reticulate::py_has_attr(imputed_py, "index") &&
+      reticulate::py_has_attr(imputed_py$index, "tolist")) {
+    rn_from_py <- tryCatch(reticulate::py_to_r(imputed_py$index$tolist()), error = function(e) NULL)
+    if (!is.null(rn_from_py)) rn_from_py <- as.character(rn_from_py)
   }
-  
-  if (is.list(res)) {
-    # Multiple return values
-    imputed_data <- res[[1]]
-    idx <- 2
-  } else {
-    # Single return value (just imputed data)
-    imputed_data <- res
-    idx <- NULL
-  }
-  
-  # ── 11) Convert imputed data to data.frame ──────────────────────────────
-  imputed_df <- as.data.frame(imputed_data, stringsAsFactors = FALSE)
-  if (!is.null(orig_rn)) rownames(imputed_df) <- orig_rn
-  if (!is.null(orig_cn)) colnames(imputed_df) <- orig_cn
-  
-  # ── 12) Re-attach index_col if provided ─────────────────────────────────
-  if (!is.null(index_vals)) {
+
+  if (!is.null(rn_from_py) && length(rn_from_py) == nrow(imputed_df)) rownames(imputed_df) <- rn_from_py
+  if (!is.null(orig_rn)    && length(orig_rn)    == nrow(imputed_df)) rownames(imputed_df) <- orig_rn
+  if (!is.null(orig_cn)    && length(orig_cn)    == ncol(imputed_df)) colnames(imputed_df) <- orig_cn
+
+  if (!is.null(index_vals) && length(index_vals) == nrow(imputed_df)) {
     imputed_df[[index_col]] <- index_vals
-    imputed_df <- imputed_df[, c(index_col, setdiff(names(imputed_df), index_col))]
+    imputed_df <- imputed_df[, c(index_col, setdiff(names(imputed_df), index_col)), drop = FALSE]
+  } else if (!is.null(index_vals) && length(index_vals) != nrow(imputed_df) && isTRUE(verbose)) {
+    message("run_cissvae(): index_col length mismatch; not attaching index_col.")
   }
-  
-  # ── 13) Assemble output based on return flags and exact Python order ────
+
+  # ---------- assemble output ----------
   out <- list(imputed = imputed_df)
-  
-  if (!is.null(idx) && length(res) >= idx) {
-    
-    # Parse in the exact order Python returns them
-    
-    # 2. Model (if return_model=True)
-    if (return_model && idx <= length(res)) {
-      out$model <- res[[idx]]
-      idx <- idx + 1
-    }
-    
-    # 3. Dataset (if return_dataset=True) - Return ClusterDataset object as-is
-    if (return_dataset && idx <= length(res)) {
-      dataset_py <- res[[idx]]
-      
-      # Return the ClusterDataset object directly without conversion
-      tryCatch({
-        # Validate it's a ClusterDataset object
-        if (reticulate::py_has_attr(dataset_py, "__class__")) {
-          class_name <- reticulate::py_to_r(dataset_py$`__class__`$`__name__`)
-          if (grepl("ClusterDataset", class_name)) {
-            out$dataset <- dataset_py  # Return Python object directly
-          } else {
-            warning("Expected ClusterDataset but got ", class_name)
-            out$dataset <- dataset_py  # Return anyway
-          }
-        } else {
-          out$dataset <- dataset_py  # Return as-is
-        }
-      }, error = function(e) {
-        warning("Could not validate ClusterDataset object: ", e$message)
-        out$dataset <- dataset_py  # Return as-is if validation fails
-      })
-      
-      idx <- idx + 1
-    }
-    
-    # 4. Silhouettes (if return_silhouettes=True)
-    if (return_silhouettes && idx <= length(res)) {
-      out$silhouettes <- res[[idx]]
-      idx <- idx + 1
-    }
-    
-    # 5. History (if return_history=True)
-    if (return_history && idx <= length(res)) {
-      history_py <- res[[idx]]
-      
-      tryCatch({
-        if (reticulate::py_has_attr(history_py, "to_numpy")) {
-          # It's a pandas DataFrame
-          out$history <- reticulate::py_to_r(history_py)
-        } else if (is.data.frame(history_py)) {
-          # Already converted to R data.frame
-          out$history <- history_py
-        } else if (is.list(history_py)) {
-          # It's an R list - try to convert to data.frame
-          if (length(history_py) > 0 && all(sapply(history_py, function(x) is.vector(x) && is.numeric(x)))) {
-            # Check if all elements have the same length
-            lengths <- sapply(history_py, length)
-            if (length(unique(lengths)) == 1) {
-              # All same length - can convert to data.frame
-              out$history <- as.data.frame(history_py, stringsAsFactors = FALSE)
-            } else {
-              # Different lengths - return as list with warning
-              warning("Training history has inconsistent lengths, returning as list")
-              out$history <- history_py
-            }
-          } else {
-            # Try direct conversion to data.frame
-            out$history <- as.data.frame(history_py, stringsAsFactors = FALSE)
-          }
-        } else {
-          # Try direct conversion
-          out$history <- as.data.frame(reticulate::py_to_r(history_py), stringsAsFactors = FALSE)
-        }
-      }, error = function(e) {
-        warning("Failed to convert training history to R data.frame: ", e$message)
-        out$history <- history_py  # Return as-is if conversion fails
-      })
-      
-      idx <- idx + 1
-    }
-  }
-  
-  return(out)
+  if (isTRUE(return_model)       && !is.null(model_py))    out$model       <- model_py
+  if (isTRUE(return_dataset)     && !is.null(dataset_py))  out$dataset     <- dataset_py
+  if (isTRUE(return_clusters)    && !is.null(clusters_py)) out$clusters    <- tryCatch(reticulate::py_to_r(clusters_py), error = function(e) NULL)
+  if (isTRUE(return_silhouettes) && !is.null(silh_py))     out$silhouettes <- tryCatch(reticulate::py_to_r(silh_py), error = function(e) NULL)
+  if (isTRUE(return_history)     && !is.null(hist_py))     out$history     <- to_r_df_safely(hist_py)
+
+  if (isTRUE(verbose)) cat("run_cissvae(): returned ->", paste(names(out), collapse = ", "), "\n")
+  out
 }

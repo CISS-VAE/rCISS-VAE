@@ -4,3 +4,4 @@
 ^\.venv(/|$)
 .readthedocs.yaml
 ^docs/
+^codecov\.yml$

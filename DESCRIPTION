@@ -3,7 +3,12 @@ Title: Clustering-Informed Shared-Structure Variational Autoencoder (CISS-VAE) f
 Version: 0.0.1.0000
 Authors@R: 
     c(  person(given = "Yasin", family = "Khadem Charvadeh", email = "khademy@mskcc.org", role = c("aut")),
-        person(given = "Danielle", family = "Vaithilingam", email = "vaithid1@mskcc.org", role = c("aut", "cre")))
+        person(given = "Danielle", family = "Vaithilingam", email = "vaithid1@mskcc.org", role = c("aut", "cre")),
+        person(given = "Kenneth", family = "Seier", role = c("aut")),
+        person( given = "Katherine", middle="S.", family = "Panageas", role = c("aut")),
+        person(given = "Mithat", family = "Gönen", role = c("aut")),
+        person(given = "Yuan", family = "Chen", email = "cheny19@mskcc.org", role = c("aut"))
+        )
 Description: Implements the Clustering-Informed Shared-Structure Variational 
     Autoencoder (CISS-VAE), a deep learning framework for missing data imputation. 
 License: MIT + file LICENSE

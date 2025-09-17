@@ -2,15 +2,15 @@ url: https://ciss-vae.github.io/rCISS-VAE/
 
 template:
   bootstrap: 5
-  bootswatch: flatly
+  bootswatch: spacelab
 
 navbar:
   title: "rCISSVAE"
   left:
     - text: "Functions"
       href: reference/index.html
-    - text: "Articles"
-      href: articles/index.html
+    - text: "Tutorials"
+      href: tutorials/index.html
     - text: "News"
       href: news/index.html
   right:
@@ -18,7 +18,7 @@ navbar:
       href: https://github.com/CISS-VAE/rCISS-VAE
       aria-label: "GitHub"
 
-articles:
+tutorials:
 - title: "Vignettes"
   desc: "Package vignettes"  
   contents: 

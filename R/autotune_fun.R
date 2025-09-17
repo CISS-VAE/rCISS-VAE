@@ -1,6 +1,7 @@
 # rCISSVAE/R/autotune_fun.R
 library(reticulate)
 library(dplyr)
+library(purrr)
 #' Autotune CISS-VAE hyperparameters with Optuna
 #' 
 #' Performs hyperparameter optimization for CISS-VAE using Optuna, with support for

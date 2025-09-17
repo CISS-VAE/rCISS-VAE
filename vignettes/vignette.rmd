@@ -117,6 +117,7 @@ suppressPackageStartupMessages({
   library(reticulate)
   library(rCISSVAE)
   library(gtsummary)
+  library(kableExtra)
 })
 
 
@@ -124,7 +125,7 @@ data(df_missing)
 data(clusters)
 
 tbl_summary(df_missing, include = -"index") %>%
-   as_kable() %>%
+   kable() %>%
   kable_styling(font_size = 12)
 ```
 
@@ -364,7 +365,7 @@ aut <- autotune_cissvae(
   device_preference = "cpu",
   show_progress = FALSE,  # Set true for Rich progress bars with training visualization
   optuna_dashboard_db = "sqlite:///optuna_study.db",  # Save results to database
-  load_if_exists = TRUE,
+  load_if_exists = FALSE,
   seed = 42, 
   verbose = FALSE,
   
@@ -432,7 +433,7 @@ aut <- autotune_cissvae(
   device_preference = "cpu",
   show_progress = FALSE,  # Rich progress bars with training visualization
   optuna_dashboard_db = "sqlite:///optuna_study.db",  # Save results to database
-  load_if_exists = TRUE,
+  load_if_exists = FALSE,
   seed = 42, 
   verbose = FALSE,
   
@@ -482,7 +483,7 @@ plot_vae_architecture(best_model, title = "Optimized CISSVAE Architecture", save
 
 
 
-```{r eval=FALSE, echo = FALSE}
+```{r eval=TRUE, echo = TRUE}
 ## Using Pre-computed Missingness Proportion Matrix -- not quite working yet
 
 ##For advanced control over the clustering process, you can provide a pre-computed missingness proportion matrix directly to `run_cissvae()`:

@@ -49,8 +49,8 @@ jobs:
       - name: Sanity check Python import
         run: |
           python - <<'PY'
-          import cissvae, sys
-          print("cissvae version:", getattr(cissvae, "__version__", "unknown"))
+          import ciss_vae, sys
+          print("ciss-vae version:", getattr(ciss_vae, "__version__", "unknown"))
           PY
 
       - name: Install R package deps

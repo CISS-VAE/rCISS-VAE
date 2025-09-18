@@ -13,10 +13,12 @@ run_cissvae(
   print_dataset = TRUE,
   clusters = NULL,
   n_clusters = NULL,
-  cluster_selection_epsilon = 0.25,
   seed = 42,
   missingness_proportion_matrix = NULL,
   scale_features = FALSE,
+  k_neighbors = 15L,
+  leiden_resolution = 0.5,
+  leiden_objective = "CPM",
   hidden_dims = c(150, 120, 60),
   latent_dim = 15,
   layer_order_enc = c("unshared", "unshared", "unshared"),
@@ -24,7 +26,6 @@ run_cissvae(
   latent_shared = FALSE,
   output_shared = FALSE,
   batch_size = 4000,
-  return_model = TRUE,
   epochs = 500,
   initial_lr = 0.01,
   decay_factor = 0.999,
@@ -37,9 +38,13 @@ run_cissvae(
   decay_factor_refit = NULL,
   beta_refit = NULL,
   verbose = FALSE,
+  return_model = TRUE,
+  return_clusters = FALSE,
   return_silhouettes = FALSE,
   return_history = FALSE,
-  return_dataset = FALSE
+  return_dataset = FALSE,
+  do_not_impute_matrix = NULL,
+  debug = FALSE
 )
 }
 \arguments{
@@ -55,7 +60,7 @@ validation during training. Must be between 0 and 1. Default \code{0.1}.}
 \item{replacement_value}{Numeric. Fill value for masked entries during training.
 Default \code{0.0}.}
 
-\item{columns_ignore}{Character or integer vector. Columns to exclude from training.
+\item{columns_ignore}{Character or integer vector. Columns to exclude from validation set.
 Can specify by name or index. Default \code{NULL}.}
 
 \item{print_dataset}{Logical. If \code{TRUE}, prints dataset summary information during
@@ -65,16 +70,15 @@ processing. Default \code{TRUE}.}
 labels for samples. If \code{NULL}, clustering will be performed automatically. Default \code{NULL}.}
 
 \item{n_clusters}{Integer. Number of clusters for KMeans clustering when \code{clusters}
-is \code{NULL}. If \code{NULL}, optimal number will be determined automatically. Default \code{NULL}.}
-
-\item{cluster_selection_epsilon}{Numeric. Epsilon parameter for HDBSCAN clustering
-when automatic clustering is used. Default \code{0.25}.}
+is \code{NULL}. Number of clusters for KMeans clustering when 'clusters' is NULL. If \code{NULL},
+will use \href{https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html}{HDBSCAN} for clustering.
+Default \code{NULL}.}
 
 \item{seed}{Integer. Random seed for reproducible results. Default \code{42}.}
 
 \item{missingness_proportion_matrix}{Optional pre-computed missingness proportion
 matrix for biomarker-based clustering. If provided, clustering will be based on
-missingness patterns. Default \code{NULL}.}
+these proportions. Default \code{NULL}.}
 
 \item{scale_features}{Logical. Whether to scale features when using missingness
 proportion matrix clustering. Default \code{FALSE}.}
@@ -100,9 +104,6 @@ Default \code{FALSE}.}
 
 \item{batch_size}{Integer. Mini-batch size for training. Larger values may improve
 training stability but require more memory. Default \code{4000}.}
-
-\item{return_model}{Logical. If \code{TRUE}, returns the trained Python VAE model object.
-Default \code{TRUE}.}
 
 \item{epochs}{Integer. Number of epochs for initial training phase. Default \code{500}.}
 
@@ -138,6 +139,9 @@ uses same value as \code{beta}. Default \code{NULL}.}
 \item{verbose}{Logical. If \code{TRUE}, prints detailed progress information during
 training. Default \code{FALSE}.}
 
+\item{return_model}{Logical. If \code{TRUE}, returns the trained Python VAE model object.
+Default \code{TRUE}.}
+
 \item{return_silhouettes}{Logical. If \code{TRUE}, returns silhouette scores for
 cluster quality assessment. Default \code{FALSE}.}
 
@@ -146,6 +150,9 @@ containing loss values and metrics over epochs. Default \code{FALSE}.}
 
 \item{return_dataset}{Logical. If \code{TRUE}, returns the ClusterDataset object used
 during training (contains validation data, masks, etc.). Default \code{FALSE}.}
+
+\item{cluster_selection_epsilon}{Numeric. Epsilon parameter for HDBSCAN clustering
+when automatic clustering is used. Default \code{0.25}.}
 }
 \value{
 A list containing imputed data and optional additional outputs:

@@ -47,7 +47,10 @@ library(purrr)
 autotune_cissvae <- function(
   data,
   index_col              = NULL,
-  clusters,
+  val_proportion         = 0.1,
+  replacement_value      = 0.0,
+  columns_ignore         = NULL,
+  clusters, ## for the autotune function user does clusters themself
   save_model_path        = NULL,
   save_search_space_path = NULL,
   n_trials               = 20,
@@ -150,7 +153,7 @@ autotune_cissvae <- function(
   if (missing(clusters)) stop("`clusters` is required for autotune.")
   data_py     <- np$array(mat)
   clusters_py <- np$array(as.integer(clusters))
-  train_ds_py <- CD_mod(data_py, clusters_py)
+  train_ds_py <- CD_mod(data_py, clusters_py, val_proportion, replacement_value, columns_ignore)
   
   if (verbose) print("Built cluster dataset")
   

@@ -7,6 +7,9 @@
 autotune_cissvae(
   data,
   index_col = NULL,
+  val_proportion = 0.1,
+  replacement_value = 0,
+  columns_ignore = NULL,
   clusters,
   save_model_path = NULL,
   save_search_space_path = NULL,

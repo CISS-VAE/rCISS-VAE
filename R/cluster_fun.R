@@ -81,7 +81,7 @@ cluster_on_missing <- function(
 #' This is useful for detecting cohorts with shared missing-data behavior (e.g., site/batch effects).
 #'
 #' @param prop_matrix Matrix or data frame where **rows are samples** and **columns are features**,
-#'   entries are missingness proportions in [0,1]. Can be created with `create_missingness_prop_matrix()`.
+#'   entries are missingness proportions in `[0,1]`. Can be created with `create_missingness_prop_matrix()`.
 #' @param n_clusters Integer; number of clusters for KMeans. If `NULL`, uses HDBSCAN (default: `NULL`).
 #' @param seed Integer; random seed for KMeans reproducibility (default: `NULL`).
 #' @param min_cluster_size Integer; HDBSCAN minimum cluster size. If `NULL`, Python default is used

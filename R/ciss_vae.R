@@ -364,11 +364,18 @@ run_cissvae <- function(
 
   res_py = do.call(run_mod$run_cissvae, py_args)
 
+  
   ## res_py[0] = imputed df, res_py[1] is model
   
   ## step 7: return to r types
   res_r = reticulate::py_to_r(res_py)
-  imputed_df = res_r[[1]]
+  
+  if(is.data.frame(res_r)){
+    imputed_df = res_r
+  }
+  else{
+    imputed_df = res_r[[1]]
+  }
 
   ## put index back on if there was an index
   if (!is.null(index_vals) && length(index_vals) == nrow(imputed_df)) {
@@ -379,7 +386,7 @@ run_cissvae <- function(
   }
 
   ## step 8: prepare output list
-  out = list(imputed_dataset = imputed_df)
+  out = list(imputed_dataset = as.data.frame(imputed_df))
   
   i = 2 ## starting from second entry in res_r, construct the output object
   if(return_model){
@@ -393,15 +400,15 @@ run_cissvae <- function(
     i = i+1
   }
   if(return_clusters){
-    out[["clusters"]] = res_r[i]
+    out[["clusters"]] = as.vector(res_r[i][[1]])
     i = i+1
   }
   if(return_silhouettes){
-    out[["silhouette_width"]] = res_r[i]
+    out[["silhouette_width"]] = as.numeric(res_r[i])
     i = i+1
   }
   if(return_history){
-    out[["training_history"]] = res_r[i]
+    out[["training_history"]] = as.data.frame(res_r[i])
     i = i+1
   }
 

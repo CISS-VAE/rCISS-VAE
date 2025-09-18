@@ -17,7 +17,7 @@
 #'   is alphanumeric (and may include dots) and \code{<timepoint>} is an integer (e.g., \code{"CRP_1"}).
 #'
 #' @return A numeric matrix of dimension \code{nrow(data)} by \code{n_features}, where rows are
-#'   samples and columns are features (base names). Entries are per-sample missingness proportions in [0, 1].
+#'   samples and columns are features (base names). Entries are per-sample missingness proportions in `[0, 1]`.
 #'   The returned matrix has an attribute \code{"feature_columns_map"}: a named list mapping each
 #'   output feature to the source columns used to compute its proportion.
 #'

@@ -2,7 +2,7 @@
 % Please edit documentation in R/cluster_fun.R
 \name{cluster_on_missing_prop}
 \alias{cluster_on_missing_prop}
-\title{Cluster Features Based on Missingness Proportions}
+\title{Cluster Samples Based on Missingness Proportions}
 \usage{
 cluster_on_missing_prop(
   prop_matrix,
@@ -16,64 +16,57 @@ cluster_on_missing_prop(
 )
 }
 \arguments{
-\item{prop_matrix}{Matrix or data frame where rows are samples, columns are features,
-entries are missingness proportions \link{0,1}. Can be created with create_missingness_prop_matrix().}
+\item{prop_matrix}{Matrix or data frame where \strong{rows are samples} and \strong{columns are features},
+entries are missingness proportions in \verb{[0,1]}. Can be created with \code{create_missingness_prop_matrix()}.}
 
-\item{n_clusters}{Number of clusters for KMeans; if NULL, uses HDBSCAN (default: NULL)}
+\item{n_clusters}{Integer; number of clusters for KMeans. If \code{NULL}, uses HDBSCAN (default: \code{NULL}).}
 
-\item{seed}{Random seed for KMeans reproducibility (default: NULL)}
+\item{seed}{Integer; random seed for KMeans reproducibility (default: \code{NULL}).}
 
-\item{min_cluster_size}{HDBSCAN minimum cluster size; if NULL, uses max(2, n_features/25) (default: NULL)}
+\item{min_cluster_size}{Integer; HDBSCAN minimum cluster size. If \code{NULL}, Python default is used
+(typically a function of the number of samples) (default: \code{NULL}).}
 
-\item{cluster_selection_epsilon}{HDBSCAN cluster selection threshold (default: 0.25)}
+\item{cluster_selection_epsilon}{Numeric; HDBSCAN cluster selection threshold (default: \code{0.25}).}
 
-\item{metric}{Distance metric - "euclidean" or "cosine" (default: "euclidean")}
+\item{metric}{Character; distance metric \code{"euclidean"} or \code{"cosine"} (default: \code{"euclidean"}).}
 
-\item{scale_features}{Whether to standardize feature vectors before clustering (default: FALSE)}
+\item{scale_features}{Logical; whether to standardize \strong{feature columns} before clustering samples (default: \code{FALSE}).}
 
-\item{handle_noise}{How to handle HDBSCAN noise points: "keep" (default), "separate", or "merge"}
+\item{handle_noise}{Character; how to handle HDBSCAN noise points (\code{-1}):
+\code{"keep"} (each noise sample gets its own new cluster ID), \code{"separate"} (all noise samples share one new ID),
+or \code{"merge"} (noise samples assigned to largest existing cluster) (default: \code{"keep"}).}
 }
 \value{
-List containing:
+A list with:
 \itemize{
-\item labels: Integer vector of cluster assignments for each feature (includes -1 for noise if HDBSCAN)
-\item labels_positive: Integer vector with noise points converted to positive cluster IDs
-\item silhouette_score: Silhouette score for clustering quality (NULL if not calculable)
-\item feature_names: Names of features corresponding to cluster labels
-\item n_noise: Number of features assigned to noise (HDBSCAN only)
+\item \code{clusters}: Integer vector of cluster assignments per \strong{sample} (may include -1 for HDBSCAN noise).
+\item \code{clusters_positive}: Integer vector with all labels non-negative after applying \code{handle_noise}.
+\item \code{silhouette_score}: Numeric silhouette score, or \code{NULL} if not computable.
+\item \code{sample_names}: Character vector of sample names corresponding to \code{clusters}.
+\item \code{n_samples}: Integer; number of samples (rows).
+\item \code{n_clusters_found}: Integer; number of clusters found (excluding noise).
+\item \code{n_clusters_final}: Integer; final number of clusters after noise handling.
+\item \code{n_noise}: Integer; number of samples assigned to noise (HDBSCAN only).
+\item \code{handle_noise}: The noise handling mode used.
 }
 }
 \description{
-Groups features with similar patterns of missingness across samples using either
-K-means clustering (when n_clusters is specified) or HDBSCAN (when n_clusters is NULL).
-This helps identify features that tend to be missing together systematically.
-}
-\details{
-Note: HDBSCAN may assign some features to "noise" (cluster -1). These features are
-kept and will be treated as individual clusters by CISS-VAE.
+Groups \strong{samples} with similar patterns of missingness across features using either
+K-means clustering (when \code{n_clusters} is specified) or HDBSCAN (when \code{n_clusters} is \code{NULL}).
+This is useful for detecting cohorts with shared missing-data behavior (e.g., site/batch effects).
 }
 \examples{
-# Create sample data with systematic missingness patterns
 set.seed(123)
-data <- data.frame(
-  sample_id = 1:100,
-  # Group 1: High missingness in first 50 samples
-  feat1 = c(rep(NA, 50), rnorm(50)),
-  feat2 = c(rep(NA, 45), rnorm(55)),
-  feat3 = c(rep(NA, 48), rnorm(52)),
-  # Group 2: High missingness in last 50 samples  
-  feat4 = c(rnorm(50), rep(NA, 50)),
-  feat5 = c(rnorm(52), rep(NA, 48)),
-  # Group 3: Low missingness throughout
-  feat6 = c(rnorm(90), rep(NA, 10)),
-  feat7 = c(rnorm(88), rep(NA, 12))
+dat <- data.frame(
+  sample_id = paste0("s", 1:12),
+  # Two features measured at 3 timepoints each → proportions by feature per sample
+  A_1 = c(NA, rnorm(11)), A_2 = c(NA, rnorm(11)), A_3 = rnorm(12),
+  B_1 = rnorm(12),        B_2 = c(rnorm(10), NA, NA), B_3 = rnorm(12)
 )
+pm <- create_missingness_prop_matrix(dat, index_col = "sample_id",
+                                     repeat_feature_names = c("A","B"))
+res <- cluster_on_missing_prop(pm, n_clusters = 2, metric = "cosine", scale_features = TRUE)
+table(res$clusters_positive)
+res$silhouette_score
 
-# Create proportion matrix
-prop_mat <- create_missingness_prop_matrix(data, index_col = "sample_id")
-
-# Cluster features by missingness pattern
-clusters <- cluster_on_missing_prop(prop_mat, n_clusters = 3)
-print(clusters$labels)
-print(clusters$silhouette_score)
 }

@@ -18,20 +18,22 @@ There are some cases in which we want to tell CISSVAE not to impute certain miss
 
 We can use the `do_not_impute_matrix` argument in the `run_cissvae()` function to mask these values. The binary `do_not_impute_matrix` should have the same dimensions as the input dataframe with each cell containing 0 (impute if missing) or 1 (do not impute, even if missing). 
 
-Let's use a simple survival dataset as an example. 
+Let's use a simple survival dataset as an example. The mock survival dataset can be found at (insert location here)
 
 
 ```{r setup, echo=FALSE}
 library(rCISSVAE)
 library(tidyverse)
 library(ggplot2)
+library(kableExtra)
 set.seed(42)
 
 set.seed(42)
 
 make_mock_survival_wide <- function(n_patients = 20,
                                     months = seq(0, 60, by = 6),
-                                    death_n = 3) {
+                                    death_n = 3,
+                                    mcar_pct = 0.10) {      # <- 10% random missingness
   month_suffix <- sprintf("m%02d", months)       # m00, m06, …, m60
   biomarker_cols <- c(
     paste0("biomarker1_", month_suffix),
@@ -58,6 +60,7 @@ make_mock_survival_wide <- function(n_patients = 20,
     b2 <- base + slope2 * months + rnorm(length(months), sd = 0.15)
     b3 <- base + slope3 * months + rnorm(length(months), sd = 0.15)
 
+    # Censor after death: set post-death biomarker values to NA
     dy <- death_years[pid]
     if (!is.na(dy)) {
       cutoff_month <- dy * 12
@@ -69,7 +72,6 @@ make_mock_survival_wide <- function(n_patients = 20,
       }
     }
 
-    # Build a named list → single-row data.frame
     row_list <- c(
       list(
         patient_id  = pid,
@@ -84,20 +86,94 @@ make_mock_survival_wide <- function(n_patients = 20,
     rows[[i]] <- as.data.frame(row_list, check.names = FALSE, stringsAsFactors = FALSE)
   }
 
-  # Bind rows safely (no name mangling)
   df <- do.call(rbind, rows)
 
-  # Ensure types: patient_id is chr; others numeric/integer as intended
+  # Ensure types
   num_cols <- setdiff(names(df), "patient_id")
   df[num_cols] <- lapply(df[num_cols], function(x) as.numeric(x))
 
-  # Order columns deterministically
-  df <- df[, c("patient_id", "death_event", "death_year", biomarker_cols)]
+  # Apply MCAR missingness across biomarker cells only (don’t touch death columns)
+  if (mcar_pct > 0) {
+    bm <- as.matrix(df[, biomarker_cols, drop = FALSE])
+    # candidate indices that are currently observed (non-NA)
+    obs_idx <- which(!is.na(bm))
+    if (length(obs_idx) > 0) {
+      m <- ceiling(mcar_pct * length(bm))        # proportion of ALL biomarker cells
+      m <- min(m, length(obs_idx))               # cap at available observed cells
+      flip <- sample(obs_idx, size = m, replace = FALSE)
+      bm[flip] <- NA_real_
+      df[, biomarker_cols] <- bm
+    }
+  }
 
+  # Final column order
+  df <- df[, c("patient_id", "death_event", "death_year", biomarker_cols)]
   df
 }
 
-# Example run:
+#' Create "do not impute" mask for survival-style wide datasets
+#'
+#' @param df A wide-form dataframe with patient_id, death_event, death_year,
+#'   followed by biomarker columns in the format biomarkerX_mYY.
+#' @param biomarker_prefixes Character vector of biomarker name prefixes,
+#'   e.g. c("biomarker1","biomarker2","biomarker3").
+#' @param months Numeric vector of follow-up months corresponding to suffixes,
+#'   e.g. seq(0, 60, by = 6).
+#'
+#' @return A matrix of 0/1 with the same dimension as the biomarker block
+#'   (rows = patients, cols = biomarker columns). 0 = can impute, 1 = do not impute.
+#' @export
+create_do_not_impute_matrix <- function(df,
+                                        biomarker_prefixes = c("biomarker1","biomarker2","biomarker3"),
+                                        months = seq(0, 60, by = 6)) {
+  # biomarker column names in expected order
+  month_suffix <- sprintf("m%02d", months)
+  biomarker_cols <- as.vector(outer(biomarker_prefixes, month_suffix, paste, sep = "_"))
+
+  # subset only biomarker values
+  bm <- as.matrix(df[, biomarker_cols, drop = FALSE])
+
+  # initialize with zeros
+  mask <- matrix(0L, nrow = nrow(bm), ncol = ncol(bm),
+                 dimnames = list(df$patient_id, biomarker_cols))
+
+  # loop over patients to flag post-death measurements
+  for (i in seq_len(nrow(df))) {
+    dy <- df$death_year[i]
+    if (!is.na(dy)) {
+      cutoff_month <- dy * 12
+      # which months are strictly after death
+      post_idx <- which(months > cutoff_month)
+      if (length(post_idx) > 0) {
+        # all biomarker prefixes, so expand into col indices
+        cols_to_mask <- as.vector(outer(biomarker_prefixes,
+                                        month_suffix[post_idx],
+                                        paste, sep = "_"))
+        mask[i, cols_to_mask] <- 1L
+      }
+    }
+  }
+
+  mask
+}
+
+
 
 mock_df <- make_mock_survival_wide()
+```
+
+The mock survival dataset looks like 
+
+```{r}
+mock_df %>% 
+   kable()
+```
+
+To create the do_not_impute_matrix,
+
+
+```{r}
+dni  = create_do_not_impute_matrix(mock_df)
+
+dni %>% kable()
 ```

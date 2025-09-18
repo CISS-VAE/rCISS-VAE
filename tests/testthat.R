@@ -8,6 +8,5 @@
 
 library(testthat)
 library(rCISSVAE)
-library(tidyverse)
 
 test_check("rCISSVAE")

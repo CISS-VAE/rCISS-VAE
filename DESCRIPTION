@@ -25,6 +25,7 @@ Suggests:
     knitr,
     quarto,
     rmarkdown,
+    tidyverse
 URL: https://ciss-vae.github.io/rCISS-VAE
 BugReports: https://github.com/CISS-VAE/rCISS-VAE/issues
 Config/testthat/edition: 3

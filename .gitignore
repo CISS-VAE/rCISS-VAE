@@ -67,3 +67,4 @@ codecov.yml
 testhat.txt
 testhat.txt
 *.txt
+!requirements.txt

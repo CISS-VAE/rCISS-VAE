@@ -64,3 +64,6 @@ data_raw/df_missing.csv
 *.Rcheck
 vignettes/vignette.rmarkdown
 codecov.yml
+testhat.txt
+testhat.txt
+*.txt

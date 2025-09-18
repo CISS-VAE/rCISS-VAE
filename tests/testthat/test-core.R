@@ -75,10 +75,10 @@ test_that("default returns: imputed + model", {
   res <- do.call(rCISSVAE::run_cissvae, c(list(sample_data), params))
   # R wrapper always returns a list
   expect_type(res, "list")
-  expect_named(res, c("imputed", "model"))
+  expect_named(res, c("imputed_dataset", "model"))
 
-  expect_s3_class(res$imputed, "data.frame")
-  expect_equal(dim(res$imputed), dim(sample_data))
+  expect_s3_class(res$imputed_dataset, "data.frame")
+  expect_equal(dim(res$imputed_dataset), dim(sample_data))
   expect_true(is_py_obj(res$model))
 })
 
@@ -96,9 +96,9 @@ test_that("single return: imputed only when all flags FALSE", {
   ), params))
   
   expect_type(res, "list")
-  expect_named(res, "imputed")
-  expect_s3_class(res$imputed, "data.frame")
-  expect_equal(dim(res$imputed), dim(sample_data))
+  expect_named(res, "imputed_dataset")
+  expect_s3_class(res$imputed_dataset, "data.frame")
+  expect_equal(dim(res$imputed_dataset), dim(sample_data))
 })
 
 test_that("return combinations: names, order, and types", {
@@ -109,60 +109,60 @@ test_that("return combinations: names, order, and types", {
   cases <- list(
     list(
       flags = list(return_model=TRUE, return_clusters=FALSE, return_silhouettes=FALSE, return_history=FALSE, return_dataset=FALSE),
-      names = c("imputed", "model"),
+      names = c("imputed_dataset", "model"),
       check = function(res) { expect_true(is_py_obj(res$model)) }
     ),
     list(
       flags = list(return_model=FALSE, return_clusters=TRUE, return_silhouettes=FALSE, return_history=FALSE, return_dataset=FALSE),
-      names = c("imputed", "clusters"),
+      names = c("imputed_dataset", "clusters"),
       check = function(res) { expect_true(is.integer(res$clusters) || is.numeric(res$clusters)) }
     ),
     list(
       flags = list(return_model=FALSE, return_clusters=FALSE, return_silhouettes=TRUE, return_history=FALSE, return_dataset=FALSE),
-      names = c("imputed", "silhouettes"),
-      check = function(res) { expect_true(is.null(res$silhouettes) || is.numeric(res$silhouettes)) }
+      names = c("imputed_dataset", "silhouette_width"),
+      check = function(res) { expect_true(is.null(res$silhouette_width) || is.numeric(res$silhouette_width)) }
     ),
     list(
       flags = list(return_model=FALSE, return_clusters=FALSE, return_silhouettes=FALSE, return_history=TRUE, return_dataset=FALSE),
-      names = c("imputed", "history"),
-      check = function(res) { expect_true(is.null(res$history) || inherits(res$history, "data.frame")) }
+      names = c("imputed_dataset", "training_history"),
+      check = function(res) { expect_true(is.null(res$training_history) || inherits(res$training_history, "data.frame")) }
     ),
     list(
       flags = list(return_model=FALSE, return_clusters=FALSE, return_silhouettes=FALSE, return_history=FALSE, return_dataset=TRUE),
-      names = c("imputed", "dataset"),
-      check = function(res) { expect_true(is_py_obj(res$dataset)) }
+      names = c("imputed_dataset", "cluster_dataset"),
+      check = function(res) { expect_true(is_py_obj(res$cluster_dataset)) }
     ),
     # Multiple
     list(
       flags = list(return_model=TRUE, return_clusters=TRUE, return_silhouettes=FALSE, return_history=FALSE, return_dataset=FALSE),
-      names = c("imputed", "model", "clusters"),
+      names = c("imputed_dataset", "model", "clusters"),
       check = function(res) { expect_true(is_py_obj(res$model)); expect_true(is.numeric(res$clusters) || is.integer(res$clusters)) }
     ),
     list(
       flags = list(return_model=TRUE, return_clusters=FALSE, return_silhouettes=TRUE, return_history=FALSE, return_dataset=FALSE),
-      names = c("imputed", "model", "silhouettes"),
-      check = function(res) { expect_true(is_py_obj(res$model)); expect_true(is.null(res$silhouettes) || is.numeric(res$silhouettes)) }
+      names = c("imputed_dataset", "model", "silhouette_width"),
+      check = function(res) { expect_true(is_py_obj(res$model)); expect_true(is.null(res$silhouette_width) || is.numeric(res$silhouette_width)) }
     ),
     list(
       flags = list(return_model=FALSE, return_clusters=TRUE, return_silhouettes=TRUE, return_history=FALSE, return_dataset=FALSE),
-      names = c("imputed", "clusters", "silhouettes"),
+      names = c("imputed_dataset", "clusters", "silhouette_width"),
       check = function(res) { expect_true(is.numeric(res$clusters) || is.integer(res$clusters)) }
     ),
     list(
       flags = list(return_model=TRUE, return_dataset=TRUE, return_clusters=FALSE, return_silhouettes=FALSE, return_history=FALSE),
-      names = c("imputed", "model", "dataset"),
-      check = function(res) { expect_true(is_py_obj(res$model)); expect_true(is_py_obj(res$dataset)) }
+      names = c("imputed_dataset", "model", "cluster_dataset"),
+      check = function(res) { expect_true(is_py_obj(res$model)); expect_true(is_py_obj(res$cluster_dataset)) }
     ),
     # All
     list(
       flags = list(return_model=TRUE, return_dataset=TRUE, return_clusters=TRUE, return_silhouettes=TRUE, return_history=TRUE),
-      names = c("imputed", "model", "dataset", "clusters", "silhouettes", "history"),
+      names = c("imputed_dataset", "model", "cluster_dataset", "clusters", "silhouette_width", "training_history"),
       check = function(res) {
         expect_true(is_py_obj(res$model))
-        expect_true(is_py_obj(res$dataset))
+        expect_true(is_py_obj(res$cluster_dataset))
         expect_true(is.numeric(res$clusters) || is.integer(res$clusters))
-        expect_true(is.null(res$silhouettes) || is.numeric(res$silhouettes))
-        expect_true(is.null(res$history) || inherits(res$history, "data.frame"))
+        expect_true(is.null(res$silhouette_width) || is.numeric(res$silhouette_width))
+        expect_true(is.null(res$training_history) || inherits(res$training_history, "data.frame"))
       }
     )
   )
@@ -170,7 +170,7 @@ test_that("return combinations: names, order, and types", {
   for (cs in cases) {
     res <- do.call(rCISSVAE::run_cissvae, c(list(sample_data), cs$flags, params))
     expect_named(res, cs$names)
-    expect_s3_class(res$imputed, "data.frame")
+    expect_s3_class(res$imputed_dataset, "data.frame")
     cs$check(res)
   }
 })
@@ -184,10 +184,10 @@ test_that("return order consistency across different flag sets", {
     return_model=TRUE, return_dataset=TRUE, return_clusters=TRUE,
     return_silhouettes=FALSE, return_history=FALSE), params
   ))
-  expect_named(res1, c("imputed", "model", "dataset", "clusters"))
-  expect_s3_class(res1$imputed, "data.frame")
+  expect_named(res1, c("imputed_dataset", "model", "cluster_dataset", "clusters"))
+  expect_s3_class(res1$imputed_dataset, "data.frame")
   expect_true(is_py_obj(res1$model))
-  expect_true(is_py_obj(res1$dataset))
+  expect_true(is_py_obj(res1$cluster_dataset))
   expect_true(is.numeric(res1$clusters) || is.integer(res1$clusters))
 
   res2 <- do.call(rCISSVAE::run_cissvae, c(list(
@@ -196,11 +196,11 @@ test_that("return order consistency across different flag sets", {
     return_silhouettes = TRUE, return_history = TRUE
   ), params))
 
-  expect_named(res2, c("imputed", "model", "clusters", "silhouettes", "history"))
+  expect_named(res2, c("imputed_dataset", "model", "clusters", "silhouette_width", "training_history"))
   expect_true(is_py_obj(res2$model))
   expect_true(is.numeric(res2$clusters) || is.integer(res2$clusters))
-  expect_true(is.null(res2$silhouettes) || is.numeric(res2$silhouettes))
-  expect_true(is.null(res2$history) || inherits(res2$history, "data.frame"))
+  expect_true(is.null(res2$silhouette_width) || is.numeric(res2$silhouette_width))
+  expect_true(is.null(res2$training_history) || inherits(res2$training_history, "data.frame"))
 })
 
 test_that("data integrity and cluster labeling", {
@@ -212,12 +212,12 @@ test_that("data integrity and cluster labeling", {
     return_model = TRUE, return_clusters = TRUE, return_dataset = TRUE
   ), params))
 
-  expect_named(res, c("imputed", "model", "dataset", "clusters"))
+  expect_named(res, c("imputed_dataset", "model", "cluster_dataset", "clusters"))
   # Shapes
-  expect_equal(dim(res$imputed), dim(sample_data))
+  expect_equal(dim(res$imputed_dataset), dim(sample_data))
   expect_equal(length(res$clusters), nrow(sample_data))
   # No NAs
-  expect_false(anyNA(res$imputed))
+  expect_false(anyNA(res$imputed_dataset))
 
   # clusters start at 0 and are contiguous
   uq <- sort(unique(as.integer(res$clusters)))
@@ -242,7 +242,7 @@ test_that("model architecture parameters are respected", {
     sample_data, return_model = TRUE, return_clusters = FALSE
   ), params))
 
-  expect_named(res, c("imputed", "model"))
+  expect_named(res, c("imputed_dataset", "model"))
   vae <- res$model
   expect_true(is_py_obj(vae))
   # Access Python attributes
@@ -262,7 +262,7 @@ test_that("clustering parameters work (fixed n_clusters and Leiden)", {
   return_clusters = TRUE, return_silhouettes = TRUE, return_model = FALSE
 ), params))
 
-  expect_named(res1, c("imputed", "clusters", "silhouettes"))
+  expect_named(res1, c("imputed_dataset", "clusters", "silhouette_width"))
   uq <- sort(unique(as.integer(res1$clusters)))
   expect_equal(length(uq), 2)
 
@@ -275,7 +275,7 @@ test_that("clustering parameters work (fixed n_clusters and Leiden)", {
   sample_data, return_clusters = TRUE, return_model = FALSE
 ), params2))
   
-  expect_named(res2, c("imputed", "clusters"))
+  expect_named(res2, c("imputed_dataset", "clusters"))
   uq2 <- sort(unique(as.integer(res2$clusters)))
   expect_true(length(uq2) >= 1)
   expect_true(length(uq2) <= nrow(sample_data) %/% 2)
@@ -299,7 +299,7 @@ test_that("prop-matrix clustering path works", {
     missingness_proportion_matrix = pm
   ), params))
   
-  expect_named(res, c("imputed", "clusters", "silhouettes"))
+  expect_named(res, c("imputed_dataset", "clusters", "silhouette_width"))
   uq <- sort(unique(as.integer(res$clusters)))
   expect_equal(length(uq), 2)
   expect_equal(length(res$clusters), nrow(longitudinal_data))
@@ -320,10 +320,10 @@ test_that("training parameters don't break the pipeline and history may exist", 
     sample_data, return_model = TRUE, return_history = TRUE
   ), params))
 
-  expect_true(all(c("imputed", "model", "history") %in% names(res)))
-  expect_s3_class(res$imputed, "data.frame")
+  expect_true(all(c("imputed_dataset", "model", "training_history") %in% names(res)))
+  expect_s3_class(res$imputed_dataset, "data.frame")
   expect_true(is_py_obj(res$model))
-  expect_true(is.null(res$history) || inherits(res$history, "data.frame"))
+  expect_true(is.null(res$training_history) || inherits(res$training_history, "data.frame"))
 })
 
 test_that("full pipeline integration (slow) [skip on CRAN]", {
@@ -347,12 +347,12 @@ test_that("full pipeline integration (slow) [skip on CRAN]", {
     verbose=FALSE
   )
 
-  expect_named(res, c("imputed","model","dataset","clusters","silhouettes","history"))
-  expect_s3_class(res$imputed, "data.frame")
+  expect_named(res, c("imputed_dataset","model","cluster_dataset","clusters","silhouette_width","training_history"))
+  expect_s3_class(res$imputed_dataset, "data.frame")
   expect_true(is_py_obj(res$model))
-  expect_true(is_py_obj(res$dataset))
-  expect_true(is.numeric(res$silhouettes) || is.null(res$silhouettes))
-  expect_true(is.null(res$history) || inherits(res$history, "data.frame"))
-  expect_equal(dim(res$imputed), dim(large_data))
-  expect_false(anyNA(res$imputed))
+  expect_true(is_py_obj(res$cluster_dataset))
+  expect_true(is.numeric(res$silhouette_width) || is.null(res$silhouette_width))
+  expect_true(is.null(res$training_history) || inherits(res$training_history, "data.frame"))
+  expect_equal(dim(res$imputed_dataset), dim(large_data))
+  expect_false(anyNA(res$imputed_dataset))
 })

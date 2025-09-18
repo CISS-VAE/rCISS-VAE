@@ -254,6 +254,10 @@ run_cissvae <- function(
     if (!index_col %in% colnames(data)) stop("`index_col` not found in data.")
     index_vals <- data[[index_col]]
     data       <- data[, setdiff(colnames(data), index_col), drop = FALSE]
+
+    if (index_col %in% colnames(do_not_impute_matrix)) {
+      do_not_impute_matrix <- do_not_impute_matrix[, setdiff(colnames(do_not_impute_matrix), index_col), drop = FALSE]
+    }
   } else {
     index_vals <- NULL
   }
@@ -261,7 +265,14 @@ run_cissvae <- function(
   orig_rn <- if (is.data.frame(data) || is.matrix(data)) rownames(data) else NULL
   orig_cn <- if (is.data.frame(data) || is.matrix(data)) colnames(data) else NULL
 
-
+  ## if there is a do_not_impute_matrix make sure it has the same dimensions as data
+  if (!all(dim(do_not_impute_matrix) == dim(data))) {
+    stop(sprintf(
+      "Dimension mismatch: data is %d x %d, do_not_impute_matrix is %d x %d",
+      nrow(data), ncol(data),
+      nrow(do_not_impute_matrix), ncol(do_not_impute_matrix)
+    ))
+  }
   ## step 3: do python imports
 
   run_mod <- reticulate::import("ciss_vae.utils.run_cissvae", convert = FALSE)

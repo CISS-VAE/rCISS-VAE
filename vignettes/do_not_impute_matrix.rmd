@@ -30,10 +30,10 @@ set.seed(42)
 
 set.seed(42)
 
-make_mock_survival_wide <- function(n_patients = 20,
+make_mock_survival_wide <- function(n_patients = 200,
                                     months = seq(0, 60, by = 6),
                                     death_n = 3,
-                                    mcar_pct = 0.10) {      # <- 10% random missingness
+                                    mcar_pct = 0.30) {      # <- 10% random missingness
   month_suffix <- sprintf("m%02d", months)       # m00, m06, …, m60
   biomarker_cols <- c(
     paste0("biomarker1_", month_suffix),
@@ -126,26 +126,21 @@ make_mock_survival_wide <- function(n_patients = 20,
 create_do_not_impute_matrix <- function(df,
                                         biomarker_prefixes = c("biomarker1","biomarker2","biomarker3"),
                                         months = seq(0, 60, by = 6)) {
-  # biomarker column names in expected order
+  # biomarker column names
   month_suffix <- sprintf("m%02d", months)
   biomarker_cols <- as.vector(outer(biomarker_prefixes, month_suffix, paste, sep = "_"))
 
-  # subset only biomarker values
-  bm <- as.matrix(df[, biomarker_cols, drop = FALSE])
-
-  # initialize with zeros
-  mask <- matrix(0L, nrow = nrow(bm), ncol = ncol(bm),
-                 dimnames = list(df$patient_id, biomarker_cols))
+  # initialize mask for full dataframe (all columns)
+  mask <- matrix(0L, nrow = nrow(df), ncol = ncol(df),
+                 dimnames = list(df$patient_id, colnames(df)))
 
   # loop over patients to flag post-death measurements
   for (i in seq_len(nrow(df))) {
     dy <- df$death_year[i]
     if (!is.na(dy)) {
       cutoff_month <- dy * 12
-      # which months are strictly after death
       post_idx <- which(months > cutoff_month)
       if (length(post_idx) > 0) {
-        # all biomarker prefixes, so expand into col indices
         cols_to_mask <- as.vector(outer(biomarker_prefixes,
                                         month_suffix[post_idx],
                                         paste, sep = "_"))
@@ -165,15 +160,27 @@ mock_df <- make_mock_survival_wide()
 The mock survival dataset looks like 
 
 ```{r}
+library(gtsummary)
 mock_df %>% 
-   kable()
+   tbl_summary() %>%
+   as_kable()
 ```
 
-To create the do_not_impute_matrix,
+To create the do_not_impute_matrix, do some things. 
 
 
 ```{r}
-dni  = create_do_not_impute_matrix(mock_df)
+dni  = create_do_not_impute_matrix(mock_df) %>% as.data.frame()
 
-dni %>% kable()
+colnames(dni) = colnames(mock_df)
+
+dni = dni %>% select(-c("death_event", "death_year"))
+mock_df = mock_df %>% select(-c("death_event", "death_year"))
+```
+
+Now when we run the run_cissvae function
+
+
+```{r}
+res = run_cissvae(mock_df, index_col = "patient_id", do_not_impute_matrix = dni, leiden_resolution = 0.01, return_clusters = TRUE, return_history = TRUE, val_proportion = 0.5, epochs = 100)
 ```

@@ -1,7 +1,10 @@
-torch
+--index-url https://test.pypi.org/simple/
+--extra-index-url https://pypi.org/simple
+
+cissvae==0.1.12
 numpy
 pandas
-optuna
 scikit-learn
-python-igraph
-leidenalg
+optuna
+hdbscan
+torch                       # CPU build is fine for CI

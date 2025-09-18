@@ -1,43 +1,38 @@
-name: R tests
+name: R-CMD-check
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   check:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest]          
-        r:  ["release"]             
+    runs-on: ubuntu-latest
 
     env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      RCISSVAE_RUN_SLOW: "FALSE"     
+      # Make sure reticulate uses the Python we install below
+      RETICULATE_PYTHON: /opt/hostedtoolcache/Python/3.10.*/x64/bin/python
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Pandoc (needed for pkgdown/roxygen)
-        uses: r-lib/actions/setup-pandoc@v2
-
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
         with:
-          r-version: ${{ matrix.r }}
+          r-version: 'release'
           use-public-rspm: true
+
+      - name: Setup Pandoc
+        uses: r-lib/actions/setup-pandoc@v2
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Cache Python deps
+      - name: Cache pip
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
@@ -45,34 +40,26 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Install Python deps 
-        if: hashFiles('**/requirements.txt') != ''
+      - name: Install Python deps (from TestPyPI + PyPI)
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install -i https://test.pypi.org/simple/ CISS-VAE
 
-      - name: Setup R dependencies
+      # sanity check that reticulate can import cissvae
+      - name: Sanity check Python import
+        run: |
+          python - <<'PY'
+          import cissvae, sys
+          print("cissvae version:", getattr(cissvae, "__version__", "unknown"))
+          PY
+
+      - name: Install R package deps
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: |
-            any::testthat
-            any::rcmdcheck
-            local::.
+          extra-packages: any::rcmdcheck
           needs: check
 
-      - name: Run tests (testthat)
-        run: |
-          Rscript -e "sessionInfo()"
-          Rscript -e "testthat::test_dir('tests/testthat', reporter = c('summary','fail'))"
-
-      - name: Upload testthat output (always)
-        if: always()
-        uses: actions/upload-artifact@v4
+      - name: Run R CMD check
+        uses: r-lib/actions/check-r-package@v2
         with:
-          name: testthat-logs
-          path: |
-            tests/testthat/*.R
-            tests/testthat/_snaps/**
-            ./**/testthat.Rout*
-          if-no-files-found: ignore
+          upload-snapshots: true

@@ -24,6 +24,7 @@ tutorials:
   contents: 
     - vignette
     - virtual_environment_tutorial
+    - do_not_impute_matrix
 
     
 

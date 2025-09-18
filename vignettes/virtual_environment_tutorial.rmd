@@ -1,6 +1,5 @@
 ---
 title: "Manual Virtual Environment Setup Tutorial"
-author: "Dani V"
 date: "2025-08-14"
 output: 
   rmarkdown::html_vignette:

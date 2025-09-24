@@ -323,7 +323,7 @@ run_cissvae <- function(
     if (is_py_obj(do_not_impute_matrix)) {
       dni_py <- do_not_impute_matrix
     } else {
-      dni_py <- reticulate::r_to_py(as.matrix(do_not_impute_matrix))
+      dni_py <- reticulate::r_to_py(do_not_impute_matrix)
     }
   } else dni_py <- NULL
 

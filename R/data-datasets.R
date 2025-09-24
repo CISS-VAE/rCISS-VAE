@@ -54,3 +54,32 @@
 #' data(clusters)
 #' table(clusters$cluster)
 "clusters"
+
+
+#' Example dni matrix for demo of do_not_impute_matrix
+#'
+#' A sample do_not_impute_matrix (dataframe)
+#'
+#' @docType data
+#' @format A dataframe:
+#' \describe{
+#'   \item{do_not_impute_matrix}{A mock do_not_impute_matrix dataframe}
+#' }
+#' @source Imported from `data_raw/dni.csv`
+#' @examples
+#' data(dni)
+"dni"
+
+#' Example survival data for demo of do_not_impute_matrix
+#'
+#' A sample survival dataset
+#'
+#' @docType data
+#' @format A dataframe:
+#' \describe{
+#'   \item{mock_surv}{A mock survival dataset}
+#' }
+#' @source Imported from `data_raw/mock_survival.csv`
+#' @examples
+#' data(mock_surv)
+"mock_surv"

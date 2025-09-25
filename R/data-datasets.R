@@ -56,21 +56,21 @@
 "clusters"
 
 
-#' Example dni matrix for demo of do_not_impute_matrix
+#' Example dni matrix for demo of imputable_matrix
 #'
-#' A sample do_not_impute_matrix (dataframe)
+#' A sample imputable_matrix (dataframe)
 #'
 #' @docType data
 #' @format A dataframe:
 #' \describe{
-#'   \item{do_not_impute_matrix}{A mock do_not_impute_matrix dataframe}
+#'   \item{imputable_matrix}{A mock imputable_matrix dataframe}
 #' }
 #' @source Imported from `data_raw/dni.csv`
 #' @examples
 #' data(dni)
 "dni"
 
-#' Example survival data for demo of do_not_impute_matrix
+#' Example survival data for demo of imputable_matrix
 #'
 #' A sample survival dataset
 #'

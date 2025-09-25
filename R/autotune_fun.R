@@ -50,6 +50,7 @@ autotune_cissvae <- function(
   val_proportion         = 0.1,
   replacement_value      = 0.0,
   columns_ignore         = NULL,
+  imputable_matrix   = NULL,
   clusters, ## for the autotune function user does clusters themself
   save_model_path        = NULL,
   save_search_space_path = NULL,
@@ -83,7 +84,8 @@ autotune_cissvae <- function(
   refit_patience    = 2,
   refit_loops       = 100,
   epochs_per_loop   = 500,
-  reset_lr_refit    = c(TRUE, FALSE)
+  reset_lr_refit    = c(TRUE, FALSE),
+  debug = FALSE
 ) {
   # ── 1) Coerce to integers ────────────────────────────────────────────────
   n_trials          <- as.integer(n_trials)
@@ -114,7 +116,10 @@ autotune_cissvae <- function(
     if (!index_col %in% colnames(data)) stop("`index_col` not found in data.")
     index_vals <- data[[index_col]]
     data       <- data[, setdiff(colnames(data), index_col), drop = FALSE]
+    imputable_matrix = imputable_matrix[, setdiff(colnames(imputable_matrix), index_col), drop = FALSE]
   } else index_vals <- NULL
+
+
   
   # ── 4) Prepare matrix & Python imports ──────────────────────────────────
   mat <- if (is.data.frame(data)) as.matrix(data) else data
@@ -122,6 +127,7 @@ autotune_cissvae <- function(
   SS       <- auto_mod$SearchSpace
   autotune <- auto_mod$autotune
   np       <- import("numpy", convert = FALSE)
+  pd       <- import("pandas", convert = FALSE)
   CD_mod   <- import("ciss_vae.classes.cluster_dataset", convert = FALSE)$ClusterDataset
   
   # ── 5) Build Python SearchSpace ─────────────────────────────────────────
@@ -151,9 +157,17 @@ autotune_cissvae <- function(
   
   # ── 6) Build ClusterDataset ──────────────────────────────────────────────
   if (missing(clusters)) stop("`clusters` is required for autotune.")
-  data_py     <- np$array(mat)
+  data_py     <- pd$DataFrame(data)
+  if(debug){
+    print(data_py$head)
+  }
   clusters_py <- np$array(as.integer(clusters))
-  train_ds_py <- CD_mod(data_py, clusters_py, val_proportion, replacement_value, columns_ignore)
+
+  if (!is.null(imputable_matrix)) {
+      dni_py <- pd$DataFrame(imputable_matrix)
+  } else dni_py <- NULL
+
+  train_ds_py <- CD_mod(data_py, clusters_py, val_proportion, replacement_value, columns_ignore, dni_py)
   
   if (verbose) print("Built cluster dataset")
   
@@ -202,6 +216,7 @@ autotune_cissvae <- function(
     imputed = imp_df,
     model   = best_mod_py,
     study   = study_py,
-    results = results_df
+    results = results_df,
+    ds = train_ds_py
   )
 }

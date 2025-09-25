@@ -232,7 +232,7 @@ run_cissvae <- function(
   return_history         = FALSE,
   return_dataset         = FALSE,
   ## NEw stuff from the ptyhon update
-  do_not_impute_matrix   = NULL,
+  imputable_matrix   = NULL,
   
   debug                  = FALSE
 ){
@@ -255,8 +255,8 @@ run_cissvae <- function(
     index_vals <- data[[index_col]]
     data       <- data[, setdiff(colnames(data), index_col), drop = FALSE]
 
-    if (index_col %in% colnames(do_not_impute_matrix)) {
-      do_not_impute_matrix <- do_not_impute_matrix[, setdiff(colnames(do_not_impute_matrix), index_col), drop = FALSE]
+    if (index_col %in% colnames(imputable_matrix)) {
+      imputable_matrix <- imputable_matrix[, setdiff(colnames(imputable_matrix), index_col), drop = FALSE]
     }
   } else {
     index_vals <- NULL
@@ -265,12 +265,12 @@ run_cissvae <- function(
   orig_rn <- if (is.data.frame(data) || is.matrix(data)) rownames(data) else NULL
   orig_cn <- if (is.data.frame(data) || is.matrix(data)) colnames(data) else NULL
 
-  ## if there is a do_not_impute_matrix make sure it has the same dimensions as data
-  if (!all(dim(do_not_impute_matrix) == dim(data))) {
+  ## if there is a imputable_matrix make sure it has the same dimensions as data
+  if (!all(dim(imputable_matrix) == dim(data))) {
     stop(sprintf(
-      "Dimension mismatch: data is %d x %d, do_not_impute_matrix is %d x %d",
+      "Dimension mismatch: data is %d x %d, imputable_matrix is %d x %d",
       nrow(data), ncol(data),
-      nrow(do_not_impute_matrix), ncol(do_not_impute_matrix)
+      nrow(imputable_matrix), ncol(imputable_matrix)
     ))
   }
   ## step 3: do python imports
@@ -319,11 +319,11 @@ run_cissvae <- function(
     }
   } else prop_matrix_py <- NULL
 
-  if (!is.null(do_not_impute_matrix)) {
-    if (is_py_obj(do_not_impute_matrix)) {
-      dni_py <- do_not_impute_matrix
+  if (!is.null(imputable_matrix)) {
+    if (is_py_obj(imputable_matrix)) {
+      dni_py <- imputable_matrix
     } else {
-      dni_py <- reticulate::r_to_py(do_not_impute_matrix)
+      dni_py <- reticulate::r_to_py(imputable_matrix)
     }
   } else dni_py <- NULL
 
@@ -362,7 +362,7 @@ run_cissvae <- function(
     return_silhouettes    = return_silhouettes,
     return_history        = return_history,
     return_dataset        = return_dataset,
-    do_not_impute_matrix = dni_py,
+    imputable_matrix = dni_py,
     k_neighbors           = as.integer(k_neighbors),
     leiden_resolution     = as.numeric(leiden_resolution),
     leiden_objective      = as.character(leiden_objective),

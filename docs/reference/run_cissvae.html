@@ -17,7 +17,7 @@ patterns within and across different data subgroups."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
@@ -68,10 +68,12 @@ patterns within and across different data subgroups.</p>
 <span>  print_dataset <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  clusters <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n_clusters <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  cluster_selection_epsilon <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">42</span>,</span>
 <span>  missingness_proportion_matrix <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scale_features <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  k_neighbors <span class="op">=</span> <span class="fl">15L</span>,</span>
+<span>  leiden_resolution <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  leiden_objective <span class="op">=</span> <span class="st">"CPM"</span>,</span>
 <span>  hidden_dims <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">150</span>, <span class="fl">120</span>, <span class="fl">60</span><span class="op">)</span>,</span>
 <span>  latent_dim <span class="op">=</span> <span class="fl">15</span>,</span>
 <span>  layer_order_enc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"unshared"</span>, <span class="st">"unshared"</span>, <span class="st">"unshared"</span><span class="op">)</span>,</span>
@@ -79,7 +81,6 @@ patterns within and across different data subgroups.</p>
 <span>  latent_shared <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  output_shared <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  batch_size <span class="op">=</span> <span class="fl">4000</span>,</span>
-<span>  return_model <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  epochs <span class="op">=</span> <span class="fl">500</span>,</span>
 <span>  initial_lr <span class="op">=</span> <span class="fl">0.01</span>,</span>
 <span>  decay_factor <span class="op">=</span> <span class="fl">0.999</span>,</span>
@@ -92,9 +93,13 @@ patterns within and across different data subgroups.</p>
 <span>  decay_factor_refit <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  beta_refit <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  return_model <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  return_clusters <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  return_silhouettes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  return_history <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  return_dataset <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  return_dataset <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  do_not_impute_matrix <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  debug <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -123,7 +128,7 @@ Default <code>0.0</code>.</p></dd>
 
 
 <dt id="arg-columns-ignore">columns_ignore<a class="anchor" aria-label="anchor" href="#arg-columns-ignore"></a></dt>
-<dd><p>Character or integer vector. Columns to exclude from training.
+<dd><p>Character or integer vector. Columns to exclude from validation set.
 Can specify by name or index. Default <code>NULL</code>.</p></dd>
 
 
@@ -139,12 +144,9 @@ labels for samples. If <code>NULL</code>, clustering will be performed automatic
 
 <dt id="arg-n-clusters">n_clusters<a class="anchor" aria-label="anchor" href="#arg-n-clusters"></a></dt>
 <dd><p>Integer. Number of clusters for KMeans clustering when <code>clusters</code>
-is <code>NULL</code>. If <code>NULL</code>, optimal number will be determined automatically. Default <code>NULL</code>.</p></dd>
-
-
-<dt id="arg-cluster-selection-epsilon">cluster_selection_epsilon<a class="anchor" aria-label="anchor" href="#arg-cluster-selection-epsilon"></a></dt>
-<dd><p>Numeric. Epsilon parameter for HDBSCAN clustering
-when automatic clustering is used. Default <code>0.25</code>.</p></dd>
+is <code>NULL</code>. Number of clusters for KMeans clustering when 'clusters' is NULL. If <code>NULL</code>,
+will use <a href="https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html" class="external-link">HDBSCAN</a> for clustering.
+Default <code>NULL</code>.</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
@@ -154,7 +156,7 @@ when automatic clustering is used. Default <code>0.25</code>.</p></dd>
 <dt id="arg-missingness-proportion-matrix">missingness_proportion_matrix<a class="anchor" aria-label="anchor" href="#arg-missingness-proportion-matrix"></a></dt>
 <dd><p>Optional pre-computed missingness proportion
 matrix for biomarker-based clustering. If provided, clustering will be based on
-missingness patterns. Default <code>NULL</code>.</p></dd>
+these proportions. Default <code>NULL</code>.</p></dd>
 
 
 <dt id="arg-scale-features">scale_features<a class="anchor" aria-label="anchor" href="#arg-scale-features"></a></dt>
@@ -196,11 +198,6 @@ Default <code>FALSE</code>.</p></dd>
 <dt id="arg-batch-size">batch_size<a class="anchor" aria-label="anchor" href="#arg-batch-size"></a></dt>
 <dd><p>Integer. Mini-batch size for training. Larger values may improve
 training stability but require more memory. Default <code>4000</code>.</p></dd>
-
-
-<dt id="arg-return-model">return_model<a class="anchor" aria-label="anchor" href="#arg-return-model"></a></dt>
-<dd><p>Logical. If <code>TRUE</code>, returns the trained Python VAE model object.
-Default <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg-epochs">epochs<a class="anchor" aria-label="anchor" href="#arg-epochs"></a></dt>
@@ -261,6 +258,11 @@ uses same value as <code>beta</code>. Default <code>NULL</code>.</p></dd>
 training. Default <code>FALSE</code>.</p></dd>
 
 
+<dt id="arg-return-model">return_model<a class="anchor" aria-label="anchor" href="#arg-return-model"></a></dt>
+<dd><p>Logical. If <code>TRUE</code>, returns the trained Python VAE model object.
+Default <code>TRUE</code>.</p></dd>
+
+
 <dt id="arg-return-silhouettes">return_silhouettes<a class="anchor" aria-label="anchor" href="#arg-return-silhouettes"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, returns silhouette scores for
 cluster quality assessment. Default <code>FALSE</code>.</p></dd>
@@ -274,6 +276,11 @@ containing loss values and metrics over epochs. Default <code>FALSE</code>.</p><
 <dt id="arg-return-dataset">return_dataset<a class="anchor" aria-label="anchor" href="#arg-return-dataset"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, returns the ClusterDataset object used
 during training (contains validation data, masks, etc.). Default <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-cluster-selection-epsilon">cluster_selection_epsilon<a class="anchor" aria-label="anchor" href="#arg-cluster-selection-epsilon"></a></dt>
+<dd><p>Numeric. Epsilon parameter for HDBSCAN clustering
+when automatic clustering is used. Default <code>0.25</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -400,7 +407,7 @@ accessible via <code>reticulate</code>. The package handles automatic device sel
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Yasin Khadem Charvadeh, Danielle Vaithilingam.</p>
+  <p>Developed by Yasin Khadem Charvadeh, Danielle Vaithilingam, Kenneth Seier, Katherine S. Panageas, Mithat Gönen, Yuan Chen.</p>
 </div>
 
 <div class="pkgdown-footer-right">

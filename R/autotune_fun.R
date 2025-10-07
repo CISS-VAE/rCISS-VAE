@@ -87,6 +87,7 @@ autotune_cissvae <- function(
   reset_lr_refit    = c(TRUE, FALSE),
   debug = FALSE
 ) {
+  
   # ── 1) Coerce to integers ────────────────────────────────────────────────
   n_trials          <- as.integer(n_trials)
   seed              <- as.integer(seed)
@@ -185,9 +186,13 @@ if (!is.null(imputable_matrix)) {
   
   # ── 6) Build ClusterDataset ──────────────────────────────────────────────
   if (missing(clusters)) stop("`clusters` is required for autotune.")
-  data_py     <- pd$DataFrame(data)
+  data[is.na(data)] <- NaN
+  data_py <- pd$DataFrame(data = data, dtype = "float64")
+
+
   if(debug){
-    print(data_py$head)
+    print("Python data thing")
+    print(data_py$head())
   }
   clusters_py <- np$array(as.integer(clusters), dtype = "int64")
 

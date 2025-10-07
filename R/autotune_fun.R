@@ -119,8 +119,36 @@ autotune_cissvae <- function(
     imputable_matrix = imputable_matrix[, setdiff(colnames(imputable_matrix), index_col), drop = FALSE]
   } else index_vals <- NULL
 
+  # ── 3.1) Ensure data and mask columns match EXACTLY (after index removal) ──
+if (!is.null(imputable_matrix)) {
+  if (!identical(colnames(data), colnames(imputable_matrix))) {
+    stop("`data` and `imputable_matrix` columns must match exactly (same names & order) after removing index_col.")
+  }
+}
 
-  
+# ── 3.2) Quick coverage diagnostics on FEATURE columns only ──
+feat_cols <- if (is.null(columns_ignore)) colnames(data) else setdiff(colnames(data), columns_ignore)
+
+if (!is.null(imputable_matrix)) {
+  obs_mat <- !is.na(as.matrix(data[, feat_cols, drop = FALSE]))
+  imp_mat <- (as.matrix(imputable_matrix[, feat_cols, drop = FALSE]) == 1L)
+  valid   <- obs_mat & imp_mat
+
+  zero_cols <- feat_cols[colSums(valid) == 0]
+  zero_rows <- which(rowSums(valid) == 0)
+
+  if (length(zero_cols)) {
+    stop("These feature columns have zero valid cells (observed ∧ imputable): ",
+         paste(zero_cols, collapse = ", "),
+         "\nDrop them or adjust the mask before running autotune.")
+  }
+  if (length(zero_rows)) {
+    message("Rows with zero valid cells: ", length(zero_rows),
+            " (they'll produce empty-loss batches unless handled in Python).")
+  }
+}
+
+
   # ── 4) Prepare matrix & Python imports ──────────────────────────────────
   mat <- if (is.data.frame(data)) as.matrix(data) else data
   auto_mod <- import("ciss_vae.training.autotune", convert = FALSE)
@@ -161,13 +189,16 @@ autotune_cissvae <- function(
   if(debug){
     print(data_py$head)
   }
-  clusters_py <- np$array(as.integer(clusters))
+  clusters_py <- np$array(as.integer(clusters), dtype = "int64")
+
+  # columns_ignore as a Python list (safer when convert = FALSE)
+  cols_ignore_py <- if (is.null(columns_ignore)) NULL else r_to_py(as.character(columns_ignore))
 
   if (!is.null(imputable_matrix)) {
       dni_py <- pd$DataFrame(imputable_matrix)
   } else dni_py <- NULL
 
-  train_ds_py <- CD_mod(data_py, clusters_py, val_proportion, replacement_value, columns_ignore, dni_py)
+  train_ds_py <- CD_mod(data_py, clusters_py, val_proportion, replacement_value, cols_ignore_py, dni_py)
   
   if (verbose) print("Built cluster dataset")
   
@@ -202,8 +233,13 @@ autotune_cissvae <- function(
   
   # ── 8) Convert back to R ─────────────────────────────────────────────────
   imp_df <- as.data.frame(best_imp_py, stringsAsFactors = FALSE)
-  colnames(imp_df) <- colnames(mat)
-  rownames(imp_df) <- rownames(mat)
+  if (ncol(imp_df) == ncol(mat)) {
+    colnames(imp_df) <- colnames(mat)
+  }
+  if (!is.null(rownames(mat)) && (nrow(imp_df) == nrow(mat))) {
+    rownames(imp_df) <- rownames(mat)
+  }
+  
   
   if (!is.null(index_vals)) {
     imp_df[[index_col]] <- index_vals

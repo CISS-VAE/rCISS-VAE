@@ -69,3 +69,7 @@ testhat.txt
 *.txt
 !requirements.txt
 test_dataset_pbc2.csv
+vignettes/optuna_study.db
+*.db
+*.sqlite3
+vignettes/.nfs000000000119e5d200000196

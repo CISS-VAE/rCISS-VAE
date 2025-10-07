@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Masking certain entries from imputation model • rCISSVAE</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -16,7 +16,7 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
@@ -61,31 +61,14 @@
 <p>There are some cases in which we want to tell CISSVAE not to impute
 certain missing data entries. For example, we would not want to impute
 patient biomarker values for collection dates past date of death.</p>
-<p>We can use the <code>do_not_impute_matrix</code> argument in the
+<p>We can use the <code>imputable_matrix</code> argument in the
 <code><a href="../reference/run_cissvae.html">run_cissvae()</a></code> function to mask these values. The binary
-<code>do_not_impute_matrix</code> should have the same dimensions as the
+<code>imputable_matrix</code> should have the same dimensions as the
 input dataframe with each cell containing 0 (impute if missing) or 1 (do
 not impute, even if missing).</p>
 <p>Let’s use a simple survival dataset as an example. The mock survival
 dataset and its dni matrix can be loaded using the data function.</p>
-<pre><code><span><span class="co">## ── <span style="font-weight: bold;">Attaching core tidyverse packages</span> ──────────────────────── tidyverse 2.0.0 ──</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">dplyr    </span> 1.1.4     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">readr    </span> 2.1.5</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">forcats  </span> 1.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">stringr  </span> 1.5.2</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">ggplot2  </span> 4.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tibble   </span> 3.3.0</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">lubridate</span> 1.9.3     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tidyr    </span> 1.3.1</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">purrr    </span> 1.1.0     </span></span>
-<span><span class="co">## ── <span style="font-weight: bold;">Conflicts</span> ────────────────────────────────────────── tidyverse_conflicts() ──</span></span>
-<span><span class="co">## <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">filter()</span> masks <span style="color: #0000BB;">stats</span>::filter()</span></span>
-<span><span class="co">## <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">lag()</span>    masks <span style="color: #0000BB;">stats</span>::lag()</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Use the conflicted package (<span style="color: #0000BB; font-style: italic;">&lt;http://conflicted.r-lib.org/&gt;</span>) to force all conflicts to become errors</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Attaching package: 'kableExtra'</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## The following object is masked from 'package:dplyr':</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">##     group_rows</span></span></code></pre>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ciss-vae.github.io/rCISS-VAE">rCISSVAE</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
@@ -415,43 +398,253 @@ dataset and its dni matrix can be loaded using the data function.</p>
 <p>If we look at the entry for P007, which has a death event at year 3,
 we can see that the biomarker entries after month 36 (aka year 3) are
 marked as non-imputable.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mock_surv</span><span class="op">[</span><span class="fl">7</span>,<span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">patient_id</th>
+<th align="right">death_event</th>
+<th align="right">death_year</th>
+<th align="right">biomarker1_m00</th>
+<th align="right">biomarker1_m06</th>
+<th align="right">biomarker1_m12</th>
+<th align="right">biomarker1_m18</th>
+<th align="right">biomarker1_m24</th>
+<th align="right">biomarker1_m30</th>
+<th align="right">biomarker1_m36</th>
+<th align="right">biomarker1_m42</th>
+<th align="right">biomarker1_m48</th>
+<th align="right">biomarker1_m54</th>
+<th align="right">biomarker1_m60</th>
+<th align="right">biomarker2_m00</th>
+<th align="right">biomarker2_m06</th>
+<th align="right">biomarker2_m12</th>
+<th align="right">biomarker2_m18</th>
+<th align="right">biomarker2_m24</th>
+<th align="right">biomarker2_m30</th>
+<th align="right">biomarker2_m36</th>
+<th align="right">biomarker2_m42</th>
+<th align="right">biomarker2_m48</th>
+<th align="right">biomarker2_m54</th>
+<th align="right">biomarker2_m60</th>
+<th align="right">biomarker3_m00</th>
+<th align="right">biomarker3_m06</th>
+<th align="right">biomarker3_m12</th>
+<th align="right">biomarker3_m18</th>
+<th align="right">biomarker3_m24</th>
+<th align="right">biomarker3_m30</th>
+<th align="right">biomarker3_m36</th>
+<th align="right">biomarker3_m42</th>
+<th align="right">biomarker3_m48</th>
+<th align="right">biomarker3_m54</th>
+<th align="right">biomarker3_m60</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="left">P007</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">-0.1646875</td>
+<td align="right">NA</td>
+<td align="right">0.3190216</td>
+<td align="right">0.5829264</td>
+<td align="right">0.7385894</td>
+<td align="right">0.9623325</td>
+<td align="right">1.07251</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">0.0623253</td>
+<td align="right">0.0624611</td>
+<td align="right">0.0732599</td>
+<td align="right">0.2839856</td>
+<td align="right">0.0027528</td>
+<td align="right">0.0585718</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">0.0546087</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">0.1709268</td>
+<td align="right">0.3963251</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr></tbody>
+</table>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mock_surv</span><span class="op">[</span><span class="fl">7</span>,<span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 1 × 36</span></span></span>
-<span><span class="co">##   patient_id death_event death_year biomarker1_m00 biomarker1_m06 biomarker1_m12</span></span>
-<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">1</span> P007                 1          3         -<span style="color: #BB0000;">0.165</span>             <span style="color: #BB0000;">NA</span>          0.319</span></span>
-<span><span class="co">## <span style="color: #949494;"># ℹ 30 more variables: biomarker1_m18 &lt;dbl&gt;, biomarker1_m24 &lt;dbl&gt;,</span></span></span>
-<span><span class="co">## <span style="color: #949494;">#   biomarker1_m30 &lt;dbl&gt;, biomarker1_m36 &lt;dbl&gt;, biomarker1_m42 &lt;dbl&gt;,</span></span></span>
-<span><span class="co">## <span style="color: #949494;">#   biomarker1_m48 &lt;dbl&gt;, biomarker1_m54 &lt;dbl&gt;, biomarker1_m60 &lt;dbl&gt;,</span></span></span>
-<span><span class="co">## <span style="color: #949494;">#   biomarker2_m00 &lt;dbl&gt;, biomarker2_m06 &lt;dbl&gt;, biomarker2_m12 &lt;dbl&gt;,</span></span></span>
-<span><span class="co">## <span style="color: #949494;">#   biomarker2_m18 &lt;dbl&gt;, biomarker2_m24 &lt;dbl&gt;, biomarker2_m30 &lt;dbl&gt;,</span></span></span>
-<span><span class="co">## <span style="color: #949494;">#   biomarker2_m36 &lt;dbl&gt;, biomarker2_m42 &lt;dbl&gt;, biomarker2_m48 &lt;dbl&gt;,</span></span></span>
-<span><span class="co">## <span style="color: #949494;">#   biomarker2_m54 &lt;dbl&gt;, biomarker2_m60 &lt;dbl&gt;, biomarker3_m00 &lt;dbl&gt;, …</span></span></span></code></pre>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">dni</span><span class="op">[</span><span class="fl">7</span>,<span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 1 × 36</span></span></span>
-<span><span class="co">##   patient_id death_event death_year biomarker1_m00 biomarker1_m06 biomarker1_m12</span></span>
-<span><span class="co">##        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">1</span>          0           0          0              0              0              0</span></span>
-<span><span class="co">## <span style="color: #949494;"># ℹ 30 more variables: biomarker1_m18 &lt;dbl&gt;, biomarker1_m24 &lt;dbl&gt;,</span></span></span>
-<span><span class="co">## <span style="color: #949494;">#   biomarker1_m30 &lt;dbl&gt;, biomarker1_m36 &lt;dbl&gt;, biomarker1_m42 &lt;dbl&gt;,</span></span></span>
-<span><span class="co">## <span style="color: #949494;">#   biomarker1_m48 &lt;dbl&gt;, biomarker1_m54 &lt;dbl&gt;, biomarker1_m60 &lt;dbl&gt;,</span></span></span>
-<span><span class="co">## <span style="color: #949494;">#   biomarker2_m00 &lt;dbl&gt;, biomarker2_m06 &lt;dbl&gt;, biomarker2_m12 &lt;dbl&gt;,</span></span></span>
-<span><span class="co">## <span style="color: #949494;">#   biomarker2_m18 &lt;dbl&gt;, biomarker2_m24 &lt;dbl&gt;, biomarker2_m30 &lt;dbl&gt;,</span></span></span>
-<span><span class="co">## <span style="color: #949494;">#   biomarker2_m36 &lt;dbl&gt;, biomarker2_m42 &lt;dbl&gt;, biomarker2_m48 &lt;dbl&gt;,</span></span></span>
-<span><span class="co">## <span style="color: #949494;">#   biomarker2_m54 &lt;dbl&gt;, biomarker2_m60 &lt;dbl&gt;, biomarker3_m00 &lt;dbl&gt;, …</span></span></span></code></pre>
+<code class="sourceCode R"><span><span class="va">dni</span><span class="op">[</span><span class="fl">7</span>,<span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+</colgroup>
+<thead><tr class="header">
+<th align="right">patient_id</th>
+<th align="right">death_event</th>
+<th align="right">death_year</th>
+<th align="right">biomarker1_m00</th>
+<th align="right">biomarker1_m06</th>
+<th align="right">biomarker1_m12</th>
+<th align="right">biomarker1_m18</th>
+<th align="right">biomarker1_m24</th>
+<th align="right">biomarker1_m30</th>
+<th align="right">biomarker1_m36</th>
+<th align="right">biomarker1_m42</th>
+<th align="right">biomarker1_m48</th>
+<th align="right">biomarker1_m54</th>
+<th align="right">biomarker1_m60</th>
+<th align="right">biomarker2_m00</th>
+<th align="right">biomarker2_m06</th>
+<th align="right">biomarker2_m12</th>
+<th align="right">biomarker2_m18</th>
+<th align="right">biomarker2_m24</th>
+<th align="right">biomarker2_m30</th>
+<th align="right">biomarker2_m36</th>
+<th align="right">biomarker2_m42</th>
+<th align="right">biomarker2_m48</th>
+<th align="right">biomarker2_m54</th>
+<th align="right">biomarker2_m60</th>
+<th align="right">biomarker3_m00</th>
+<th align="right">biomarker3_m06</th>
+<th align="right">biomarker3_m12</th>
+<th align="right">biomarker3_m18</th>
+<th align="right">biomarker3_m24</th>
+<th align="right">biomarker3_m30</th>
+<th align="right">biomarker3_m36</th>
+<th align="right">biomarker3_m42</th>
+<th align="right">biomarker3_m48</th>
+<th align="right">biomarker3_m54</th>
+<th align="right">biomarker3_m60</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr></tbody>
+</table>
 <p>When running the cissvae model with this dataset, it is important
 that the dataset and dni matrix have the same shape and column names.
 This allows us to take advantage of the <code>index_col</code> and
 <code>columns_ignore</code> arguments. We pass the dni matrix through
-the <code>do_not_impute_matrix</code> argument.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+the <code>imputable_matrix</code> argument.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_cissvae.html">run_cissvae</a></span><span class="op">(</span></span>
 <span>  <span class="va">mock_surv</span>,</span>
 <span>  index_col <span class="op">=</span> <span class="st">"patient_id"</span>,</span>
 <span>  columns_ignore <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"death_event"</span>,<span class="st">"death_year"</span><span class="op">)</span>,</span>
-<span>  do_not_impute_matrix <span class="op">=</span> <span class="va">dni</span>,   </span>
+<span>  imputable_matrix <span class="op">=</span> <span class="va">dni</span>,   </span>
 <span>  val_proportion <span class="op">=</span> <span class="fl">0.3</span>,</span>
 <span>  return_clusters <span class="op">=</span><span class="cn">FALSE</span>,</span>
 <span>  return_history <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -461,81 +654,372 @@ the <code>do_not_impute_matrix</code> argument.</p>
 <span>  return_silhouettes <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Cluster dataset:</span></span>
-<span><span class="co">##  ClusterDataset(n_samples=200, n_features=35, n_clusters=53)</span></span>
+<span><span class="co">##  ClusterDataset(n_samples=200, n_features=35, n_clusters=55)</span></span>
 <span><span class="co">##   • Original missing: 2543 / 6600 (38.53%)</span></span>
-<span><span class="co">##   • Validation held-out: 2077 (51.20% of non-missing)</span></span>
+<span><span class="co">##   • Validation held-out: 1684 (41.51% of non-missing)</span></span>
 <span><span class="co">##   • .data shape:     (200, 35)</span></span>
 <span><span class="co">##   • .masks shape:    (200, 35)</span></span>
-<span><span class="co">##   • .val_data shape: (200, 35)</span></span></code></pre>
+<span><span class="co">##   • .val_data shape: (200, 35)</span></span>
+<span><span class="co">##   • Non-imputable entries: 393</span></span></code></pre>
 <p>When we unpack the results and look at the imputed dataset, we can
 see that P007 still has NAs for biomarkers past 36 months.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">imputed_dataset</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">7</span>,<span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##   patient_id death_event death_year biomarker1_m00 biomarker1_m06</span></span>
-<span><span class="co">## 0       P001           0   2.816667     0.08017647    -0.07296034</span></span>
-<span><span class="co">## 1       P002           0   2.816667     0.08017647     0.20198478</span></span>
-<span><span class="co">## 2       P003           0   2.816667     0.08017647    -0.34786278</span></span>
-<span><span class="co">## 3       P004           0   2.816667     0.08017647     0.17267427</span></span>
-<span><span class="co">## 4       P005           0   2.816667     0.82078469     1.48447073</span></span>
-<span><span class="co">## 5       P006           0   2.816667     0.07983060     0.24580511</span></span>
-<span><span class="co">## 6       P007           1   3.000000    -0.16468754     0.17267427</span></span>
-<span><span class="co">##   biomarker1_m12 biomarker1_m18 biomarker1_m24 biomarker1_m30 biomarker1_m36</span></span>
-<span><span class="co">## 0      0.3055585      0.2332004      0.5508518      0.6703717      0.8551518</span></span>
-<span><span class="co">## 1      0.3008975      0.3917370      0.4851941      0.6703717      0.7560281</span></span>
-<span><span class="co">## 2     -0.2809101     -0.3463161     -0.1221673      0.1957781      0.1373877</span></span>
-<span><span class="co">## 3      0.3008975      0.8257963      0.5508518      0.6703717      1.1511669</span></span>
-<span><span class="co">## 4      1.5075537      1.4269625      1.7042559      1.7166684      1.8634248</span></span>
-<span><span class="co">## 5      0.3008975      0.2171040      0.2917295      0.4103813      0.7858086</span></span>
-<span><span class="co">## 6      0.3190216      0.5829263      0.7385894      0.9623325      1.0725095</span></span>
-<span><span class="co">##   biomarker1_m42 biomarker1_m48 biomarker1_m54 biomarker1_m60 biomarker2_m00</span></span>
-<span><span class="co">## 0      0.8027524      0.9459516       1.324799      1.2813294    -0.28330877</span></span>
-<span><span class="co">## 1      0.8027524      1.3371121       1.332744      1.2813294    -0.26420641</span></span>
-<span><span class="co">## 2      0.1664135      0.1874206       1.332744      0.6016288     0.02322435</span></span>
-<span><span class="co">## 3      0.8027524      1.2363808       1.376007      1.4586281     0.80775446</span></span>
-<span><span class="co">## 4      1.9726140      2.1577544       2.650625      2.5509279     1.01649344</span></span>
-<span><span class="co">## 5      0.4664922      0.6859184       1.073819      0.8490065    -0.09670670</span></span>
-<span><span class="co">## 6            NaN            NaN            NaN            NaN     0.06232529</span></span>
-<span><span class="co">##   biomarker2_m06 biomarker2_m12 biomarker2_m18 biomarker2_m24 biomarker2_m30</span></span>
-<span><span class="co">## 0     0.04395184   -0.524100661    -0.04306518   -0.426104784    -0.55038774</span></span>
-<span><span class="co">## 1    -0.21099393   -0.060090043    -0.12981604   -0.138382033    -0.22393437</span></span>
-<span><span class="co">## 2     0.04395184   -0.338102847    -0.91641790   -0.669931769    -0.15691766</span></span>
-<span><span class="co">## 3     0.04395184    0.330412626     0.50364304    0.547709584     0.56977868</span></span>
-<span><span class="co">## 4     0.04395184    0.913325489     0.51596826   -0.138382033     0.57457983</span></span>
-<span><span class="co">## 5    -0.08690932   -0.008838233    -0.23246098   -0.138382033    -0.15691766</span></span>
-<span><span class="co">## 6     0.06246109    0.073259890     0.28398558    0.002752766     0.05857181</span></span>
-<span><span class="co">##   biomarker2_m36 biomarker2_m42 biomarker2_m48 biomarker2_m54 biomarker2_m60</span></span>
-<span><span class="co">## 0    -0.48500043    -0.38082999     -0.8269995     -1.1647223     -0.5343538</span></span>
-<span><span class="co">## 1    -0.08213539    -0.28418347     -0.3139518     -0.5520591     -0.5343538</span></span>
-<span><span class="co">## 2    -1.16175210    -0.28418347     -1.3168920     -1.2316631     -1.4466560</span></span>
-<span><span class="co">## 3     0.43870801    -0.28418347      0.7032660     -0.5520591      0.3902867</span></span>
-<span><span class="co">## 4     0.12197453    -0.05538718     -0.2674445     -0.4097872     -0.4382522</span></span>
-<span><span class="co">## 5    -0.44593602    -0.31419751     -0.6617219     -0.5807806     -0.7427507</span></span>
-<span><span class="co">## 6    -0.36641607            NaN            NaN            NaN            NaN</span></span>
-<span><span class="co">##   biomarker3_m00 biomarker3_m06 biomarker3_m12 biomarker3_m18 biomarker3_m24</span></span>
-<span><span class="co">## 0    -0.33970779   -0.321329862     0.02692955     0.04827372    -0.35563889</span></span>
-<span><span class="co">## 1    -0.19654533    0.007062256    -0.30070391    -0.04024491     0.07211136</span></span>
-<span><span class="co">## 2     0.10233848    0.054567128     0.02692955    -0.02368132     0.08414590</span></span>
-<span><span class="co">## 3     0.45304477    0.054567128     0.52907348     0.31234542     0.16816741</span></span>
-<span><span class="co">## 4     1.09130454    0.054567128     1.03140509     0.83404821     0.16816741</span></span>
-<span><span class="co">## 5     0.10233848   -0.201686859    -0.12894012    -0.20327407    -0.20174129</span></span>
-<span><span class="co">## 6     0.05460874    0.054567128     0.02692955     0.17092685     0.39632505</span></span>
-<span><span class="co">##   biomarker3_m30 biomarker3_m36 biomarker3_m42 biomarker3_m48 biomarker3_m54</span></span>
-<span><span class="co">## 0    -0.13013658    -0.16296671  -0.1260692775   -0.053942729    -0.15213469</span></span>
-<span><span class="co">## 1     0.06548417    -0.03495115  -0.0235729553    0.007716056    -0.02886459</span></span>
-<span><span class="co">## 2     0.14724579     0.03879652   0.0770729780    0.007716056     0.60639662</span></span>
-<span><span class="co">## 3     0.09883979    -0.03495115  -0.0008705333    0.007716056    -0.21237339</span></span>
-<span><span class="co">## 4     0.70956743    -0.03495115   0.8746145964    0.552908182     0.96187115</span></span>
-<span><span class="co">## 5     0.14724579    -0.02289455  -0.2137401998   -0.544870973     0.09003889</span></span>
-<span><span class="co">## 6     0.14724579    -0.03495115            NaN            NaN            NaN</span></span>
-<span><span class="co">##   biomarker3_m60</span></span>
-<span><span class="co">## 0     0.01531991</span></span>
-<span><span class="co">## 1     0.10208759</span></span>
-<span><span class="co">## 2     0.57671410</span></span>
-<span><span class="co">## 3    -0.33763975</span></span>
-<span><span class="co">## 4     0.10208759</span></span>
-<span><span class="co">## 5     0.10208759</span></span>
-<span><span class="co">## 6            NaN</span></span></code></pre>
-  </main>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">res</span><span class="op">$</span><span class="va">imputed_dataset</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">7</span>,<span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<colgroup>
+<col width="0%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+<col width="2%">
+</colgroup>
+<thead><tr class="header">
+<th align="left"></th>
+<th align="left">patient_id</th>
+<th align="right">death_event</th>
+<th align="right">death_year</th>
+<th align="right">biomarker1_m00</th>
+<th align="right">biomarker1_m06</th>
+<th align="right">biomarker1_m12</th>
+<th align="right">biomarker1_m18</th>
+<th align="right">biomarker1_m24</th>
+<th align="right">biomarker1_m30</th>
+<th align="right">biomarker1_m36</th>
+<th align="right">biomarker1_m42</th>
+<th align="right">biomarker1_m48</th>
+<th align="right">biomarker1_m54</th>
+<th align="right">biomarker1_m60</th>
+<th align="right">biomarker2_m00</th>
+<th align="right">biomarker2_m06</th>
+<th align="right">biomarker2_m12</th>
+<th align="right">biomarker2_m18</th>
+<th align="right">biomarker2_m24</th>
+<th align="right">biomarker2_m30</th>
+<th align="right">biomarker2_m36</th>
+<th align="right">biomarker2_m42</th>
+<th align="right">biomarker2_m48</th>
+<th align="right">biomarker2_m54</th>
+<th align="right">biomarker2_m60</th>
+<th align="right">biomarker3_m00</th>
+<th align="right">biomarker3_m06</th>
+<th align="right">biomarker3_m12</th>
+<th align="right">biomarker3_m18</th>
+<th align="right">biomarker3_m24</th>
+<th align="right">biomarker3_m30</th>
+<th align="right">biomarker3_m36</th>
+<th align="right">biomarker3_m42</th>
+<th align="right">biomarker3_m48</th>
+<th align="right">biomarker3_m54</th>
+<th align="right">biomarker3_m60</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">0</td>
+<td align="left">P001</td>
+<td align="right">0</td>
+<td align="right">5.026575</td>
+<td align="right">0.0992763</td>
+<td align="right">-0.0729603</td>
+<td align="right">0.3055585</td>
+<td align="right">0.2332004</td>
+<td align="right">0.3276050</td>
+<td align="right">0.7823124</td>
+<td align="right">0.8551518</td>
+<td align="right">0.9849613</td>
+<td align="right">1.6164122</td>
+<td align="right">1.3247994</td>
+<td align="right">1.8981762</td>
+<td align="right">-0.2833088</td>
+<td align="right">-0.4720574</td>
+<td align="right">-0.5241007</td>
+<td align="right">0.2158539</td>
+<td align="right">-0.4261048</td>
+<td align="right">-0.5503877</td>
+<td align="right">-0.4850004</td>
+<td align="right">-0.3808300</td>
+<td align="right">-0.8269995</td>
+<td align="right">-1.1647223</td>
+<td align="right">-0.6176439</td>
+<td align="right">-0.3397078</td>
+<td align="right">-0.3213299</td>
+<td align="right">-0.3140999</td>
+<td align="right">-0.4421682</td>
+<td align="right">-0.3556389</td>
+<td align="right">-0.1301366</td>
+<td align="right">-0.1629667</td>
+<td align="right">-0.1260693</td>
+<td align="right">-0.0539427</td>
+<td align="right">-0.1521347</td>
+<td align="right">0.0153199</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left">P002</td>
+<td align="right">0</td>
+<td align="right">4.752638</td>
+<td align="right">0.2888352</td>
+<td align="right">0.2019848</td>
+<td align="right">0.4387381</td>
+<td align="right">0.3917370</td>
+<td align="right">0.4851941</td>
+<td align="right">0.7778220</td>
+<td align="right">0.8608982</td>
+<td align="right">1.1031142</td>
+<td align="right">1.3371121</td>
+<td align="right">1.3231797</td>
+<td align="right">1.8323689</td>
+<td align="right">-0.2642064</td>
+<td align="right">-0.2109939</td>
+<td align="right">-0.0600900</td>
+<td align="right">-0.1298160</td>
+<td align="right">-0.1598918</td>
+<td align="right">-0.2239344</td>
+<td align="right">-0.0821354</td>
+<td align="right">-0.0776768</td>
+<td align="right">-0.3139518</td>
+<td align="right">-1.0887223</td>
+<td align="right">-0.6208212</td>
+<td align="right">-0.1965453</td>
+<td align="right">0.0070623</td>
+<td align="right">-0.3007039</td>
+<td align="right">-0.0402449</td>
+<td align="right">0.0721114</td>
+<td align="right">0.0654842</td>
+<td align="right">-0.1818187</td>
+<td align="right">-0.0235730</td>
+<td align="right">0.2157366</td>
+<td align="right">-0.0288646</td>
+<td align="right">0.1142993</td>
+</tr>
+<tr class="odd">
+<td align="left">2</td>
+<td align="left">P003</td>
+<td align="right">0</td>
+<td align="right">2.822800</td>
+<td align="right">0.4143608</td>
+<td align="right">-0.3478628</td>
+<td align="right">-0.2809101</td>
+<td align="right">-0.3463161</td>
+<td align="right">-0.1221673</td>
+<td align="right">0.1957781</td>
+<td align="right">0.1373876</td>
+<td align="right">0.1664135</td>
+<td align="right">0.1874206</td>
+<td align="right">0.4028772</td>
+<td align="right">0.6016288</td>
+<td align="right">0.2199725</td>
+<td align="right">0.8655384</td>
+<td align="right">-0.3381028</td>
+<td align="right">-0.9164179</td>
+<td align="right">-0.6699318</td>
+<td align="right">0.2897322</td>
+<td align="right">-1.1617521</td>
+<td align="right">0.7424825</td>
+<td align="right">-1.3168920</td>
+<td align="right">-1.2316631</td>
+<td align="right">-1.4466560</td>
+<td align="right">0.4822631</td>
+<td align="right">-0.2676046</td>
+<td align="right">1.0590632</td>
+<td align="right">-0.0236813</td>
+<td align="right">0.0841459</td>
+<td align="right">0.3231916</td>
+<td align="right">0.0387965</td>
+<td align="right">1.5284162</td>
+<td align="right">-0.6747830</td>
+<td align="right">0.6063966</td>
+<td align="right">0.5767140</td>
+</tr>
+<tr class="even">
+<td align="left">3</td>
+<td align="left">P004</td>
+<td align="right">0</td>
+<td align="right">3.133871</td>
+<td align="right">0.1486479</td>
+<td align="right">0.5275683</td>
+<td align="right">0.4716955</td>
+<td align="right">0.8257963</td>
+<td align="right">0.5531164</td>
+<td align="right">0.7018346</td>
+<td align="right">1.1511669</td>
+<td align="right">0.8525666</td>
+<td align="right">1.2363808</td>
+<td align="right">1.3760070</td>
+<td align="right">1.4586281</td>
+<td align="right">0.8077545</td>
+<td align="right">0.5059839</td>
+<td align="right">0.3304126</td>
+<td align="right">0.5036430</td>
+<td align="right">0.5477096</td>
+<td align="right">0.5697787</td>
+<td align="right">0.4387080</td>
+<td align="right">0.2331361</td>
+<td align="right">0.7032660</td>
+<td align="right">-0.4819341</td>
+<td align="right">0.3902866</td>
+<td align="right">0.4530448</td>
+<td align="right">0.2785703</td>
+<td align="right">0.5290735</td>
+<td align="right">0.3123454</td>
+<td align="right">0.6486312</td>
+<td align="right">0.0988398</td>
+<td align="right">0.1982485</td>
+<td align="right">-0.0008705</td>
+<td align="right">-0.0308212</td>
+<td align="right">-0.2123734</td>
+<td align="right">-0.3376397</td>
+</tr>
+<tr class="odd">
+<td align="left">4</td>
+<td align="left">P005</td>
+<td align="right">0</td>
+<td align="right">2.690021</td>
+<td align="right">0.8207847</td>
+<td align="right">1.4844707</td>
+<td align="right">1.5075537</td>
+<td align="right">1.4269625</td>
+<td align="right">1.7042561</td>
+<td align="right">1.7166684</td>
+<td align="right">1.8634248</td>
+<td align="right">1.9726139</td>
+<td align="right">2.1577544</td>
+<td align="right">2.6506255</td>
+<td align="right">2.5509279</td>
+<td align="right">1.0164934</td>
+<td align="right">-0.0313322</td>
+<td align="right">0.9133255</td>
+<td align="right">0.5159683</td>
+<td align="right">-0.0352236</td>
+<td align="right">0.5745798</td>
+<td align="right">0.1219745</td>
+<td align="right">-0.0553872</td>
+<td align="right">-0.2674445</td>
+<td align="right">-0.4097872</td>
+<td align="right">-0.4382522</td>
+<td align="right">1.0913045</td>
+<td align="right">0.0666001</td>
+<td align="right">1.0314051</td>
+<td align="right">0.8340482</td>
+<td align="right">-0.3929905</td>
+<td align="right">0.7095674</td>
+<td align="right">0.0082563</td>
+<td align="right">0.8746146</td>
+<td align="right">0.5529082</td>
+<td align="right">0.9618712</td>
+<td align="right">0.0822179</td>
+</tr>
+<tr class="even">
+<td align="left">5</td>
+<td align="left">P006</td>
+<td align="right">0</td>
+<td align="right">2.692540</td>
+<td align="right">0.0798306</td>
+<td align="right">0.2458051</td>
+<td align="right">0.2257504</td>
+<td align="right">0.2171040</td>
+<td align="right">0.2917295</td>
+<td align="right">0.4103813</td>
+<td align="right">0.7858086</td>
+<td align="right">0.4664923</td>
+<td align="right">0.6859184</td>
+<td align="right">1.0738187</td>
+<td align="right">0.8490065</td>
+<td align="right">-0.0967067</td>
+<td align="right">-0.0869093</td>
+<td align="right">-0.0088382</td>
+<td align="right">-0.2324610</td>
+<td align="right">-0.1976925</td>
+<td align="right">-0.2271145</td>
+<td align="right">-0.4459360</td>
+<td align="right">-0.3141975</td>
+<td align="right">-0.6617219</td>
+<td align="right">-0.5807806</td>
+<td align="right">-0.7427507</td>
+<td align="right">0.1507194</td>
+<td align="right">-0.2016869</td>
+<td align="right">-0.1289401</td>
+<td align="right">-0.2032741</td>
+<td align="right">-0.2017413</td>
+<td align="right">0.2066579</td>
+<td align="right">-0.0228946</td>
+<td align="right">-0.2137402</td>
+<td align="right">-0.5448710</td>
+<td align="right">0.1241557</td>
+<td align="right">0.1504754</td>
+</tr>
+<tr class="odd">
+<td align="left">6</td>
+<td align="left">P007</td>
+<td align="right">1</td>
+<td align="right">3.000000</td>
+<td align="right">-0.1646875</td>
+<td align="right">0.4432334</td>
+<td align="right">0.3190216</td>
+<td align="right">0.5829263</td>
+<td align="right">0.7385894</td>
+<td align="right">0.9623325</td>
+<td align="right">1.0725095</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+<td align="right">0.0623253</td>
+<td align="right">0.0624611</td>
+<td align="right">0.0732599</td>
+<td align="right">0.2839856</td>
+<td align="right">0.0027528</td>
+<td align="right">0.0585718</td>
+<td align="right">-0.1537978</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+<td align="right">0.0546087</td>
+<td align="right">0.1216233</td>
+<td align="right">0.3556244</td>
+<td align="right">0.1709269</td>
+<td align="right">0.3963251</td>
+<td align="right">-0.3260288</td>
+<td align="right">0.0289759</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+</tr>
+</tbody>
+</table></main>
 </div>
 
 

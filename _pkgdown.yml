@@ -3,6 +3,9 @@ url: https://ciss-vae.github.io/rCISS-VAE/
 template:
   bootstrap: 5
   bootswatch: spacelab
+  light-switch: true
+  theme: pygments
+  theme-dark: arrow-dark
 
 navbar:
   title: "rCISSVAE"

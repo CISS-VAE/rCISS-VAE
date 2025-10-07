@@ -149,9 +149,9 @@ The `run_cissvae()` function is a comprehensive wrapper for all basic steps in r
 - print_dataset: Set `TRUE` to print dataset summary information during processing.   
 
 **Clustering Parameters (optional)**    
-- clusters: Vector of one cluster label per row of 'data' dataframe. If NULL, will automatically determine clusters using [HDBSCAN](https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html) or [KMeans](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html).   
-- n_clusters: Number of clusters for KMeans clustering when 'clusters' is NULL. If n_clusters is NULL, will use [HDBSCAN](https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html) for clustering.  
-- cluster_selection_epsilon: Epsilon parameter for [HDBSCAN](https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html) clustering when automatic clustering is used.   
+- clusters: Vector of one cluster label per row of 'data' dataframe. If NULL, will automatically determine clusters using [HDBSCAN]() or [KMeans](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html).   
+- n_clusters: Number of clusters for KMeans clustering when 'clusters' is NULL. If n_clusters is NULL, will use [HDBSCAN]() for clustering.  
+- leiden_resolution: Epsilon parameter for [HDBSCAN]() clustering when automatic clustering is used.   
 - missingness_proportion_matrix: Optional pre-computed missingness proportion matrix for feature-based clustering. If provided, clustering will be based on these proportions instead of direct 0/1 missingness pattern.    
 - scale_features: Set `TRUE` to scale features when using missingness proportion matrix clustering.  
 
@@ -295,7 +295,7 @@ plot_vae_architecture(model = dat$model, save_path = "test_plot_arch.png")
 
 Before running CISS-VAE, you can cluster features based on their missingness patterns. This helps identify features that tend to be missing together systematically, which can improve imputation quality.
 
-```{r}
+```{r clusfeatmissing}
 library(rCISSVAE)
 
 data(df_missing)
@@ -365,7 +365,7 @@ aut <- autotune_cissvae(
   device_preference = "cpu",
   show_progress = FALSE,  # Set true for Rich progress bars with training visualization
   optuna_dashboard_db = "sqlite:///optuna_study.db",  # Save results to database
-  load_if_exists = FALSE,
+  load_if_exists = FALSE, ## Set true to load and continue study if it exists
   seed = 42, 
   verbose = FALSE,
   
@@ -433,7 +433,7 @@ aut <- autotune_cissvae(
   device_preference = "cpu",
   show_progress = FALSE,  # Rich progress bars with training visualization
   optuna_dashboard_db = "sqlite:///optuna_study.db",  # Save results to database
-  load_if_exists = FALSE,
+  load_if_exists = TRUE,
   seed = 42, 
   verbose = FALSE,
   
@@ -463,7 +463,7 @@ aut <- autotune_cissvae(
   refit_patience = 2,        # Early stopping patience
   refit_loops = 100,                # Fixed refit loops
   epochs_per_loop = 5,   # Epochs per refit loop
-  reset_lr_refit = c(TRUE, FALSE)
+  reset_lr_refit = TRUE
 )
 
 imputed <- aut$imputed
@@ -483,7 +483,7 @@ plot_vae_architecture(best_model, title = "Optimized CISSVAE Architecture", save
 
 
 
-```{r eval=TRUE, echo = TRUE}
+```{r useprecompmissingprop, eval=TRUE, echo = TRUE}
 ## Using Pre-computed Missingness Proportion Matrix -- not quite working yet
 
 ##For advanced control over the clustering process, you can provide a pre-computed missingness proportion matrix directly to `run_cissvae()`:
@@ -508,10 +508,11 @@ advanced_result <- run_cissvae(
   data = df_missing,
   index_col = "index",
   clusters = NULL,  # Let function cluster using prop_matrix
+  columns_ignore = c('Age', 'Salary', 'ZipCode10001', 'ZipCode20002', 'ZipCode30003'), 
   missingness_proportion_matrix = prop_matrix,
   scale_features = TRUE,  # Standardize features before clustering
   n_clusters = 4,
-  cluster_selection_epsilon = 0.1,  # HDBSCAN parameter
+  leiden_resolution = 0.1,  # HDBSCAN parameter
   epochs = 5,
   return_history = TRUE,
   return_silhouettes = TRUE,
@@ -520,7 +521,7 @@ advanced_result <- run_cissvae(
 )
 
 print("Clustering quality:")
-print(paste("Silhouette score:", round(advanced_result$silhouettes, 3)))
+print(paste("Silhouette score:", round(advanced_result$silhouette_width, 3)))
 
 # Plot training history
 if (!is.null(advanced_result$history)) {

@@ -331,7 +331,7 @@ run_cissvae <- function(
     data                  = data_py,
     val_proportion        = val_proportion,
     replacement_value     = replacement_value,
-    columns_ignore        = if (is.null(columns_ignore)) NULL else reticulate::r_to_py(columns_ignore),
+    columns_ignore        = if (is.null(columns_ignore)) NULL else reticulate::r_to_py(list(as.character(columns_ignore))),
     print_dataset         = print_dataset,
     clusters              = clusters_py,
     n_clusters            = n_clusters,

@@ -9,29 +9,38 @@ output:
     fig_height: 5
     dpi: 600
 vignette: >
-  %\VignetteIndexEntry{rCISSVAE Vignette}
+  %\VignetteIndexEntry{Masking certain entries from imputation
+  model}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 There are some cases in which we want to tell CISSVAE not to impute certain missing data entries. For example, we would not want to impute patient biomarker values for collection dates past date of death.
 
-We can use the `do_not_impute_matrix` argument in the `run_cissvae()` function to mask these values. The binary `do_not_impute_matrix` should have the same dimensions as the input dataframe with each cell containing 0 (impute if missing) or 1 (do not impute, even if missing). 
+We can use the `imputable_matrix` argument in the `run_cissvae()` function to mask these values. The binary `imputable_matrix` should have the same dimensions as the input dataframe with each cell containing 0 (impute if missing) or 1 (do not impute, even if missing). 
 
 Let's use a simple survival dataset as an example. The mock survival dataset and its dni matrix can be loaded using the data function. 
 
 
-```{r setup, echo=FALSE}
+```{r setup, echo=FALSE, include=FALSE}
 rm(list = ls())
 
+setwd("/home/nfs/vaithid1/CISS-VAE/rCISSVAE")
 library(rCISSVAE)
 library(tidyverse)
 library(ggplot2)
 library(kableExtra)
+library(reticulate)
 
 set.seed(42)
-reticulate::use_virtualenv("/home/nfs/vaithid1/CISS-VAE/CISS-VAE-demo/cissvae_demo_env_v1", required = TRUE)
+reticulate::use_virtualenv("../.venv", required = TRUE)
 
+# if (py_module_available("ciss_vae")) {
+#   ciss_vae <- import("ciss_vae")
+#   print(ciss_vae$`__version__`)
+# } else {
+#   message("ciss_vae is not installed in the active Python environment.")
+# }
 ```
 
 ```{r}
@@ -51,19 +60,19 @@ mock_surv %>%
 If we look at the entry for P007, which has a death event at year 3, we can see that the biomarker entries after month 36 (aka year 3) are marked as non-imputable. 
 
 ```{r}
-print(mock_surv[7,])
+mock_surv[7,] %>% kableExtra::kable()
 
-print(dni[7,])
+dni[7,] %>%  kableExtra::kable()
 ```
 
-When running the cissvae model with this dataset, it is important that the dataset and dni matrix have the same shape and column names. This allows us to take advantage of the `index_col` and `columns_ignore` arguments. We pass the dni matrix through the `do_not_impute_matrix` argument. 
+When running the cissvae model with this dataset, it is important that the dataset and dni matrix have the same shape and column names. This allows us to take advantage of the `index_col` and `columns_ignore` arguments. We pass the dni matrix through the `imputable_matrix` argument. 
 
 ```{r}
 res <- run_cissvae(
   mock_surv,
   index_col = "patient_id",
   columns_ignore = c("death_event","death_year"),
-  do_not_impute_matrix = dni,   
+  imputable_matrix = dni,   
   val_proportion = 0.3,
   return_clusters =FALSE,
   return_history = FALSE,
@@ -79,6 +88,6 @@ When we unpack the results and look at the imputed dataset, we can see that P007
 
 ```{r}
 
-print(res$imputed_dataset[1:7,])
+res$imputed_dataset[1:7,] %>% kableExtra::kable()
 
 ```

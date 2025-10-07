@@ -8,9 +8,9 @@
 #' @param n_clusters Integer; if provided, will run KMeans with this many clusters.
 #'                   If `NULL`, will use HDBSCAN.
 #' @param seed Integer; random seed for KMeans (or reproducibility in HDBSCAN).
-#' @param min_cluster_size Integer; minimum cluster size for HDBSCAN.
+#' @param k_neighbors Integer; minimum cluster size for HDBSCAN.
 #'                           If `NULL`, defaults to `nrow(data) %/% 25`.
-#' @param cluster_selection_epsilon Numeric; epsilon parameter for HDBSCAN.
+#' @param leiden_resolution Numeric; epsilon parameter for HDBSCAN.
 #'
 #' @return A list with components:
 #'   * `clusters`   — integer vector of cluster labels  
@@ -20,9 +20,11 @@ cluster_on_missing <- function(
   data,
   cols_ignore            = NULL,
   n_clusters             = NULL,
-  seed                   = NULL,
-  min_cluster_size       = NULL,
-  cluster_selection_epsilon = 0.25
+  seed                   = 42,
+  k_neighbors       = NULL,
+  leiden_resolution = 0.25,
+  leiden_objective = "CPM",
+  use_snn = TRUE
 ) {
   # load reticulate
   requireNamespace("reticulate", quietly = TRUE)
@@ -39,14 +41,18 @@ cluster_on_missing <- function(
   # 3) prepare arguments list
   args_py <- list(
     data                     = df_py,
-    cluster_selection_epsilon = cluster_selection_epsilon
+    leiden_resolution = reticulate::r_to_py(leiden_resolution),
+    leiden_objective = reticulate::r_to_py(leiden_objective),
+    use_snn = reticulate::r_to_py(use_snn),
+    k_neighbors = reticulate::r_to_py(as.integer(k_neighbors))
+
   )
   if (!is.null(cols_ignore)) {
     args_py$cols_ignore <- reticulate::r_to_py(as.character(cols_ignore))
   }
   if (!is.null(n_clusters))       args_py$n_clusters       <- as.integer(n_clusters)
   if (!is.null(seed))             args_py$seed             <- as.integer(seed)
-  if (!is.null(min_cluster_size)) args_py$min_cluster_size <- as.integer(min_cluster_size)
+  # if (!is.null(k_neighbors)) args_py$k_neighbors <- as.integer(k_neighbors)
 
   # 4) call Python
   out_py <- do.call(cluster_fn, args_py)
@@ -84,9 +90,9 @@ cluster_on_missing <- function(
 #'   entries are missingness proportions in `[0,1]`. Can be created with `create_missingness_prop_matrix()`.
 #' @param n_clusters Integer; number of clusters for KMeans. If `NULL`, uses HDBSCAN (default: `NULL`).
 #' @param seed Integer; random seed for KMeans reproducibility (default: `NULL`).
-#' @param min_cluster_size Integer; HDBSCAN minimum cluster size. If `NULL`, Python default is used
+#' @param k_neighbors Integer; HDBSCAN minimum cluster size. If `NULL`, Python default is used
 #'   (typically a function of the number of samples) (default: `NULL`).
-#' @param cluster_selection_epsilon Numeric; HDBSCAN cluster selection threshold (default: `0.25`).
+#' @param leiden_resolution Numeric; HDBSCAN cluster selection threshold (default: `0.25`).
 #' @param metric Character; distance metric `"euclidean"` or `"cosine"` (default: `"euclidean"`).
 #' @param scale_features Logical; whether to standardize **feature columns** before clustering samples (default: `FALSE`).
 #' @param handle_noise Character; how to handle HDBSCAN noise points (`-1`):
@@ -125,8 +131,10 @@ cluster_on_missing_prop <- function(
   prop_matrix,
   n_clusters = NULL,
   seed = NULL,
-  min_cluster_size = NULL,
-  cluster_selection_epsilon = 0.25,
+  k_neighbors = NULL,
+  leiden_resolution = 0.25,
+  use_snn = TRUE,
+  leiden_objective = "CPM",
   metric = "euclidean",
   scale_features = FALSE,
   handle_noise = "keep"
@@ -164,9 +172,9 @@ cluster_on_missing_prop <- function(
     if (n_clusters < 2) stop("n_clusters must be >= 2")
   }
   if (!is.null(seed)) seed <- as.integer(seed)
-  if (!is.null(min_cluster_size)) {
-    min_cluster_size <- as.integer(min_cluster_size)
-    if (min_cluster_size < 2) stop("min_cluster_size must be >= 2")
+  if (!is.null(k_neighbors)) {
+    k_neighbors <- as.integer(k_neighbors)
+    if (k_neighbors < 2) stop("k_neighbors must be >= 2")
   }
   if (!metric %in% c("euclidean", "cosine")) {
     stop("metric must be 'euclidean' or 'cosine'")
@@ -180,10 +188,12 @@ cluster_on_missing_prop <- function(
     prop_matrix = prop_py,
     n_clusters = n_clusters,
     seed = seed,
-    min_cluster_size = min_cluster_size,
-    cluster_selection_epsilon = cluster_selection_epsilon,
+    k_neighbors = k_neighbors,
+    leiden_resolution = leiden_resolution,
     metric = metric,
-    scale_features = scale_features
+    scale_features = scale_features,
+    leiden_objective = reticulate::r_to_py(leiden_objective),
+    use_snn = reticulate::r_to_py(use_snn)
   )
   args_py <- args_py[!vapply(args_py, is.null, logical(1))]
 

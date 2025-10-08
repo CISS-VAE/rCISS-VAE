@@ -85,6 +85,7 @@ autotune_cissvae <- function(
   refit_loops       = 100,
   epochs_per_loop   = 500,
   reset_lr_refit    = c(TRUE, FALSE),
+  ## defaults to returning helpful things
   debug = FALSE
 ) {
   
@@ -253,11 +254,47 @@ if (!is.null(imputable_matrix)) {
   
   results_df <- as.data.frame(results_py, stringsAsFactors = FALSE)
   
-  list(
-    imputed = imp_df,
+  out = list(
+    imputed_dataset = imp_df,
     model   = best_mod_py,
+    cluster_dataset = train_ds_py,
+    clusters = clusters,
     study   = study_py,
     results = results_df,
-    ds = train_ds_py
   )
+  val_data = reticulate::py_to_r(
+    out[["cluster_dataset"]]$val_data$detach()$cpu()$contiguous()$numpy()
+  ) |>
+    as.data.frame()
+
+  val_imputed = reticulate::py_to_r(out$model$get_imputed_valdata(out$cluster_dataset)$detach()$cpu()$contiguous()$numpy()) |>
+    as.data.frame()
+
+  if (!is.null(out[["cluster_dataset"]]$feature_names)) {
+    colnames(val_data) <- reticulate::py_to_r(out[["cluster_dataset"]]$feature_names)
+    colnames(val_imputed) <- reticulate::py_to_r(out[["cluster_dataset"]]$feature_names)
+  } 
+  if (!is.null(index_col)){
+    val_data[[index_col]] = index_vals
+    val_data <- val_data[c(index_col, setdiff(names(val_data), index_col))]
+
+    val_imputed[[index_col]] = index_vals
+    val_imputed <- val_imputed[c(index_col, setdiff(names(val_imputed), index_col))]
+  }
+  # -----------------
+  # If there were columns we wanted the model to ignore for validation, we want to keep them the same in the val_data  so we can filter by them for mse funct
+  # ------------------
+  if (!is.null(columns_ignore)){
+    for(col in columns_ignore){
+      val_data[[col]] = data[[col]]
+      val_imputed[[col]] = data[[col]]
+    }
+
+  }
+
+  out[["val_data"]] = val_data
+  out[["val_imputed"]] = val_imputed
+
+  return(out)
+
 }

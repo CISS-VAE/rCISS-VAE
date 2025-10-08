@@ -195,7 +195,8 @@ run_cissvae <- function(
   val_proportion         = 0.1,
   replacement_value      = 0.0,
   columns_ignore         = NULL,
-  print_dataset          = TRUE,
+  imputable_matrix   = NULL,
+  print_dataset          = TRUE, ## take out this option (leave as legacy). Print_dataset should signal by verbose...? Instead of true/false do verbose by levels.... (maybe deal with that later)
   ## Cluster stuff
   clusters               = NULL,
   n_clusters             = NULL,
@@ -227,15 +228,27 @@ run_cissvae <- function(
   ## other params
   verbose                = FALSE,
   return_model           = TRUE,
-  return_clusters        = FALSE,     # NEW
+  return_clusters        = FALSE,     # if clusters initiially null, will automatically return clusters. 
   return_silhouettes     = FALSE,
   return_history         = FALSE,
   return_dataset         = FALSE,
+  return_validation_dataset = FALSE,
   ## NEw stuff from the ptyhon update
-  imputable_matrix   = NULL,
+
   
   debug                  = FALSE
 ){
+  ## step 0: if return_validation_dataset, set return_dataset = true. If run_cissvae does your clusters, return_clusters = true
+  if(return_validation_dataset){
+    return_dataset = TRUE
+  }
+  if(is.null(clusters)){
+    return_clusters = TRUE
+  }
+
+  ## preserve raw data
+  data_raw = as.data.frame(data)
+
   ## step 1: coerse numerics 
   seed            <- as.integer(seed)
   latent_dim      <- as.integer(latent_dim)
@@ -282,25 +295,9 @@ run_cissvae <- function(
 
   ## step 4: handle whatever type of object `data` is (i.e. if it's a python object vs r dataframe vs matrix)
   is_py_obj <- function(x) inherits(x, "python.builtin.object")
-  if (is_py_obj(data)) {
-    # If it's already a pandas object with .isna, pass through
-    if (reticulate::py_has_attr(data, "isna")) {
-      data_py <- data
-    } else {
-      # Best effort: wrap into pandas DataFrame
-      data_py <- pd$DataFrame(reticulate::r_to_py(as.data.frame(data)))
-    }
-  } else if (is.data.frame(data)) {
-    data_py <- pd$DataFrame(reticulate::r_to_py(data))
-  } else if (is.matrix(data)) {
-    # Keep column names if present
-    df_tmp <- as.data.frame(data, stringsAsFactors = FALSE)
-    colnames(df_tmp) <- colnames(data)
-    data_py <- pd$DataFrame(reticulate::r_to_py(df_tmp))
-  } else {
-    # fallback
-    data_py <- pd$DataFrame(reticulate::r_to_py(as.data.frame(data)))
-  }
+
+  data[is.na(data)] <- NaN
+  data_py <- pd$DataFrame(data = data, dtype = "float64")
 
   ## step 5: perpare python args
   if (!is.null(clusters)) { ## check for clusters
@@ -397,7 +394,7 @@ run_cissvae <- function(
   }
 
   ## step 8: prepare output list
-  out = list(imputed_dataset = as.data.frame(imputed_df))
+  out = list(imputed_dataset = as.data.frame(imputed_df), raw_data = data_raw)
   
   i = 2 ## starting from second entry in res_r, construct the output object
   if(return_model){
@@ -421,6 +418,41 @@ run_cissvae <- function(
   if(return_history){
     out[["training_history"]] = as.data.frame(res_r[i])
     i = i+1
+  }
+
+  if(return_validation_dataset){
+    val_data = reticulate::py_to_r(
+      out[["cluster_dataset"]]$val_data$detach()$cpu()$contiguous()$numpy()
+    ) |>
+      as.data.frame()
+
+    val_imputed = reticulate::py_to_r(out$model$get_imputed_valdata(out$cluster_dataset)$detach()$cpu()$contiguous()$numpy()) |>
+      as.data.frame()
+
+    if (!is.null(out[["cluster_dataset"]]$feature_names)) {
+      colnames(val_data) <- reticulate::py_to_r(out[["cluster_dataset"]]$feature_names)
+      colnames(val_imputed) <- reticulate::py_to_r(out[["cluster_dataset"]]$feature_names)
+    } 
+    if (!is.null(index_col)){
+      val_data[[index_col]] = index_vals
+      val_data <- val_data[c(index_col, setdiff(names(val_data), index_col))]
+
+      val_imputed[[index_col]] = index_vals
+      val_imputed <- val_imputed[c(index_col, setdiff(names(val_imputed), index_col))]
+    }
+    # -----------------
+    # If there were columns we wanted the model to ignore for validation, we want to keep them the same in the val_data  so we can filter by them for mse funct
+    # ------------------
+    if (!is.null(columns_ignore)){
+      for(col in columns_ignore){
+        val_data[[col]] = data[[col]]
+        val_imputed[[col]] = data[[col]]
+      }
+
+    }
+
+    out[["val_data"]] = val_data
+    out[["val_imputed"]] = val_imputed
   }
 
     

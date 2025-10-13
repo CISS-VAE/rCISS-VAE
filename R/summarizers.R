@@ -1,258 +1,251 @@
-#'@export
-cluster_summary <- function(data, 
-  clusters, 
+#' Cluster Summary Table (wide)
+#'
+#' Summarize continuous and categorical variables overall and by cluster.
+#' For continuous variables, choose "mean_sd", "median_iqr", or "both".
+#'
+#' @param data data.frame; rows are samples
+#' @param clusters vector; cluster labels (length = nrow(data))
+#' @param index_col character or NULL; column to drop from `data` (e.g., ID)
+#' @param categorical_vars character or NULL; vars treated as categorical
+#' @param continuous_vars character or NULL; vars treated as continuous
+#' @param digits integer; rounding for numeric summaries
+#' @param show_overall logical; include an "Overall" column
+#' @param na_label character; label for missing factor levels in categorical summaries
+#' @param cont_style one of c("mean_sd","median_iqr","both")
+#'
+#' @return tibble with one row per variable (and each level for categoricals)
+#'         and one column per Overall/Cluster.
+#' @export
+cluster_summary <- function(
+  data,
+  clusters,
   index_col = NULL,
   categorical_vars = NULL,
-  continuous_vars = NULL,  # Add explicit continuous vars
+  continuous_vars = NULL,
   digits = 2,
   show_overall = TRUE,
-  na_label = "Missing") {
-  
-  ## for cluster_summary maybe just import gt_summary's tbl_summary and pretty it up for the task at hand? 
+  na_label = "Missing",
+  cont_style = c("mean_sd", "median_iqr", "both")
+) {
+  cont_style <- match.arg(cont_style)
 
-# Input validation
-if (nrow(data) != length(clusters)) {
-stop("Length of clusters must equal number of rows in data")
+  # ---- input checks ----
+  if (!is.data.frame(data)) stop("`data` must be a data.frame")
+  if (nrow(data) != length(clusters)) {
+    stop("Length of `clusters` must equal number of rows in `data`.")
+  }
+
+  # optional index col removal
+  if (!is.null(index_col)) {
+    if (!index_col %in% colnames(data)) {
+      stop(sprintf("index_col '%s' not found in data.", index_col))
+    }
+    data <- dplyr::select(data, -dplyr::all_of(index_col))
+  }
+
+  # add cluster column (as character)
+  data$cluster <- paste0("Cluster ", as.character(clusters))
+  cluster_levels <- sort(unique(data$cluster))
+
+  # ---- variable specification / auto-detect ----
+  available_vars <- setdiff(colnames(data), "cluster")
+
+  if (is.null(categorical_vars) && is.null(continuous_vars)) {
+    categorical_vars <- data |>
+      dplyr::select(-"cluster") |>
+      dplyr::select(dplyr::where(\(x) is.factor(x) || is.character(x) || is.logical(x))) |>
+      colnames()
+    continuous_vars <- data |>
+      dplyr::select(-"cluster", -dplyr::all_of(categorical_vars)) |>
+      dplyr::select(dplyr::where(is.numeric)) |>
+      colnames()
+  } else if (is.null(categorical_vars)) {
+    # user specified continuous → infer categorical from the rest that are non-numeric
+    categorical_vars <- setdiff(available_vars, continuous_vars)
+    categorical_vars <- intersect(
+      categorical_vars,
+      data |>
+        dplyr::select(dplyr::where(\(x) is.factor(x) || is.character(x) || is.logical(x))) |>
+        colnames()
+    )
+  } else if (is.null(continuous_vars)) {
+    # user specified categorical → infer continuous from remaining numeric
+    continuous_vars <- setdiff(available_vars, categorical_vars)
+    continuous_vars <- intersect(
+      continuous_vars,
+      data |>
+        dplyr::select(dplyr::where(is.numeric)) |>
+        colnames()
+    )
+  }
+
+  # sanity checks on specified names
+  if (!is.null(categorical_vars)) {
+    missing_cat <- setdiff(categorical_vars, colnames(data))
+    if (length(missing_cat) > 0) {
+      stop("Categorical variables not found in data: ", paste(missing_cat, collapse = ", "))
+    }
+  }
+  if (!is.null(continuous_vars)) {
+    missing_cont <- setdiff(continuous_vars, colnames(data))
+    if (length(missing_cont) > 0) {
+      stop("Continuous variables not found in data: ", paste(missing_cont, collapse = ", "))
+    }
+  }
+
+  # ensure continuous are numeric; demote to categorical otherwise
+  for (v in continuous_vars) {
+    if (!is.numeric(data[[v]])) {
+      warning(sprintf("Variable '%s' is not numeric. Moving to categorical.", v))
+      categorical_vars <- unique(c(categorical_vars, v))
+    }
+  }
+  continuous_vars <- intersect(continuous_vars, names(data)[vapply(data, is.numeric, TRUE)])
+
+  # ---- helpers ----
+  fmt_mean_sd <- function(x, digits = 2) {
+    m <- mean(x, na.rm = TRUE); s <- stats::sd(x, na.rm = TRUE)
+    paste0(round(m, digits), " (", round(s, digits), ")")
+  }
+  fmt_median_iqr <- function(x, digits = 2) {
+    med <- stats::median(x, na.rm = TRUE)
+    q1  <- stats::quantile(x, 0.25, na.rm = TRUE, type = 7)
+    q3  <- stats::quantile(x, 0.75, na.rm = TRUE, type = 7)
+    paste0(round(med, digits), " [", round(q1, digits), ", ", round(q3, digits), "]")
+  }
+  format_cont <- function(x, digits = 2, style = "mean_sd") {
+    if (!is.numeric(x)) return("Invalid")
+    n_total    <- length(x)
+    n_missing  <- sum(is.na(x))
+    n_complete <- n_total - n_missing
+    if (n_complete == 0) {
+      return(paste0("—, ", n_missing, " (", round(100 * n_missing / n_total, 1), "%) missing"))
+    }
+    pieces <- switch(
+      style,
+      mean_sd    = fmt_mean_sd(x, digits),
+      median_iqr = fmt_median_iqr(x, digits),
+      both       = paste0(fmt_mean_sd(x, digits), "; ", fmt_median_iqr(x, digits))
+    )
+    if (n_missing > 0) {
+      pieces <- paste0(pieces, ", ", n_missing, " (", round(100 * n_missing / n_total, 1), "%) missing")
+    }
+    pieces
+  }
+
+  format_cat <- function(x, var_name) {
+    # factor w/ explicit NA level
+    x_chr   <- as.character(x)
+    is_na   <- is.na(x_chr)
+    x_chr[is_na] <- na_label
+    x_fac   <- factor(x_chr, levels = unique(c(var_name, sort(unique(x_chr)))))
+    counts  <- table(x_fac, useNA = "no")
+    total   <- length(x_fac)
+
+    # header row (N=)
+    header <- tibble::tibble(Variable = var_name, Statistic = paste0("N = ", total))
+
+    # level rows
+    levs <- setdiff(names(counts), var_name)
+    rows <- purrr::map_dfr(levs, function(lv) {
+      n <- counts[[lv]]
+      pct <- round(100 * n / total, 1)
+      tibble::tibble(Variable = paste0("  ", lv), Statistic = paste0(n, " (", pct, "%)"))
+    })
+
+    tibble::tibble(header) |>
+      dplyr::bind_rows(rows)
+  }
+
+  # ---- build summaries ----
+  all_summaries <- list()
+
+  # continuous block
+  if (length(continuous_vars) > 0) {
+    cont_tbl <- purrr::map_dfr(continuous_vars, function(v) {
+      row <- tibble::tibble(Variable = v)
+      if (show_overall) {
+        row$Overall <- format_cont(data[[v]], digits = digits, style = cont_style)
+      }
+      for (cl in cluster_levels) {
+        x <- data[data$cluster == cl, v, drop = TRUE]
+        row[[cl]] <- format_cont(x, digits = digits, style = cont_style)
+      }
+      row
+    })
+    all_summaries <- append(all_summaries, list(cont_tbl))
+  }
+
+  # categorical block
+  if (length(categorical_vars) > 0) {
+    cat_tbl <- purrr::map_dfr(categorical_vars, function(v) {
+      # base structure: header + level rows (for alignment)
+      all_levels <- unique(as.character(data[[v]]))
+      all_levels <- all_levels[!is.na(all_levels)]
+      if (any(is.na(data[[v]]))) all_levels <- c(all_levels, na_label)
+
+      var_header <- tibble::tibble(Variable = v)
+      level_rows <- tibble::tibble(Variable = paste0("  ", all_levels))
+      var_structure <- dplyr::bind_rows(var_header, level_rows)
+
+      # Overall
+      if (show_overall) {
+        ovr <- format_cat(data[[v]], v) |>
+          dplyr::rename(Overall = Statistic)
+        var_structure <- var_structure |>
+          dplyr::left_join(ovr, by = "Variable") |>
+          dplyr::mutate(
+            Overall = dplyr::if_else(
+              is.na(.data$Overall) & .data$Variable == v,
+              paste0("N = ", nrow(data)),
+              .data$Overall
+            )
+          )
+      }
+
+      # per cluster
+      for (cl in cluster_levels) {
+        sub <- data[data$cluster == cl, v, drop = TRUE]
+        ct  <- format_cat(sub, v) |>
+          dplyr::rename(!!cl := Statistic)
+        var_structure <- var_structure |>
+          dplyr::left_join(ct, by = "Variable") |>
+          dplyr::mutate(
+            !!cl := dplyr::if_else(
+              is.na(.data[[cl]]) & .data$Variable == v,
+              paste0("N = ", sum(data$cluster == cl)),
+              .data[[cl]]
+            )
+          )
+      }
+
+      var_structure
+    })
+    all_summaries <- append(all_summaries, list(cat_tbl))
+  }
+
+  # combine
+  final_summary <- if (length(all_summaries)) dplyr::bind_rows(all_summaries) else {
+    out <- tibble::tibble(Variable = character(0))
+    if (show_overall) out$Overall <- character(0)
+    for (cl in cluster_levels) out[[cl]] <- character(0)
+    out
+  }
+
+  # sample size header row
+  cluster_sizes <- table(data$cluster)
+  size_row <- tibble::tibble(Variable = "N")
+  if (show_overall) size_row$Overall <- as.character(nrow(data))
+  for (cl in cluster_levels) {
+    size_row[[cl]] <- as.character(cluster_sizes[[cl]])
+  }
+
+  final_summary <- dplyr::bind_rows(size_row, final_summary) |>
+    dplyr::mutate(dplyr::across(dplyr::everything(), \(x) ifelse(is.na(x), "", as.character(x))))
+
+  final_summary
 }
 
-# Remove index column if specified
-if (!is.null(index_col)) {
-if (!index_col %in% colnames(data)) {
-stop("index_col '", index_col, "' not found in data")
-}
-data <- data %>% select(-all_of(index_col))
-}
-
-# Add cluster column with consistent naming
-data$cluster <- paste0("Cluster ", as.character(clusters))
-cluster_levels <- sort(unique(data$cluster))
-
-# Validate variable specifications
-if (!is.null(categorical_vars)) {
-missing_cat <- setdiff(categorical_vars, colnames(data))
-if (length(missing_cat) > 0) {
-stop("Categorical variables not found in data: ", paste(missing_cat, collapse = ", "))
-}
-}
-
-if (!is.null(continuous_vars)) {
-missing_cont <- setdiff(continuous_vars, colnames(data))
-if (length(missing_cont) > 0) {
-stop("Continuous variables not found in data: ", paste(missing_cont, collapse = ", "))
-}
-}
-
-# Auto-detect variable types if not specified
-available_vars <- setdiff(colnames(data), "cluster")
-
-if (is.null(categorical_vars) && is.null(continuous_vars)) {
-# Auto-detect both
-categorical_vars <- data %>%
-select(-cluster) %>%
-select_if(function(x) is.factor(x) || is.character(x) || is.logical(x)) %>%
-colnames()
-
-continuous_vars <- data %>%
-select(-cluster, -all_of(categorical_vars)) %>%
-select_if(is.numeric) %>%
-colnames()
-} else if (is.null(categorical_vars)) {
-# Continuous specified, auto-detect categorical from remaining
-categorical_vars <- setdiff(available_vars, continuous_vars)
-categorical_vars <- intersect(categorical_vars, 
-       data %>% 
-         select_if(function(x) is.factor(x) || is.character(x) || is.logical(x)) %>%
-         colnames())
-} else if (is.null(continuous_vars)) {
-# Categorical specified, auto-detect continuous from remaining
-continuous_vars <- setdiff(available_vars, categorical_vars)
-continuous_vars <- intersect(continuous_vars,
-      data %>%
-        select_if(is.numeric) %>%
-        colnames())
-}
-
-# Final validation - check for numeric data in continuous vars
-for (var in continuous_vars) {
-if (!is.numeric(data[[var]])) {
-warning("Variable '", var, "' is not numeric. Moving to categorical variables.")
-categorical_vars <- c(categorical_vars, var)
-continuous_vars <- setdiff(continuous_vars, var)
-}
-}
-
-# Print what we're processing (for debugging)
-cat("Processing continuous variables:", paste(continuous_vars, collapse = ", "), "\n")
-cat("Processing categorical variables:", paste(categorical_vars, collapse = ", "), "\n")
-
-# Helper function to format continuous variables
-format_continuous <- function(x, digits = 2) {
-# Additional safety check
-if (!is.numeric(x)) {
-warning("Non-numeric data passed to format_continuous")
-return("Invalid data type")
-}
-
-n_total <- length(x)
-n_missing <- sum(is.na(x))
-n_complete <- n_total - n_missing
-
-if (n_complete == 0) {
-return(paste0("—, ", n_missing, " (", round(100 * n_missing / n_total, 1), "%) missing"))
-}
-
-mean_val <- mean(x, na.rm = TRUE)
-sd_val <- sd(x, na.rm = TRUE)
-median_val <- median(x, na.rm = TRUE)
-q1_val <- quantile(x, 0.25, na.rm = TRUE)
-q3_val <- quantile(x, 0.75, na.rm = TRUE)
-
-mean_sd <- paste0(round(mean_val, digits), " (", round(sd_val, digits), ")")
-median_iqr <- paste0(round(median_val, digits), " [", round(q1_val, digits), ", ", round(q3_val, digits), "]")
-
-if (n_missing > 0) {
-missing_info <- paste0(", ", n_missing, " (", round(100 * n_missing / n_total, 1), "%) missing")
-} else {
-missing_info <- ""
-}
-
-return(paste0(mean_sd, "; ", median_iqr, missing_info))
-}
-
-# Helper function to format categorical variables
-format_categorical <- function(x, var_name) {
-# Convert to character first, then factor to handle various input types
-x_char <- as.character(x)
-x_factor <- factor(x_char, exclude = NULL)
-if (any(is.na(x_char))) {
-levels(x_factor)[is.na(levels(x_factor))] <- na_label
-}
-
-counts <- table(x_factor, useNA = "ifany")
-total <- length(x)
-
-# Create summary for each level
-result <- purrr::map_dfr(names(counts), function(level) {
-count <- counts[[level]]
-percent <- round(100 * count / total, 1)
-tibble(
-Variable = paste0("  ", level),
-Statistic = paste0(count, " (", percent, "%)")
-)
-})
-
-# Add variable header
-header <- tibble(
-Variable = var_name,
-Statistic = paste0("N = ", total)
-)
-
-bind_rows(header, result)
-}
-
-# Initialize results list
-all_summaries <- list()
-
-# Process continuous variables
-if (length(continuous_vars) > 0) {
-continuous_summary <- purrr::map_dfr(continuous_vars, function(var) {
-# Create base tibble with variable name
-result <- tibble(Variable = var)
-
-# Add overall column if requested
-if (show_overall) {
-result$Overall <- format_continuous(data[[var]], digits)
-}
-
-# Add cluster columns
-for (cluster_name in cluster_levels) {
-cluster_data <- data[data$cluster == cluster_name, var, drop = TRUE]  # drop = TRUE ensures vector output
-result[[cluster_name]] <- format_continuous(cluster_data, digits)
-}
-
-result
-})
-all_summaries <- append(all_summaries, list(continuous_summary))
-}
-
-# Process categorical variables
-if (length(categorical_vars) > 0) {
-categorical_summary <- purrr::map_dfr(categorical_vars, function(var) {
-# Get all unique levels across all clusters to ensure consistent structure
-all_levels <- unique(as.character(data[[var]]))
-all_levels <- all_levels[!is.na(all_levels)]
-if (any(is.na(data[[var]]))) {
-all_levels <- c(all_levels, na_label)
-}
-
-# Create base structure
-var_header <- tibble(Variable = var)
-level_rows <- tibble(Variable = paste0("  ", all_levels))
-
-# Combine header and levels
-var_structure <- bind_rows(var_header, level_rows)
-
-# Add overall column if requested
-if (show_overall) {
-overall_summary <- format_categorical(data[[var]], var)
-# Match structure
-var_structure <- var_structure %>%
-left_join(overall_summary %>% rename(Overall = Statistic), by = "Variable") %>%
-mutate(Overall = ifelse(is.na(Overall) & Variable == var, 
-       paste0("N = ", nrow(data)), Overall))
-}
-
-# Add cluster columns
-for (cluster_name in cluster_levels) {
-cluster_data <- data[data$cluster == cluster_name, var, drop = TRUE]
-cluster_summary <- format_categorical(cluster_data, var)
-
-# Match structure
-var_structure <- var_structure %>%
-left_join(cluster_summary %>% rename(!!cluster_name := Statistic), by = "Variable") %>%
-mutate(!!cluster_name := ifelse(is.na(.data[[cluster_name]]) & Variable == var,
-               paste0("N = ", sum(data$cluster == cluster_name)), 
-               .data[[cluster_name]]))
-}
-
-var_structure
-})
-all_summaries <- append(all_summaries, list(categorical_summary))
-}
-
-# Combine all summaries
-if (length(all_summaries) > 0) {
-final_summary <- bind_rows(all_summaries)
-} else {
-# Create empty structure if no variables
-final_summary <- tibble(Variable = character(0))
-if (show_overall) final_summary$Overall <- character(0)
-for (cluster_name in cluster_levels) {
-final_summary[[cluster_name]] <- character(0)
-}
-}
-
-# Add sample size row at the top
-cluster_sizes <- table(data$cluster)
-size_row <- tibble(Variable = "N")
-
-if (show_overall) {
-size_row$Overall <- as.character(nrow(data))
-}
-
-for (cluster_name in cluster_levels) {
-size_row[[cluster_name]] <- as.character(cluster_sizes[[cluster_name]])
-}
-
-# Combine size row with summary
-final_summary <- bind_rows(size_row, final_summary)
-
-# Replace NA values with empty strings for cleaner output
-final_summary <- final_summary %>%
-mutate(across(everything(), ~ifelse(is.na(.), "", as.character(.))))
-
-return(final_summary)
-}
 
 
 

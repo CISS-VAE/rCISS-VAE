@@ -217,6 +217,7 @@ run_cissvae <- function(
   epochs                 = 500,
   initial_lr             = 0.01,
   decay_factor           = 0.999,
+  weight_decay = 0.001,
   beta                   = 0.001,
   device                 = NULL,
   max_loops              = 100,
@@ -288,7 +289,7 @@ run_cissvae <- function(
   }
   ## step 3: do python imports
 
-  run_mod <- reticulate::import("ciss_vae.utils.run_cissvae", convert = FALSE)
+  run_mod <- reticulate::import("ciss_vae.training.run_cissvae", convert = FALSE)
   np      <- reticulate::import("numpy", convert = FALSE)
   pd      <- reticulate::import("pandas", convert = FALSE)
 
@@ -346,6 +347,7 @@ run_cissvae <- function(
     epochs                = epochs,
     initial_lr            = initial_lr,
     decay_factor          = decay_factor,
+    weight_decay = weight_decay,
     beta                  = beta,
     device                = device,
     max_loops             = max_loops,

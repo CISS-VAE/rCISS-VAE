@@ -31,7 +31,7 @@ cluster_on_missing <- function(
 
   # 1) import pandas and the helper function
   pd_mod      <- reticulate::import("pandas", convert = FALSE)
-  helpers_mod <- reticulate::import("ciss_vae.utils.run_cissvae", convert = FALSE)
+  helpers_mod <- reticulate::import("ciss_vae.utils.clustering", convert = FALSE)
   cluster_fn  <- helpers_mod$cluster_on_missing
 
   # 2) convert R data → pandas DataFrame
@@ -145,7 +145,7 @@ cluster_on_missing_prop <- function(
   }
 
   # Locate Python function
-  run_mod <- reticulate::import("ciss_vae.utils.run_cissvae", convert = FALSE)
+  run_mod <- reticulate::import("ciss_vae.utils.clustering", convert = FALSE)
   cluster_func <- run_mod$cluster_on_missing_prop
 
   # Prepare data for Python

@@ -61,20 +61,24 @@
 #' mse_results$per_cluster
 #' }
 #'
+#'
+#'
 #' @export
-get_mse = function(res, 
-  group_col, 
-  feature_cols = NULL, ## default, all numeric columns excluding group_col & cols_ignore
+get_mse <- function(res,
+  clusters = NULL, ## ifclusters not in result object, include them here. 
+  group_col = NULL,
+  feature_cols = NULL,  # default: all numeric columns excluding group_col & cols_ignore
   by_group = TRUE,
   by_cluster = TRUE,
-  cols_ignore = NULL ## columns to not score
-  ){
-  ## here index goes in cols_ignore
-  raw_data = res$raw_data
-  val_data = res$val_data
-  val_mask = !is.na(val_data)
-  clusters = res$clusters
-  val_imputed = res$val_imputed
+  cols_ignore = NULL     # columns to not score
+) {
+  # ---- unpack ----
+  raw_data   <- res$raw_data
+  val_data   <- res$val_data
+  if(is.null(clusters)){
+    clusters   <- res$clusters
+  }
+  val_imputed<- res$val_imputed
 
   # ---- checks ----
   if (!is.data.frame(val_data) || !is.data.frame(val_imputed))
@@ -83,19 +87,29 @@ get_mse = function(res,
     stop("Row counts differ between `val_data` and `val_imputed`.")
   if (length(clusters) != nrow(val_data))
     stop("`clusters` length must match number of rows in `val_data`.")
-  if (!group_col %in% colnames(val_data))
+
+  # group handling: allow NULL safely
+  has_group <- !is.null(group_col) && group_col %in% colnames(val_data)
+  if (!is.null(group_col) && !has_group) {
     stop(sprintf("group_col '%s' not found in val_data.", group_col))
-  
-  ## get feature cols to score
+  }
+  # If group_col is NULL, ignore by_group requests
+  if (!has_group) {
+    by_group <- FALSE
+  }
+
+  # ---- feature columns to score ----
   if (is.null(feature_cols)) {
-    # default: all numeric columns except the grouping column
     num_cols <- names(val_data)[vapply(val_data, is.numeric, logical(1))]
-    if(!is.null(cols_ignore)){
-      ignores = c(cols_ignore, group_col)
-      feature_cols <- setdiff(num_cols, ignores)
+    ignores <- cols_ignore
+    if (has_group) {
+      ignores <- c(ignores, group_col)
     }
-    else{
-      feature_cols <- setdiff(num_cols, group_col)
+    ignores <- unique(ignores)
+    if (length(ignores)) {
+      feature_cols <- setdiff(num_cols, ignores)
+    } else {
+      feature_cols <- num_cols
     }
   } else {
     # keep only those that exist in both frames
@@ -103,7 +117,6 @@ get_mse = function(res,
   }
   if (length(feature_cols) == 0L)
     stop("No feature columns to score after filtering. Provide `feature_cols` or ensure numeric features exist.")
-  
 
   # ensure identical column order for scoring
   val_sub  <- val_data[, feature_cols, drop = FALSE]
@@ -116,57 +129,60 @@ get_mse = function(res,
   se_mat <- (as.matrix(pred_sub) - as.matrix(val_sub))^2
   se_mat[!as.matrix(used_mask)] <- NA_real_
 
-  overall_mse = mean(se_mat, na.rm = TRUE)
+  overall_mse <- mean(se_mat, na.rm = TRUE)
+  message(sprintf("Overall MSE for validation data: %.4f", overall_mse))
 
-  glue::glue("Overall MSE for validation data: {round(overall_mse, 2)}.")
-
-  ## make long data frame for aggregation
+  # ---- long data for aggregation ----
   df_long <- data.frame(
     row     = rep.int(seq_len(nrow(val_sub)), times = ncol(val_sub)),
     feature = rep(feature_cols, each = nrow(val_sub)),
     cluster = rep(clusters, times = ncol(val_sub)),
-    group   = rep(val_data[[group_col]], times = ncol(val_sub)),
     se      = as.vector(se_mat),
     used    = as.vector(used_mask),
     check.names = FALSE
   )
-  df_long <- df_long[df_long$used & !is.na(df_long$se), c("row","feature","cluster","group","se")]
+  if (has_group) {
+    df_long$group <- rep(val_data[[group_col]], times = ncol(val_sub))
+  }
+
+  # keep only scored cells
+  keep_cols <- c("row", "feature", "cluster", if (has_group) "group", "se", "used")
+  df_long <- df_long[ , keep_cols]
+  df_long <- df_long[df_long$used & !is.na(df_long$se), setdiff(keep_cols, "used"), drop = FALSE]
 
   results <- list()
 
-  ## overall
+  # overall
   results$overall <- data.frame(
     mse = mean(df_long$se),
     n   = length(df_long$se)
   )
-  
-  ## helper to aggregate safely
-  .safe_aggs <- function(data, key) {
-    m <- aggregate(se ~ ., data = data[key], FUN = mean)
-    n <- aggregate(se ~ ., data = data[key], FUN = length)
+
+  # helper: safe aggregate of mean + count
+  .safe_aggs <- function(data, keys) {
+    # data must contain keys and 'se'
+    m <- stats::aggregate(se ~ ., data = data[ , c(keys, "se"), drop = FALSE], FUN = mean)
+    n <- stats::aggregate(se ~ ., data = data[ , c(keys, "se"), drop = FALSE], FUN = length)
     names(m)[names(m) == "se"] <- "mse"
     names(n)[names(n) == "se"] <- "n"
-    merge(m, n, by = setdiff(names(m), "mse"), sort = TRUE)
+    merge(m, n, by = keys, sort = TRUE)
   }
-  
-  ## by cluster
+
+  # by cluster
   if (by_cluster) {
-    results$per_cluster <- .safe_aggs(df_long, c("cluster", "se"))
+    results$per_cluster <- .safe_aggs(df_long, c("cluster"))
   }
-  
-  ## by group
-  if (by_group) {
-    results$per_group <- .safe_aggs(df_long, c("group", "se"))
+
+  # by group (only if group exists)
+  if (by_group && has_group) {
+    results$per_group <- .safe_aggs(df_long, c("group"))
   }
-  
-  ## by group x cluster
-  if (interaction && by_group && by_cluster) {
-    results$group_by_cluster <- .safe_aggs(df_long, c("group", "cluster", "se"))
+
+  # by group x cluster (only if both are requested and group exists)
+  if (by_group && by_cluster && has_group) {
+    results$group_by_cluster <- .safe_aggs(df_long, c("group", "cluster"))
   }
-  
-  ## optional: per feature overall
-  results$per_feature_overall <- aggregate(se ~ feature, data = df_long, FUN = mean)
-  names(results$per_feature_overall)[2] <- "mse"
+
 
   results
 }

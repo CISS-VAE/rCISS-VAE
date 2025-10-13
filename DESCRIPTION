@@ -19,7 +19,7 @@ Imports:
     methods,
     ggplot2,
     dplyr,
-    purrr,,
+    purrr,
     glue
 Suggests: 
     testthat (>= 3.0.0),

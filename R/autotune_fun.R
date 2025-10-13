@@ -73,6 +73,7 @@ autotune_cissvae <- function(
   output_shared     = c(TRUE, FALSE),
   lr                = c(1e-4, 1e-3),
   decay_factor      = c(0.9, 0.999),
+  weight_decay = 0.001,
   beta              = 0.01,
   num_epochs        = 500,
   batch_size        = 4000,
@@ -170,6 +171,7 @@ if (!is.null(imputable_matrix)) {
     lr                = r_to_py(lr),
     decay_factor      = r_to_py(decay_factor),
     beta              = beta,
+    weight_decay = r_to_py(weight_decay),
     num_epochs        = num_epochs,
     batch_size        = batch_size,
     num_shared_encode = r_to_py(num_shared_encode),
@@ -253,6 +255,10 @@ if (!is.null(imputable_matrix)) {
   }
   
   results_df <- as.data.frame(results_py, stringsAsFactors = FALSE)
+
+  if(debug){
+    print("At results")
+  }
   
   out = list(
     imputed_dataset = imp_df,
@@ -260,8 +266,11 @@ if (!is.null(imputable_matrix)) {
     cluster_dataset = train_ds_py,
     clusters = clusters,
     study   = study_py,
-    results = results_df,
+    results = results_df
   )
+  if(debug){
+    print("made out list")
+  }
   val_data = reticulate::py_to_r(
     out[["cluster_dataset"]]$val_data$detach()$cpu()$contiguous()$numpy()
   ) |>
@@ -293,7 +302,13 @@ if (!is.null(imputable_matrix)) {
   }
 
   out[["val_data"]] = val_data
+  if(debug){
+    print("added valdata")
+  }
   out[["val_imputed"]] = val_imputed
+  if(debug){
+    print("added valimputed")
+  }
 
   return(out)
 

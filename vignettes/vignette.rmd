@@ -89,7 +89,7 @@ reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
 ```
 
 ```{r usevenv, echo=FALSE, include=FALSE}
-reticulate::use_virtualenv("/home/nfs/vaithid1/CISS-VAE/CISS-VAE-demo/cissvae_demo_env_v1", required = TRUE)
+reticulate::use_virtualenv("/home/nfs/vaithid1/CISS-VAE/.venv", required = TRUE)
 ```
 
 ### (optional) Installing other python packages

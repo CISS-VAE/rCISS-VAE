@@ -48,7 +48,8 @@ create_missingness_prop_matrix <- function(
   index_col = NULL,
   cols_ignore = NULL,
   na_values = c(NA, NaN, Inf, -Inf),
-  repeat_feature_names = character(0)
+  repeat_feature_names = character(0),
+  loose = FALSE
 ) {
   # ------------------------------- #
   # 1) Validate & normalize inputs  #
@@ -117,7 +118,12 @@ create_missingness_prop_matrix <- function(
       # Allow dots or alphanumerics in base feature; user guarantees the base names.
       # Escape regex special characters in feat to match literal
       feat_escaped <- gsub("([.|()\\^{}+$*?\\[\\]\\\\])", "\\\\\\1", feat)
-      pat <- paste0("^", feat_escaped, "_\\d+$")
+      if(loose){
+        pat <- paste0("^", feat_escaped, ".*")
+      }
+      else{
+        pat <- paste0("^", feat_escaped, "_\\d+$")
+      }
 
       these <- grep(pat, feature_candidate_cols, value = TRUE)
       if (length(these) == 0) {

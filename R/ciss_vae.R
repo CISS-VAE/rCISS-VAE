@@ -196,6 +196,7 @@ run_cissvae <- function(
   replacement_value      = 0.0,
   columns_ignore         = NULL,
   imputable_matrix   = NULL,
+  binary_feature_mask = NULL,
   print_dataset          = TRUE, ## take out this option (leave as legacy). Print_dataset should signal by verbose...? Instead of true/false do verbose by levels.... (maybe deal with that later)
   ## Cluster stuff
   clusters               = NULL,
@@ -334,6 +335,7 @@ run_cissvae <- function(
     clusters              = clusters_py,
     n_clusters            = n_clusters,
     seed                  = seed,
+    binary_feature_mask  = reticulate::r_to_py(binary_feature_mask),
     missingness_proportion_matrix = prop_matrix_py,
     scale_features        = scale_features,
     hidden_dims           = reticulate::r_to_py(hidden_dims),

@@ -432,7 +432,6 @@ aut <- autotune_cissvae(
   study_name = "comprehensive_vae_autotune",
   device_preference = "cpu",
   show_progress = FALSE,  # Rich progress bars with training visualization
-  optuna_dashboard_db = "sqlite:///optuna_study.db",  # Save results to database
   load_if_exists = TRUE,
   seed = 42, 
   verbose = FALSE,

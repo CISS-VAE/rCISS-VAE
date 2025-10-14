@@ -51,6 +51,7 @@ autotune_cissvae <- function(
   replacement_value      = 0.0,
   columns_ignore         = NULL,
   imputable_matrix   = NULL,
+  binary_feature_mask = NULL,
   clusters, ## for the autotune function user does clusters themself
   save_model_path        = NULL,
   save_search_space_path = NULL,
@@ -206,7 +207,7 @@ if (!is.null(imputable_matrix)) {
       dni_py <- pd$DataFrame(imputable_matrix)
   } else dni_py <- NULL
 
-  train_ds_py <- CD_mod(data_py, clusters_py, val_proportion, replacement_value, cols_ignore_py, dni_py)
+  train_ds_py <- CD_mod(data_py, clusters_py, val_proportion, replacement_value, cols_ignore_py, dni_py, reticulate::r_to_py(binary_feature_mask))
   
   if (verbose) print("Built cluster dataset")
   

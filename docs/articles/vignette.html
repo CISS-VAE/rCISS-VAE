@@ -2189,10 +2189,10 @@ shared layers (with reproducible seed)</li>
 <span><span class="co"># Plot model architecture</span></span>
 <span><span class="fu"><a href="../reference/plot_vae_architecture.html">plot_vae_architecture</a></span><span class="op">(</span><span class="va">best_model</span>, title <span class="op">=</span> <span class="st">"Optimized CISSVAE Architecture"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Starting Optuna optimization with 3 trials...</span></span>
-<span><span class="co">#&gt; Optimization complete. Best trial: 6 (MSE: 10.463780)</span></span>
+<span><span class="co">#&gt; Optimization complete. Best trial: 1 (MSE: 9.860881)</span></span>
 <span><span class="co">#&gt; Training final model with best parameters...</span></span>
 <span><span class="co">#&gt; Final model training complete.</span></span>
-<span><span class="co">#&gt; Best validation MSE: 10.46378</span></span>
+<span><span class="co">#&gt; Best validation MSE: 9.860881</span></span>
 <span><span class="co">#&gt; [1] "Trial results:"</span></span></code></pre>
 <table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <thead><tr>
@@ -2257,63 +2257,7 @@ layer_order_dec_used
 0
 </td>
 <td style="text-align:right;">
-48.58593
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-512
-</td>
-<td style="text-align:right;">
-512
-</td>
-<td style="text-align:right;">
-100
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:right;">
-1000
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-at_start
-</td>
-<td style="text-align:left;">
-random
-</td>
-<td style="text-align:left;">
-S,S,U,U,U
-</td>
-<td style="text-align:left;">
-S,U,U,S,U
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-58.21634
+474.477020
 </td>
 <td style="text-align:right;">
 5
@@ -2322,438 +2266,158 @@ S,U,U,S,U
 512
 </td>
 <td style="text-align:right;">
-64
+512
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+512
 </td>
 <td style="text-align:right;">
 64
 </td>
 <td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-100
+10
 </td>
 <td style="text-align:left;">
 TRUE
 </td>
 <td style="text-align:left;">
-TRUE
+FALSE
 </td>
 <td style="text-align:right;">
 4000
 </td>
 <td style="text-align:right;">
-0
+1
 </td>
 <td style="text-align:right;">
 1
 </td>
 <td style="text-align:left;">
-at_end
+at_start
 </td>
 <td style="text-align:left;">
-at_end
+random
+</td>
+<td style="text-align:left;">
+S,U,U,U,U
+</td>
+<td style="text-align:left;">
+S,U,U,U,U
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+9.860881
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+alternating
+</td>
+<td style="text-align:left;">
+alternating
+</td>
+<td style="text-align:left;">
+U,U
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+56.839573
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+random
+</td>
+<td style="text-align:left;">
+alternating
 </td>
 <td style="text-align:left;">
 U,U,U,U,U
 </td>
 <td style="text-align:left;">
-U,U,U,U,S
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-104.33282
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-512
-</td>
-<td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-NaN
-</td>
-<td style="text-align:right;">
-NaN
-</td>
-<td style="text-align:right;">
-NaN
-</td>
-<td style="text-align:right;">
-100
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:right;">
-1000
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-random
-</td>
-<td style="text-align:left;">
-at_start
-</td>
-<td style="text-align:left;">
-S,S
-</td>
-<td style="text-align:left;">
-S,S
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-182.42284
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-512
-</td>
-<td style="text-align:right;">
-512
-</td>
-<td style="text-align:right;">
-NaN
-</td>
-<td style="text-align:right;">
-NaN
-</td>
-<td style="text-align:right;">
-NaN
-</td>
-<td style="text-align:right;">
-100
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:right;">
-1000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-at_end
-</td>
-<td style="text-align:left;">
-alternating
-</td>
-<td style="text-align:left;">
-U,S
-</td>
-<td style="text-align:left;">
-S,S
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-43.79465
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-512
-</td>
-<td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-512
-</td>
-<td style="text-align:right;">
-100
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:right;">
-1000
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:left;">
-at_start
-</td>
-<td style="text-align:left;">
-random
-</td>
-<td style="text-align:left;">
-S,U,U,U,U
-</td>
-<td style="text-align:left;">
-S,U,U,S,S
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-43.97161
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-512
-</td>
-<td style="text-align:right;">
-512
-</td>
-<td style="text-align:right;">
-10
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:right;">
-1000
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:left;">
-alternating
-</td>
-<td style="text-align:left;">
-alternating
-</td>
-<td style="text-align:left;">
 S,U,S,U,U
-</td>
-<td style="text-align:left;">
-S,S,S,U,U
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-10.46378
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-512
-</td>
-<td style="text-align:right;">
-NaN
-</td>
-<td style="text-align:right;">
-NaN
-</td>
-<td style="text-align:right;">
-NaN
-</td>
-<td style="text-align:right;">
-10
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:right;">
-1000
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-alternating
-</td>
-<td style="text-align:left;">
-alternating
-</td>
-<td style="text-align:left;">
-S,S
-</td>
-<td style="text-align:left;">
-S,S
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-56.05628
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-512
-</td>
-<td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-512
-</td>
-<td style="text-align:right;">
-512
-</td>
-<td style="text-align:right;">
-100
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-FALSE
-</td>
-<td style="text-align:right;">
-1000
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:left;">
-at_end
-</td>
-<td style="text-align:left;">
-at_end
-</td>
-<td style="text-align:left;">
-U,U,U,S,S
-</td>
-<td style="text-align:left;">
-U,U,S,S,S
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-45.45372
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-512
-</td>
-<td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-512
-</td>
-<td style="text-align:right;">
-64
-</td>
-<td style="text-align:right;">
-512
-</td>
-<td style="text-align:right;">
-100
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:right;">
-1000
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-random
-</td>
-<td style="text-align:left;">
-at_start
-</td>
-<td style="text-align:left;">
-S,U,S,U,S
-</td>
-<td style="text-align:left;">
-S,U,U,U,U
 </td>
 </tr>
 </tbody>

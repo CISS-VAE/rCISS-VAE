@@ -136,8 +136,7 @@ cluster_on_missing_prop <- function(
   use_snn = TRUE,
   leiden_objective = "CPM",
   metric = "euclidean",
-  scale_features = FALSE,
-  handle_noise = "keep"
+  scale_features = FALSE
 ) {
   # Dependencies
   if (!requireNamespace("reticulate", quietly = TRUE)) {
@@ -179,9 +178,7 @@ cluster_on_missing_prop <- function(
   if (!metric %in% c("euclidean", "cosine")) {
     stop("metric must be 'euclidean' or 'cosine'")
   }
-  if (!handle_noise %in% c("keep", "separate", "merge")) {
-    stop("handle_noise must be 'keep', 'separate', or 'merge'")
-  }
+
 
   # Build Python args, drop NULLs
   args_py <- list(
@@ -204,47 +201,20 @@ cluster_on_missing_prop <- function(
   labels <- as.integer(result_list[[1]])          # per-sample labels
   silhouette_score <- result_list[[2]]
 
-  # Noise handling (for HDBSCAN: -1 = noise)
-  n_noise <- sum(labels == -1L, na.rm = TRUE)
-  labels_positive <- labels
-
-  if (n_noise > 0L) {
-    max_cluster <- suppressWarnings(max(labels[labels >= 0L], na.rm = TRUE))
-    if (!is.finite(max_cluster)) max_cluster <- -1L
-
-    if (handle_noise == "keep") {
-      noise_idx <- which(labels == -1L)
-      labels_positive[noise_idx] <- seq.int(from = max_cluster + 1L,
-                                            length.out = length(noise_idx))
-    } else if (handle_noise == "separate") {
-      labels_positive[labels == -1L] <- max_cluster + 1L
-    } else if (handle_noise == "merge") {
-      if (max_cluster >= 0L) {
-        tab <- table(labels[labels >= 0L])
-        largest <- as.integer(names(tab)[which.max(tab)])
-        labels_positive[labels == -1L] <- largest
-      } else {
-        # all noise → assign cluster 0
-        labels_positive[labels == -1L] <- 0L
-      }
-    }
-  }
+  
 
   # Stats
   n_samples <- length(sample_names)
   unique_original <- unique(labels[labels >= 0L])
-  unique_positive <- unique(labels_positive)
+
 
   outs = list(
     clusters = labels,                          # may include -1 for noise
-    clusters_positive = labels_positive,        # non-negative labels after handling
+         # non-negative labels after handling
     silhouette_score = silhouette_score,
-    sample_names = sample_names,
+    
     n_samples = n_samples,
-    n_clusters_found = length(unique_original),
-    n_clusters_final = length(unique_positive),
-    n_noise = n_noise,
-    handle_noise = handle_noise
+    n_clusters_found = length(unique_original)
   )
 
   return(outs)

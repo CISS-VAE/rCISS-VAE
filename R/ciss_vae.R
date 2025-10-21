@@ -240,6 +240,7 @@ run_cissvae <- function(
   
   debug                  = FALSE
 ){
+  is_py_obj <- function(x) inherits(x, "python.builtin.object")
   ## step 0: if return_validation_dataset, set return_dataset = true. If run_cissvae does your clusters, return_clusters = true
   if(return_validation_dataset){
     return_dataset = TRUE
@@ -250,6 +251,31 @@ run_cissvae <- function(
 
   ## preserve raw data
   data_raw = as.data.frame(data)
+
+  ## step 0.5: make everything numeric double; keep NaN for missing
+  to_numeric_matrix <- function(df, debug) {
+  df <- as.data.frame(df)
+  # convert factor/character/logical/integer to numeric (double)
+  for (nm in names(df)) {
+    col <- df[[nm]]
+    if (is.logical(col))       col <- as.numeric(col)       # TRUE/FALSE -> 1/0, NAs kept
+    else if (is.factor(col))   col <- as.numeric(col)       # factor -> codes, NA kept
+    else if (is.integer(col))  col <- as.numeric(col)       # int -> double
+    else if (is.character(col)) col <- suppressWarnings(as.numeric(col))
+    # ensure missing is NaN (good for pandas/NumPy)
+    col[is.na(col)] <- NaN
+    df[[nm]] <- col
+  }
+    mat = as.matrix(df)  # guarantees homogeneous double
+    colnames(mat) = colnames(df)
+    rownames(mat) = rownames(df)
+
+    if(debug){
+      print(colnames(mat))
+    }
+    return(mat)
+  }
+
 
   ## step 1: coerse numerics 
   seed            <- as.integer(seed)
@@ -281,13 +307,16 @@ run_cissvae <- function(
   orig_cn <- if (is.data.frame(data) || is.matrix(data)) colnames(data) else NULL
 
   ## if there is a imputable_matrix make sure it has the same dimensions as data
-  if (!all(dim(imputable_matrix) == dim(data))) {
-    stop(sprintf(
-      "Dimension mismatch: data is %d x %d, imputable_matrix is %d x %d",
-      nrow(data), ncol(data),
-      nrow(imputable_matrix), ncol(imputable_matrix)
-    ))
+  if (!is.null(imputable_matrix)) {
+    if (!all(dim(imputable_matrix) == dim(data))) {
+      stop(sprintf(
+        "Dimension mismatch: data is %d x %d, imputable_matrix is %d x %d",
+        nrow(data), ncol(data),
+        nrow(imputable_matrix), ncol(imputable_matrix)
+      ))
+    }
   }
+  
   ## step 3: do python imports
 
   run_mod <- reticulate::import("ciss_vae.training.run_cissvae", convert = FALSE)
@@ -295,11 +324,26 @@ run_cissvae <- function(
   pd      <- reticulate::import("pandas", convert = FALSE)
 
 
-  ## step 4: handle whatever type of object `data` is (i.e. if it's a python object vs r dataframe vs matrix)
-  is_py_obj <- function(x) inherits(x, "python.builtin.object")
+  ## step 4: coerce R data.frame -> numeric double matrix -> pandas
+  data_num <- to_numeric_matrix(data, debug = debug)  # has colnames/rownames
+  cols_py  <- reticulate::r_to_py(colnames(data_num))
+  idx_py   <- if (!is.null(rownames(data_num))) reticulate::r_to_py(rownames(data_num)) else NULL
+  
+  pd   <- reticulate::import("pandas", convert = FALSE)
+  np   <- reticulate::import("numpy",  convert = FALSE)
+  
+  data_np <- reticulate::r_to_py(unclass(data_num))  # 2D ndarray (float64)
+  
+  if (is.null(idx_py)) {
+    data_py <- pd$DataFrame(data = data_np, columns = cols_py)
+  } else {
+    data_py <- pd$DataFrame(data = data_np, columns = cols_py, index = idx_py)
+  }
+  
+  if (debug) {
+    print(data_py$head())   # <- call it
+  }
 
-  data[is.na(data)] <- NaN
-  data_py <- pd$DataFrame(data = data, dtype = "float64")
 
   ## step 5: perpare python args
   if (!is.null(clusters)) { ## check for clusters

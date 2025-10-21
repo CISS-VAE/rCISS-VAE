@@ -2189,10 +2189,10 @@ shared layers (with reproducible seed)</li>
 <span><span class="co"># Plot model architecture</span></span>
 <span><span class="fu"><a href="../reference/plot_vae_architecture.html">plot_vae_architecture</a></span><span class="op">(</span><span class="va">best_model</span>, title <span class="op">=</span> <span class="st">"Optimized CISSVAE Architecture"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Starting Optuna optimization with 3 trials...</span></span>
-<span><span class="co">#&gt; Optimization complete. Best trial: 0 (MSE: 9.332108)</span></span>
+<span><span class="co">#&gt; Optimization complete. Best trial: 1 (MSE: 10.750444)</span></span>
 <span><span class="co">#&gt; Training final model with best parameters...</span></span>
 <span><span class="co">#&gt; Final model training complete.</span></span>
-<span><span class="co">#&gt; Best validation MSE: 9.332108</span></span>
+<span><span class="co">#&gt; Best validation MSE: 10.75044</span></span>
 <span><span class="co">#&gt; [1] "Trial results:"</span></span></code></pre>
 <table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <thead><tr>
@@ -2241,15 +2241,6 @@ layer_order_enc_used
 <th style="text-align:left;">
 layer_order_dec_used
 </th>
-<th style="text-align:right;">
-hidden_dim_2
-</th>
-<th style="text-align:right;">
-hidden_dim_3
-</th>
-<th style="text-align:right;">
-hidden_dim_4
-</th>
 </tr></thead>
 <tbody>
 <tr>
@@ -2257,69 +2248,13 @@ hidden_dim_4
 0
 </td>
 <td style="text-align:right;">
-9.332109
+19.50337
 </td>
 <td style="text-align:right;">
 2
 </td>
 <td style="text-align:right;">
 64
-</td>
-<td style="text-align:right;">
-512
-</td>
-<td style="text-align:right;">
-10
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:right;">
-1000
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-at_end
-</td>
-<td style="text-align:left;">
-random
-</td>
-<td style="text-align:left;">
-U,U
-</td>
-<td style="text-align:left;">
-S,U
-</td>
-<td style="text-align:right;">
-NaN
-</td>
-<td style="text-align:right;">
-NaN
-</td>
-<td style="text-align:right;">
-NaN
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-82.498062
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-512
 </td>
 <td style="text-align:right;">
 64
@@ -2331,51 +2266,42 @@ NaN
 TRUE
 </td>
 <td style="text-align:left;">
-TRUE
+FALSE
 </td>
 <td style="text-align:right;">
 4000
 </td>
 <td style="text-align:right;">
-2
+1
 </td>
 <td style="text-align:right;">
-2
+1
 </td>
 <td style="text-align:left;">
 random
 </td>
 <td style="text-align:left;">
-at_start
+alternating
 </td>
 <td style="text-align:left;">
-S,S
+U,S
 </td>
 <td style="text-align:left;">
-S,S
-</td>
-<td style="text-align:right;">
-NaN
-</td>
-<td style="text-align:right;">
-NaN
-</td>
-<td style="text-align:right;">
-NaN
+S,U
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+10.75044
+</td>
+<td style="text-align:right;">
 2
 </td>
 <td style="text-align:right;">
-30.599863
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-512
+64
 </td>
 <td style="text-align:right;">
 64
@@ -2384,19 +2310,19 @@ NaN
 100
 </td>
 <td style="text-align:left;">
-FALSE
+TRUE
 </td>
 <td style="text-align:left;">
-FALSE
+TRUE
 </td>
 <td style="text-align:right;">
 1000
 </td>
 <td style="text-align:right;">
-1
+0
 </td>
 <td style="text-align:right;">
-3
+1
 </td>
 <td style="text-align:left;">
 random
@@ -2405,19 +2331,57 @@ random
 at_start
 </td>
 <td style="text-align:left;">
-U,U,U,U,S
+U,U
 </td>
 <td style="text-align:left;">
-S,S,S,U,U
+S,U
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+64.41515
+</td>
+<td style="text-align:right;">
+2
 </td>
 <td style="text-align:right;">
 64
 </td>
 <td style="text-align:right;">
-512
+64
 </td>
 <td style="text-align:right;">
-64
+10
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+4000
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+at_end
+</td>
+<td style="text-align:left;">
+random
+</td>
+<td style="text-align:left;">
+U,S
+</td>
+<td style="text-align:left;">
+U,U
 </td>
 </tr>
 </tbody>

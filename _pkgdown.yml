@@ -26,6 +26,7 @@ articles:
   desc: "Package vignettes"  
   contents: 
     - vignette
+    - binary_variables_tutorial
     - virtual_environment_tutorial
     - do_not_impute_matrix
     - summary_functions

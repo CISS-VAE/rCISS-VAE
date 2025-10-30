@@ -2189,10 +2189,10 @@ shared layers (with reproducible seed)</li>
 <span><span class="co"># Plot model architecture</span></span>
 <span><span class="fu"><a href="../reference/plot_vae_architecture.html">plot_vae_architecture</a></span><span class="op">(</span><span class="va">best_model</span>, title <span class="op">=</span> <span class="st">"Optimized CISSVAE Architecture"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Starting Optuna optimization with 3 trials...</span></span>
-<span><span class="co">#&gt; Optimization complete. Best trial: 1 (MSE: 10.750444)</span></span>
+<span><span class="co">#&gt; Optimization complete. Best trial: 0 (MSE: 23.569462)</span></span>
 <span><span class="co">#&gt; Training final model with best parameters...</span></span>
 <span><span class="co">#&gt; Final model training complete.</span></span>
-<span><span class="co">#&gt; Best validation MSE: 10.75044</span></span>
+<span><span class="co">#&gt; Best validation MSE: 23.56946</span></span>
 <span><span class="co">#&gt; [1] "Trial results:"</span></span></code></pre>
 <table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <thead><tr>
@@ -2241,6 +2241,15 @@ layer_order_enc_used
 <th style="text-align:left;">
 layer_order_dec_used
 </th>
+<th style="text-align:right;">
+hidden_dim_2
+</th>
+<th style="text-align:right;">
+hidden_dim_3
+</th>
+<th style="text-align:right;">
+hidden_dim_4
+</th>
 </tr></thead>
 <tbody>
 <tr>
@@ -2248,46 +2257,55 @@ layer_order_dec_used
 0
 </td>
 <td style="text-align:right;">
-19.50337
+23.56946
 </td>
 <td style="text-align:right;">
 2
 </td>
 <td style="text-align:right;">
-64
+512
 </td>
 <td style="text-align:right;">
-64
+512
 </td>
 <td style="text-align:right;">
 10
 </td>
 <td style="text-align:left;">
-TRUE
-</td>
-<td style="text-align:left;">
 FALSE
 </td>
-<td style="text-align:right;">
-4000
+<td style="text-align:left;">
+TRUE
 </td>
 <td style="text-align:right;">
-1
+1000
 </td>
 <td style="text-align:right;">
-1
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+at_start
 </td>
 <td style="text-align:left;">
 random
 </td>
 <td style="text-align:left;">
-alternating
+S,S
 </td>
 <td style="text-align:left;">
-U,S
+S,S
 </td>
-<td style="text-align:left;">
-S,U
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
 </td>
 </tr>
 <tr>
@@ -2295,7 +2313,7 @@ S,U
 1
 </td>
 <td style="text-align:right;">
-10.75044
+101.55747
 </td>
 <td style="text-align:right;">
 2
@@ -2313,28 +2331,37 @@ S,U
 TRUE
 </td>
 <td style="text-align:left;">
-TRUE
+FALSE
 </td>
 <td style="text-align:right;">
-1000
+4000
+</td>
+<td style="text-align:right;">
+2
 </td>
 <td style="text-align:right;">
 0
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-random
 </td>
 <td style="text-align:left;">
 at_start
 </td>
 <td style="text-align:left;">
-U,U
+random
 </td>
 <td style="text-align:left;">
-S,U
+S,S
+</td>
+<td style="text-align:left;">
+U,U
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
 </td>
 </tr>
 <tr>
@@ -2342,16 +2369,16 @@ S,U
 2
 </td>
 <td style="text-align:right;">
-64.41515
+27.13581
 </td>
 <td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-64
+5
 </td>
 <td style="text-align:right;">
 64
+</td>
+<td style="text-align:right;">
+512
 </td>
 <td style="text-align:right;">
 10
@@ -2363,32 +2390,41 @@ TRUE
 FALSE
 </td>
 <td style="text-align:right;">
-4000
-</td>
-<td style="text-align:right;">
-1
+1000
 </td>
 <td style="text-align:right;">
 0
 </td>
-<td style="text-align:left;">
-at_end
+<td style="text-align:right;">
+3
 </td>
 <td style="text-align:left;">
 random
 </td>
 <td style="text-align:left;">
-U,S
+at_start
 </td>
 <td style="text-align:left;">
-U,U
+U,U,U,U,U
+</td>
+<td style="text-align:left;">
+S,S,S,U,U
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+512
 </td>
 </tr>
 </tbody>
 </table>
 <pre><code><span><span class="co">#&gt; Plot saved to: autotune_vae_arch.png</span></span></code></pre>
-<div class="figure">
-<img src="autotune_vae_arch.png" alt=""><p class="caption">Autotuned VAE Architecture</p>
+<div class="float">
+<img src="autotune_vae_arch.png" alt="Autotuned VAE Architecture"><div class="figcaption">Autotuned VAE Architecture</div>
 </div>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Using Pre-computed Missingness Proportion Matrix -- not quite working yet</span></span>

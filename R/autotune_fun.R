@@ -189,10 +189,12 @@ if (!is.null(imputable_matrix)) {
   if (verbose) print("Built search space")
   
   # ── 6) Build ClusterDataset ──────────────────────────────────────────────
+  ## Building the ClusterDataset is the point at which it will be necessary for the NAs to be good. 
   if (missing(clusters)) stop("`clusters` is required for autotune.")
+  
+  ## Fix for the sentinals -> make sure that, for whatever 'data' is, if it's NA the actual value in the data thing is 'NaN'
   data[is.na(data)] <- NaN
   data_py <- pd$DataFrame(data = data, dtype = "float64")
-
 
   if(debug){
     print("Python data thing")
@@ -208,6 +210,10 @@ if (!is.null(imputable_matrix)) {
   } else dni_py <- NULL
 
   train_ds_py <- CD_mod(data_py, clusters_py, val_proportion, replacement_value, cols_ignore_py, dni_py, reticulate::r_to_py(binary_feature_mask))
+
+  if(debug){
+    print(train_ds_py$binary_feature_mask)
+  }
   
   if (verbose) print("Built cluster dataset")
   

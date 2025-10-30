@@ -325,6 +325,7 @@ run_cissvae <- function(
 
 
   ## step 4: coerce R data.frame -> numeric double matrix -> pandas
+  ## R function should be able to accept matrix or df. Does need column names
   data_num <- to_numeric_matrix(data, debug = debug)  # has colnames/rownames
   cols_py  <- reticulate::r_to_py(colnames(data_num))
   idx_py   <- if (!is.null(rownames(data_num))) reticulate::r_to_py(rownames(data_num)) else NULL

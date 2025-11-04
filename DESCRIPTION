@@ -20,7 +20,8 @@ Imports:
     ggplot2,
     dplyr,
     purrr,
-    glue
+    glue,
+    gtsummary
 Suggests: 
     testthat (>= 3.0.0),
     knitr,

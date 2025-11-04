@@ -98,7 +98,7 @@ If you want to install other python packages (eg seaborn) to your environment, y
 
 # Quickstart
 
-Once reticulate is pointing to the virtual environment containing the `ciss_vae` python package, you can either use the `run_cissvae` function or the `autotune_cissvae` function. 
+Once reticulate is pointing to the virtual environment containing the `ciss_vae` python package, you can either use the `run_cissvae` function or the `autotune_cissvae` function. For details on using the CISSVAE model with binary/categorical values see [binary variables tutorial](https://ciss-vae.github.io/rCISS-VAE/articles/binary_variables_tutorial.html).
 
 If you know what hyperparameters you want to use for the model, use the `run_cissvae` function. 
 
@@ -212,12 +212,19 @@ library(tidyverse)
 library(reticulate)
 library(rCISSVAE)
 library(kableExtra)
+library(gtsummary)
 
 data(df_missing)
 data(clusters)
 
-cluster_summary(df_missing, clusters$clusters, index_col = "index")  %>% kable()  %>%
-  kable_styling(font_size = 12)
+cluster_summary(
+  data = df_missing, 
+  clusters = clusters$clusters, 
+  include =setdiff(names(df_missing), "index"),
+  statistic = list(
+    all_continuous() ~ "{mean} ({sd})",
+    all_categorical() ~ "{n} / {N}\n ({p}%)"), 
+  missing = "always")
 
 ```
 
@@ -308,8 +315,12 @@ cluster_result <- cluster_on_missing(
   seed = 42
 )
 
-cluster_summary(df_missing, cluster_result$clusters, index_col = "index")  %>% kable() %>%
-  kable_styling(font_size = 12)
+cluster_summary(df_missing, factor(cluster_result$clusters), include = setdiff(names(df_missing), "index"), 
+statistic = list(
+  all_continuous() ~ "{mean} ({sd})",
+  all_categorical() ~ "{n} / {N}\n ({p}%)"), 
+  missing = "always")  
+
 cat(paste("Clustering quality (silhouette):", round(cluster_result$silhouette, 3)))
 
 

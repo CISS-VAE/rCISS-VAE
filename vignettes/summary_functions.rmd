@@ -27,11 +27,17 @@ library(tidyverse)
 library(reticulate)
 library(rCISSVAE)
 library(kableExtra)
+library(gtsummary)
 
 data(df_missing)
 data(clusters)
 
-cluster_summary(df_missing, clusters$clusters, index_col = "index", cont_style = "mean_sd")  %>% kable()  
+cluster_summary(data = df_missing, factor(clusters$clusters), 
+include = setdiff(names(df_missing), "index"), 
+statistic = list(
+  all_continuous() ~ "{mean} ({sd})",
+  all_categorical() ~ "{n} / {N}\n ({p}%)"), 
+  missing = "always")  %>% kable()  
 
 ```
 

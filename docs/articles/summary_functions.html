@@ -71,10 +71,10 @@ param to set the style of continuous variable summaries (“mean_sd”,
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## ── <span style="font-weight: bold;">Attaching core tidyverse packages</span> ──────────────────────── tidyverse 2.0.0 ──</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">dplyr    </span> 1.1.4     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">readr    </span> 2.1.5</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">forcats  </span> 1.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">stringr  </span> 1.5.1</span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">forcats  </span> 1.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">stringr  </span> 1.6.0</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">ggplot2  </span> 4.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tibble   </span> 3.3.0</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">lubridate</span> 1.9.4     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tidyr    </span> 1.3.1</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">purrr    </span> 1.1.0     </span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">lubridate</span> 1.9.3     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tidyr    </span> 1.3.1</span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">purrr    </span> 1.2.0     </span></span>
 <span><span class="co">## ── <span style="font-weight: bold;">Conflicts</span> ────────────────────────────────────────── tidyverse_conflicts() ──</span></span>
 <span><span class="co">## <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">filter()</span> masks <span style="color: #0000BB;">stats</span>::filter()</span></span>
 <span><span class="co">## <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">lag()</span>    masks <span style="color: #0000BB;">stats</span>::lag()</span></span>
@@ -90,278 +90,61 @@ param to set the style of continuous variable summaries (“mean_sd”,
 <span><span class="co">## </span></span>
 <span><span class="co">##     group_rows</span></span></code></pre>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">df_missing</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ddsjoberg/gtsummary" class="external-link">gtsummary</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">df_missing</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clusters</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">cluster_summary</span><span class="op">(</span><span class="va">df_missing</span>, <span class="va">clusters</span><span class="op">$</span><span class="va">clusters</span>, index_col <span class="op">=</span> <span class="st">"index"</span>, cont_style <span class="op">=</span> <span class="st">"mean_sd"</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span>  </span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="7%">
-<col width="21%">
-<col width="21%">
-<col width="21%">
-<col width="8%">
-<col width="20%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Variable</th>
-<th align="left">Overall</th>
-<th align="left">Cluster 0</th>
-<th align="left">Cluster 1</th>
-<th align="left">Cluster 2</th>
-<th align="left">Cluster 3</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">N</td>
-<td align="left">8000</td>
-<td align="left">2000</td>
-<td align="left">2000</td>
-<td align="left">2000</td>
-<td align="left">2000</td>
-</tr>
-<tr class="even">
-<td align="left">Age</td>
-<td align="left">10.2 (2.08)</td>
-<td align="left">10.1 (2.04)</td>
-<td align="left">10.19 (2.08)</td>
-<td align="left">10.21 (2.14)</td>
-<td align="left">10.29 (2.06)</td>
-</tr>
-<tr class="odd">
-<td align="left">Salary</td>
-<td align="left">5.82 (0.61)</td>
-<td align="left">5.81 (0.61)</td>
-<td align="left">5.83 (0.62)</td>
-<td align="left">5.83 (0.61)</td>
-<td align="left">5.81 (0.6)</td>
-</tr>
-<tr class="even">
-<td align="left">ZipCode10001</td>
-<td align="left">0.33 (0.47)</td>
-<td align="left">0.32 (0.47)</td>
-<td align="left">0.34 (0.47)</td>
-<td align="left">0.33 (0.47)</td>
-<td align="left">0.32 (0.47)</td>
-</tr>
-<tr class="odd">
-<td align="left">ZipCode20002</td>
-<td align="left">0.34 (0.47)</td>
-<td align="left">0.35 (0.48)</td>
-<td align="left">0.33 (0.47)</td>
-<td align="left">0.33 (0.47)</td>
-<td align="left">0.34 (0.47)</td>
-</tr>
-<tr class="even">
-<td align="left">ZipCode30003</td>
-<td align="left">0.33 (0.47)</td>
-<td align="left">0.33 (0.47)</td>
-<td align="left">0.34 (0.47)</td>
-<td align="left">0.34 (0.47)</td>
-<td align="left">0.33 (0.47)</td>
-</tr>
-<tr class="odd">
-<td align="left">Y11</td>
-<td align="left">-2.82 (13.25), 3122 (39%) missing</td>
-<td align="left">-21.2 (10.08), 1281 (64%) missing</td>
-<td align="left">-16.04 (8.89), 1288 (64.4%) missing</td>
-<td align="left">8.39 (5.39)</td>
-<td align="left">-2.68 (5.86), 553 (27.6%) missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y12</td>
-<td align="left">22.23 (42.54), 3118 (39%) missing</td>
-<td align="left">68.9 (11.29), 1264 (63.2%) missing</td>
-<td align="left">-26.43 (9.3), 1283 (64.2%) missing</td>
-<td align="left">55.35 (6.18)</td>
-<td align="left">-23.73 (7.87), 571 (28.6%) missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y13</td>
-<td align="left">42.75 (57.09), 3110 (38.9%) missing</td>
-<td align="left">77.28 (12.34), 1289 (64.4%) missing</td>
-<td align="left">-24.92 (8.71), 1264 (63.2%) missing</td>
-<td align="left">98.14 (11.87)</td>
-<td align="left">-16.52 (6.63), 557 (27.9%) missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y14</td>
-<td align="left">55.55 (66.05), 3129 (39.1%) missing</td>
-<td align="left">73.32 (11.53), 1300 (65%) missing</td>
-<td align="left">-20.78 (7.8), 1283 (64.2%) missing</td>
-<td align="left">125.13 (16.23)</td>
-<td align="left">-11.08 (5.61), 546 (27.3%) missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y15</td>
-<td align="left">63.77 (72.61), 3141 (39.3%) missing</td>
-<td align="left">75.96 (11.74), 1273 (63.6%) missing</td>
-<td align="left">-11.93 (6.41), 1293 (64.7%) missing</td>
-<td align="left">141.25 (19.01)</td>
-<td align="left">-13.64 (6.4), 575 (28.8%) missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y21</td>
-<td align="left">-12.23 (15.68), 3135 (39.2%) missing</td>
-<td align="left">-33.45 (12.23), 1266 (63.3%) missing</td>
-<td align="left">-27.52 (10.59), 1292 (64.6%) missing</td>
-<td align="left">0.9 (6.62)</td>
-<td align="left">-12.14 (7.39), 577 (28.9%) missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y22</td>
-<td align="left">16.04 (48.68), 3094 (38.7%) missing</td>
-<td align="left">69.27 (11.68), 1266 (63.3%) missing</td>
-<td align="left">-39.51 (11.64), 1276 (63.8%) missing</td>
-<td align="left">54.43 (6.21)</td>
-<td align="left">-36.19 (9.78), 552 (27.6%) missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y23</td>
-<td align="left">39.92 (65.7), 3098 (38.7%) missing</td>
-<td align="left">78.76 (13.09), 1273 (63.6%) missing</td>
-<td align="left">-38.1 (11), 1275 (63.8%) missing</td>
-<td align="left">103.87 (12.61)</td>
-<td align="left">-28.73 (8.52), 550 (27.5%) missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y24</td>
-<td align="left">55.14 (75.63), 3146 (39.3%) missing</td>
-<td align="left">75.32 (12.36), 1302 (65.1%) missing</td>
-<td align="left">-32.22 (9.53), 1287 (64.3%) missing</td>
-<td align="left">134.69 (17.51)</td>
-<td align="left">-21.7 (7.16), 557 (27.9%) missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y25</td>
-<td align="left">63.86 (83.02), 3106 (38.8%) missing</td>
-<td align="left">77.63 (12.52), 1257 (62.9%) missing</td>
-<td align="left">-22.23 (7.81), 1294 (64.7%) missing</td>
-<td align="left">153.08 (20.72)</td>
-<td align="left">-24.63 (8.12), 555 (27.8%) missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y31</td>
-<td align="left">-2.38 (15.47), 2067 (25.8%) missing</td>
-<td align="left">-18.28 (10.37), 192 (9.6%) missing</td>
-<td align="left">-13.16 (9.15), 1285 (64.2%) missing</td>
-<td align="left">13.4 (5.48)</td>
-<td align="left">1.07 (6.02), 590 (29.5%) missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y32</td>
-<td align="left">35.48 (44.33), 2056 (25.7%) missing</td>
-<td align="left">74.39 (10.92), 206 (10.3%) missing</td>
-<td align="left">-24.27 (9.9), 1287 (64.3%) missing</td>
-<td align="left">62.21 (6.63)</td>
-<td align="left">-20.65 (8), 563 (28.1%) missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y33</td>
-<td align="left">54.8 (56.83), 2013 (25.2%) missing</td>
-<td align="left">83.77 (12.9), 203 (10.2%) missing</td>
-<td align="left">-23.25 (9.53), 1267 (63.4%) missing</td>
-<td align="left">107.81 (12.65)</td>
-<td align="left">-14.43 (7.08), 543 (27.1%) missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y34</td>
-<td align="left">66.6 (63.23), 2051 (25.6%) missing</td>
-<td align="left">81.4 (12.51), 195 (9.8%) missing</td>
-<td align="left">-16.58 (7.73), 1275 (63.8%) missing</td>
-<td align="left">135.95 (17.14)</td>
-<td align="left">-7.48 (5.83), 581 (29%) missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y35</td>
-<td align="left">73.13 (69.46), 2054 (25.7%) missing</td>
-<td align="left">83.22 (12.63), 204 (10.2%) missing</td>
-<td align="left">-7.56 (6.11), 1285 (64.2%) missing</td>
-<td align="left">152.77 (20)</td>
-<td align="left">-10.27 (6.66), 565 (28.2%) missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y41</td>
-<td align="left">-1.03 (6.75), 2032 (25.4%) missing</td>
-<td align="left">-8.43 (4.11), 184 (9.2%) missing</td>
-<td align="left">-5.47 (3.4), 1279 (64%) missing</td>
-<td align="left">6 (2.08)</td>
-<td align="left">0.79 (2.29), 569 (28.4%) missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y42</td>
-<td align="left">16.62 (20.72), 2022 (25.3%) missing</td>
-<td align="left">35.33 (6.07), 199 (9.9%) missing</td>
-<td align="left">-10.85 (3.89), 1282 (64.1%) missing</td>
-<td align="left">28.63 (3.53)</td>
-<td align="left">-9.43 (3.15), 541 (27%) missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y43</td>
-<td align="left">25.38 (25.81), 2013 (25.2%) missing</td>
-<td align="left">38.94 (6.89), 217 (10.8%) missing</td>
-<td align="left">-9.74 (3.42), 1242 (62.1%) missing</td>
-<td align="left">49.16 (6.44)</td>
-<td align="left">-5.82 (2.54), 554 (27.7%) missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y44</td>
-<td align="left">30.33 (29.1), 2023 (25.3%) missing</td>
-<td align="left">37.26 (6.6), 186 (9.3%) missing</td>
-<td align="left">-8.17 (3.15), 1280 (64%) missing</td>
-<td align="left">62.18 (8.63)</td>
-<td align="left">-3.33 (2.17), 557 (27.9%) missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y45</td>
-<td align="left">33.81 (31.9), 2086 (26.1%) missing</td>
-<td align="left">38.57 (6.75), 204 (10.2%) missing</td>
-<td align="left">-3.85 (2.5), 1305 (65.2%) missing</td>
-<td align="left">69.91 (9.98)</td>
-<td align="left">-4.52 (2.45), 577 (28.9%) missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y51</td>
-<td align="left">0.95 (5.79), 2077 (26%) missing</td>
-<td align="left">-5.38 (3.58), 222 (11.1%) missing</td>
-<td align="left">-2.94 (3.05), 1279 (64%) missing</td>
-<td align="left">6.88 (1.91)</td>
-<td align="left">2.48 (2.04), 576 (28.8%) missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y52</td>
-<td align="left">16 (17.75), 2034 (25.4%) missing</td>
-<td align="left">32.07 (5.19), 209 (10.4%) missing</td>
-<td align="left">-7.54 (3.37), 1283 (64.2%) missing</td>
-<td align="left">26.28 (3.07)</td>
-<td align="left">-6.26 (2.73), 542 (27.1%) missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y53</td>
-<td align="left">23.58 (22.01), 1976 (24.7%) missing</td>
-<td align="left">35.23 (5.83), 184 (9.2%) missing</td>
-<td align="left">-6.5 (3.01), 1243 (62.1%) missing</td>
-<td align="left">43.78 (5.51)</td>
-<td align="left">-3.13 (2.22), 549 (27.4%) missing</td>
-</tr>
-<tr class="even">
-<td align="left">Y54</td>
-<td align="left">27.66 (24.95), 2047 (25.6%) missing</td>
-<td align="left">33.71 (5.52), 217 (10.8%) missing</td>
-<td align="left">-5.23 (2.74), 1281 (64%) missing</td>
-<td align="left">54.94 (7.4)</td>
-<td align="left">-1.08 (1.92), 549 (27.4%) missing</td>
-</tr>
-<tr class="odd">
-<td align="left">Y55</td>
-<td align="left">30.49 (27.35), 2050 (25.6%) missing</td>
-<td align="left">34.83 (5.69), 207 (10.3%) missing</td>
-<td align="left">-1.63 (2.14), 1292 (64.6%) missing</td>
-<td align="left">61.59 (8.52)</td>
-<td align="left">-2.09 (2.15), 551 (27.6%) missing</td>
-</tr>
-</tbody>
-</table>
+<span><span class="fu">cluster_summary</span><span class="op">(</span>data <span class="op">=</span> <span class="va">df_missing</span>, <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">clusters</span><span class="op">$</span><span class="va">clusters</span><span class="op">)</span>, </span>
+<span>include <span class="op">=</span> <span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">df_missing</span><span class="op">)</span>, <span class="st">"index"</span><span class="op">)</span>, </span>
+<span>statistic <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://www.danieldsjoberg.com/gtsummary/reference/select_helpers.html" class="external-link">all_continuous</a></span><span class="op">(</span><span class="op">)</span> <span class="op">~</span> <span class="st">"{mean} ({sd})"</span>,</span>
+<span>  <span class="fu"><a href="https://www.danieldsjoberg.com/gtsummary/reference/select_helpers.html" class="external-link">all_categorical</a></span><span class="op">(</span><span class="op">)</span> <span class="op">~</span> <span class="st">"{n} / {N}\n ({p}%)"</span><span class="op">)</span>, </span>
+<span>  missing <span class="op">=</span> <span class="st">"always"</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span>  </span></code></pre></div>
+<p>|<strong>Characteristic</strong> |<strong>N</strong>
+|<strong>0</strong><br>
+N = 2,000 |<strong>1</strong><br>
+N = 2,000 |<strong>2</strong><br>
+N = 2,000 |<strong>3</strong><br>
+N = 2,000 | |:——————|:—–|:—————-|:—————-|:—————-|:—————-| |Age |8,000
+|10.10 (2.04) |10.19 (2.08) |10.21 (2.14) |10.29 (2.06) | |Unknown |NA
+|0 |0 |0 |0 | |Salary |8,000 |5.81 (0.61) |5.83 (0.62) |5.83 (0.61)
+|5.81 (0.60) | |Unknown |NA |0 |0 |0 |0 | |ZipCode10001 |8,000 |646 /
+2,000 (32%) |674 / 2,000 (34%) |663 / 2,000 (33%) |645 / 2,000 (32%) |
+|Unknown |NA |0 |0 |0 |0 | |ZipCode20002 |8,000 |703 / 2,000 (35%) |652
+/ 2,000 (33%) |655 / 2,000 (33%) |687 / 2,000 (34%) | |Unknown |NA |0 |0
+|0 |0 | |ZipCode30003 |8,000 |651 / 2,000 (33%) |674 / 2,000 (34%) |682
+/ 2,000 (34%) |668 / 2,000 (33%) | |Unknown |NA |0 |0 |0 |0 | |Y11
+|4,878 |-21 (10) |-16 (9) |8 (5) |-3 (6) | |Unknown |NA |1,281 |1,288 |0
+|553 | |Y12 |4,882 |69 (11) |-26 (9) |55 (6) |-24 (8) | |Unknown |NA
+|1,264 |1,283 |0 |571 | |Y13 |4,890 |77 (12) |-25 (9) |98 (12) |-17 (7)
+| |Unknown |NA |1,289 |1,264 |0 |557 | |Y14 |4,871 |73 (12) |-21 (8)
+|125 (16) |-11 (6) | |Unknown |NA |1,300 |1,283 |0 |546 | |Y15 |4,859
+|76 (12) |-12 (6) |141 (19) |-14 (6) | |Unknown |NA |1,273 |1,293 |0
+|575 | |Y21 |4,865 |-33 (12) |-28 (11) |1 (7) |-12 (7) | |Unknown |NA
+|1,266 |1,292 |0 |577 | |Y22 |4,906 |69 (12) |-40 (12) |54 (6) |-36 (10)
+| |Unknown |NA |1,266 |1,276 |0 |552 | |Y23 |4,902 |79 (13) |-38 (11)
+|104 (13) |-29 (9) | |Unknown |NA |1,273 |1,275 |0 |550 | |Y24 |4,854
+|75 (12) |-32 (10) |135 (18) |-22 (7) | |Unknown |NA |1,302 |1,287 |0
+|557 | |Y25 |4,894 |78 (13) |-22 (8) |153 (21) |-25 (8) | |Unknown |NA
+|1,257 |1,294 |0 |555 | |Y31 |5,933 |-18 (10) |-13 (9) |13 (5) |1 (6) |
+|Unknown |NA |192 |1,285 |0 |590 | |Y32 |5,944 |74 (11) |-24 (10) |62
+(7) |-21 (8) | |Unknown |NA |206 |1,287 |0 |563 | |Y33 |5,987 |84 (13)
+|-23 (10) |108 (13) |-14 (7) | |Unknown |NA |203 |1,267 |0 |543 | |Y34
+|5,949 |81 (13) |-17 (8) |136 (17) |-7 (6) | |Unknown |NA |195 |1,275 |0
+|581 | |Y35 |5,946 |83 (13) |-8 (6) |153 (20) |-10 (7) | |Unknown |NA
+|204 |1,285 |0 |565 | |Y41 |5,968 |-8 (4) |-5 (3) |6 (2) |1 (2) |
+|Unknown |NA |184 |1,279 |0 |569 | |Y42 |5,978 |35 (6) |-11 (4) |29 (4)
+|-9 (3) | |Unknown |NA |199 |1,282 |0 |541 | |Y43 |5,987 |39 (7) |-10
+(3) |49 (6) |-6 (3) | |Unknown |NA |217 |1,242 |0 |554 | |Y44 |5,977 |37
+(7) |-8 (3) |62 (9) |-3 (2) | |Unknown |NA |186 |1,280 |0 |557 | |Y45
+|5,914 |39 (7) |-4 (3) |70 (10) |-5 (2) | |Unknown |NA |204 |1,305 |0
+|577 | |Y51 |5,923 |-5.4 (3.6) |-2.9 (3.0) |6.9 (1.9) |2.5 (2.0) |
+|Unknown |NA |222 |1,279 |0 |576 | |Y52 |5,966 |32 (5) |-8 (3) |26 (3)
+|-6 (3) | |Unknown |NA |209 |1,283 |0 |542 | |Y53 |6,024 |35 (6) |-6 (3)
+|44 (6) |-3 (2) | |Unknown |NA |184 |1,243 |0 |549 | |Y54 |5,953 |34 (6)
+|-5 (3) |55 (7) |-1 (2) | |Unknown |NA |217 |1,281 |0 |549 | |Y55 |5,950
+|35 (6) |-2 (2) |62 (9) |-2 (2) | |Unknown |NA |207 |1,292 |0 |551 |</p>
 </div>
 <div class="section level2">
 <h2 id="by-cluster-mse-function">By-cluster MSE function<a class="anchor" aria-label="anchor" href="#by-cluster-mse-function"></a>
@@ -413,17 +196,17 @@ part of the return object. Otherwise, use the ‘clusters’ parameter in
 <span>  by_cluster <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  cols_ignore <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"index"</span>, <span class="st">"Age"</span>, <span class="st">"Salary"</span>, <span class="st">"ZipCode10001"</span>, <span class="st">"ZipCode20002"</span>, <span class="st">"ZipCode30003"</span><span class="op">)</span> <span class="co">## columns to not score</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Overall MSE for validation data: 53.0386</span></span></code></pre>
+<pre><code><span><span class="co">## Overall MSE for validation data: 140.0841</span></span></code></pre>
 <pre><code><span><span class="co">## $overall</span></span>
-<span><span class="co">##       mse     n</span></span>
-<span><span class="co">## 1 53.0386 13783</span></span>
+<span><span class="co">##        mse     n</span></span>
+<span><span class="co">## 1 140.0841 13783</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $per_cluster</span></span>
-<span><span class="co">##   cluster      mse    n</span></span>
-<span><span class="co">## 1       0 67.45624 3408</span></span>
-<span><span class="co">## 2       1 98.47993 1787</span></span>
-<span><span class="co">## 3       2 42.68959 5000</span></span>
-<span><span class="co">## 4       3 31.13395 3588</span></span></code></pre>
+<span><span class="co">##   cluster       mse    n</span></span>
+<span><span class="co">## 1       0  85.45211 3408</span></span>
+<span><span class="co">## 2       1 180.51999 1787</span></span>
+<span><span class="co">## 3       2 193.24880 5000</span></span>
+<span><span class="co">## 4       3  97.74949 3588</span></span></code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

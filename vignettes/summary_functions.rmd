@@ -32,12 +32,13 @@ library(gtsummary)
 data(df_missing)
 data(clusters)
 
+## Integer clusters must be passed in as a factor
 cluster_summary(data = df_missing, factor(clusters$clusters), 
 include = setdiff(names(df_missing), "index"), 
 statistic = list(
   all_continuous() ~ "{mean} ({sd})",
   all_categorical() ~ "{n} / {N}\n ({p}%)"), 
-  missing = "always")  %>% kable()  
+  missing = "always")
 
 ```
 

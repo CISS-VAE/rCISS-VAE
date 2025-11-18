@@ -28,6 +28,7 @@ The `autotune_cissvae()` function has an option for creating an Optuna Dashboard
 library(tidyverse)
 library(reticulate)
 library(rCISSVAE)
+library(kableExtra)
 
 ## Set the virtual environment
 # reticulate::use_virtualenv("./.venv", required = TRUE)
@@ -40,21 +41,13 @@ aut <- autotune_cissvae(
   data = df_missing,
   index_col = "index",
   clusters = clusters$clusters,
-  save_model_path = NULL,
-  save_search_space_path = NULL,
   n_trials = 3, ## Using low number of trials for demo
   study_name = "ShowOptunaDB",
   device_preference = "cpu",
-  show_progress = FALSE,  # Set true for Rich progress bars with training visualization
   optuna_dashboard_db = "sqlite:///optuna_study_demo.db",  # Save results to database
-  load_if_exists = FALSE, ## Set true to load and continue study if it exists
+  load_if_exists = TRUE, ## Set true to load and continue study if it exists
   seed = 42, 
   verbose = FALSE,
-  
-  # Search strategy options
-  constant_layer_size = FALSE,     # Allow different sizes per layer
-  evaluate_all_orders = FALSE,     # Sample layer arrangements efficiently
-  max_exhaustive_orders = 100,     # Limit for exhaustive search
   
   ## Hyperparameter search space
   num_hidden_layers = c(2, 5),     # Try 2-5 hidden layers
@@ -65,7 +58,7 @@ aut <- autotune_cissvae(
   lr = 0.01,  # Learning rate range
   decay_factor = 0.99,
   beta = 0.01,  # KL weight range
-  num_epochs = 50,                # Fixed epochs for demo
+  num_epochs = 5,                # Fixed epochs for demo
   batch_size = c(1000, 4000),     # Batch size options
   num_shared_encode = c(0, 1, 2, 3),
   num_shared_decode = c(0, 1, 2, 3),
@@ -75,9 +68,9 @@ aut <- autotune_cissvae(
   decoder_shared_placement = c("at_start", "at_end", "alternating", "random"),
   
   refit_patience = 2,        # Early stopping patience
-  refit_loops = 100,                # Fixed refit loops
-  epochs_per_loop = 100,   # Epochs per refit loop
-  reset_lr_refit = c(TRUE, FALSE)
+  refit_loops = 10,                # Fixed refit loops
+  epochs_per_loop = 5,   # Epochs per refit loop
+  reset_lr_refit = FALSE
 )
 
 # Analyze results
@@ -97,6 +90,6 @@ results %>% kable() %>%
 To view the dashboard
 
 **From Command Line**
-```{bash}
+```{.bash}
 optuna-dashboard "sqlite:///optuna_study_demo.db"
 ```

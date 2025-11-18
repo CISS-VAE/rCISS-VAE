@@ -68,7 +68,7 @@ performance_by_cluster <- function(
     ignores  <- unique(c(cols_ignore, group_col))
     feature_cols <- setdiff(num_cols, ignores)
   }
-  feature_cols <- intersect(feature_cols, colnames(val_data), colnames(val_imputed))
+  feature_cols <- Reduce(intersect, list(feature_cols, colnames(val_data), colnames(val_imputed)))
   if (length(feature_cols) == 0L)
     stop("No feature columns available to score.")
 
@@ -84,7 +84,7 @@ performance_by_cluster <- function(
   se_mat <- (as.matrix(pred_sub) - as.matrix(val_sub))^2
   se_mat[!used_mask] <- NA_real_
 
-  # Binary cross‐entropy for binary features
+  # Binary cross‐entropy for binary features -- assumes that yhat is prbabilty
   bce_mat <- matrix(NA_real_, nrow = nrow(val_sub), ncol = ncol(val_sub))
   if (length(binary_features) > 0) {
     idx <- which(colnames(val_sub) %in% binary_features)
@@ -118,7 +118,7 @@ performance_by_cluster <- function(
   .safe_aggs <- function(data, keys) {
     m <- stats::aggregate(metric_value ~ ., data = data[, c(keys, "metric_value")], FUN = mean)
     n <- stats::aggregate(metric_value ~ ., data = data[, c(keys, "metric_value")], FUN = length)
-    names(m)[names(m) == "metric_value"] <- "mean_metric"
+    names(m)[names(m) == "metric_value"] <- "mean_imputation_loss"
     names(n)[names(n) == "metric_value"] <- "n"
     merge(m, n, by = keys, sort = TRUE)
   }

@@ -15,9 +15,9 @@ vignette: >
 
 ## What is Optuna Dashboard? 
 
-Optuna dashboard is _. To install it, activate your `rCISSVAE` virtual environment and use `pip install optuna-dashboard` from command line. 
+[Optuna dashboard](https://optuna-dashboard.readthedocs.io/en/latest/getting-started.html) is a visualization tool that allows you to view the history and results of optuna hyperparameter optimization studies. To install it, activate your `rCISSVAE` virtual environment and use `pip install optuna-dashboard` from command line. 
 
-If you are using [Positron]() as your IDE, you can install the Optuna Dashboard Extension and easily open optuna database files. For others, the simplest way to use Optuna Dashboard is from the command line. 
+If you are using [Positron](https://positron.posit.co/welcome.html) as your IDE, you can install the Optuna Dashboard Extension and easily open optuna database files. For others, the simplest way to use Optuna Dashboard is from the command line. Please note that the command line version of Optuna Dashboard has some features that are not in the Extension. 
 
 ## Creating an Optuna Dashboard with the Autotune Function
 
@@ -87,9 +87,11 @@ results %>% kable() %>%
 
 ```
 
-To view the dashboard
+To view the dashboard:
 
 **From Command Line**
 ```{.bash}
 optuna-dashboard "sqlite:///optuna_study_demo.db"
 ```
+
+For more information see the [optuna dashboard documentation](https://optuna-dashboard.readthedocs.io/en/latest/getting-started.html).

@@ -546,4 +546,4 @@ plot_vae_architecture(best_model, title = "Optimized CISSVAE Architecture", save
 
 ![Autotuned VAE Architecture](autotune_vae_arch.png)
 
-For more information on using optuna dashboard, see the [Optuna Dashboard tutorial](ciss-vae.github.io/rCISS-VAE/articles/optunadb.html)
+For more information on using optuna dashboard, see the [Optuna Dashboard tutorial](https://ciss-vae.github.io/rCISS-VAE/articles/optunadb.html)

@@ -20,10 +20,13 @@ navbar:
     - icon: fa-github
       href: https://github.com/CISS-VAE/rCISS-VAE
       aria-label: "GitHub"
+    - icon: filetype-py
+      href: https://ciss-vae.readthedocs.io/en/latest/index.html
+      aria-label: "CISS-VAE"
 
 articles:
 - title: "Vignettes"
-  desc: "Package vignettes"  
+  desc: "Package vignettes."  
   contents: 
     - vignette
     - binary_variables_tutorial

@@ -9,6 +9,13 @@
 #' @param install_python Logical; if TRUE, install Python if none of at least the requested
 #'   version is found on the system.
 #' @param python_version Python version string (major.minor), used when installing Python.
+#' 
+#' @examples
+#' create_cissvae_env(
+#' envname = "cissvae_environment",
+#' install_python = FALSE,
+#' python_version = "3.10")
+#' 
 #' @export
 create_cissvae_env <- function(
   envname        = "cissvae_environment",
@@ -56,7 +63,8 @@ create_cissvae_env <- function(
     reticulate::virtualenv_create(
       envname = env_spec,
       python  = starter,
-      packages = c("numpy", "pandas", "torch", "rich", "matplotlib", "scikit-learn", "optuna", "typing")
+      packages = c("numpy", "pandas", "torch", "rich", 
+      "matplotlib", "scikit-learn", "optuna", "typing", "ciss-vae")
     )
   } else {
     message(
@@ -64,20 +72,6 @@ create_cissvae_env <- function(
       "' already exists; skipping creation."
     )
   }
-
-  # 3. Activate and install CISSVAE
-  reticulate::use_virtualenv(env_spec, required = TRUE)
-  message("Installing 'ciss-vae' into '", env_spec, "' from test.pypi.org")
-  reticulate::virtualenv_install(
-    envname           = env_spec,
-    packages          = "ciss-vae",   # normalized lowercase name
-    ignore_installed  = FALSE,
-    pip_options       = c(
-      "--index-url=https://test.pypi.org/simple/",
-      "--extra-index-url=https://pypi.org/simple/"
-    ),
-    python_version    = python_version
-  )
 
   invisible(NULL)
 }

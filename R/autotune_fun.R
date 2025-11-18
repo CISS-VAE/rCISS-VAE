@@ -43,6 +43,8 @@ library(purrr)
 #' @param reset_lr_refit Logical vector: whether to reset LR before refit
 #' 
 #' @return List containing imputed data, best model, study object, and results dataframe
+#' 
+#' @example inst/examples/autotune_ex.R
 #' @export
 autotune_cissvae <- function(
   data,

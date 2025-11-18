@@ -1,13 +1,14 @@
-pandoc: 2.17.1.1
+pandoc: 3.6.3
 pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   binary_variables_tutorial: binary_variables_tutorial.html
   do_not_impute_matrix: do_not_impute_matrix.html
+  optunadb: optunadb.html
   summary_functions: summary_functions.html
   vignette: vignette.html
   virtual_environment_tutorial: virtual_environment_tutorial.html
-last_built: 2025-11-04T16:46Z
+last_built: 2025-11-17T20:02Z
 urls:
   reference: https://ciss-vae.github.io/rCISS-VAE/reference
   article: https://ciss-vae.github.io/rCISS-VAE/articles

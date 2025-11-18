@@ -44,9 +44,9 @@ statistic = list(
 
 ## By-cluster MSE function
 
-After running the model, you can get the per-cluster validation set MSE using the `get_mse()` function. Set 'return_validation_dataset = TRUE' in the `run_cissvae()` function to be able to use get_mse on the result object. If the validation dataset (val_data in result object) and imputed validation dataset (val_imputed in the result object) are not returned, the MSE cannot be calculated. 
+After running the model, you can get the per-cluster validation set MSE using the `performance_by_cluster()` function. Set 'return_validation_dataset = TRUE' in the `run_cissvae()` function to be able to use performance_by_cluster on the result object. If the validation dataset (val_data in result object) and imputed validation dataset (val_imputed in the result object) are not returned, the MSE cannot be calculated. 
 
-If the `run_cissvae()` function was used to generate clusters, set `return_clusters=TRUE` and the clusters will be part of the return object. Otherwise, use the 'clusters' parameter in `get_mse()` to input the clusters. 
+If the `run_cissvae()` function was used to generate clusters, set `return_clusters=TRUE` and the clusters will be part of the return object. Otherwise, use the 'clusters' parameter in `performance_by_cluster()` to input the clusters. 
 
 ```{r}
 result = run_cissvae(
@@ -70,7 +70,7 @@ cat(paste("Check necessary returns:", paste0(names(result), collapse = ", ")))
 ```
 
 ```{r}
-get_mse(res = result, 
+performance_by_cluster(res = result, 
   group_col = NULL, 
   clusters = clusters$clusters,
   feature_cols = NULL, ## default, all numeric columns excluding group_col & cols_ignore

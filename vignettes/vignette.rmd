@@ -190,11 +190,11 @@ The `run_cissvae()` function is a comprehensive wrapper for all basic steps in r
 To run the imputation model, first load your data. You can use the `cluster_summary()` function to visualize the missingness by cluster. 
 
 ```{r eval=FALSE, message=FALSE, warning=FALSE}
-suppressPackageStartupMessages({
   library(tidyverse)
   library(reticulate)
   library(rCISSVAE)
-})
+  library(gtsummary)
+
 
 ## Set correct virtualenv
 reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
@@ -203,16 +203,23 @@ reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
 data(df_missing)
 data(clusters) ## actual cluster labels in clusters$clusters (other column is index)
 
-cluster_summary(df_missing, clusters$clusters, index_col = "index")  %>% kable()  %>%
-  kable_styling(font_size = 12)
+cluster_summary(
+  data = df_missing, 
+  clusters = clusters$clusters, 
+  include =setdiff(names(df_missing), "index"),
+  statistic = list(
+    all_continuous() ~ "{mean} ({sd})",
+    all_categorical() ~ "{n} / {N}\n ({p}%)"), 
+  missing = "always")
 ```
 
 ```{r showruncissvae2, echo=FALSE}
-library(tidyverse)
-library(reticulate)
-library(rCISSVAE)
-library(kableExtra)
-library(gtsummary)
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(reticulate)
+  library(rCISSVAE)
+  library(gtsummary)
+})
 
 data(df_missing)
 data(clusters)
@@ -335,6 +342,54 @@ result <- run_cissvae(
 )
 ```
 
+
+### Using Pre-computed Missingness Proportion Matrix
+For advanced control over the clustering process, you can provide a pre-computed missingness proportion matrix directly to `run_cissvae()`:
+
+```{r useprecompmissingprop, eval=TRUE, echo = TRUE}
+
+## Standardize df_missing column names to feature_timepoint format
+colnames(df_missing) = c('index', 'Age', 'Salary', 'ZipCode10001', 'ZipCode20002', 'ZipCode30003', 'Y1_1', 'Y1_2', 'Y1_3', 'Y1_4', 'Y1_5', 'Y2_1', 'Y2_2', 'Y2_3', 'Y2_4', 'Y2_5', 'Y3_1', 'Y3_2', 'Y3_3', 'Y3_4', 'Y3_5', 'Y4_1', 'Y4_2', 'Y4_3', 'Y4_4', 'Y4_5', 'Y5_1', 'Y5_2', 'Y5_3', 'Y5_4', 'Y5_5')
+
+# Create and examine missingness proportion matrix
+prop_matrix <- create_missingness_prop_matrix(df_missing, 
+index_col = "index", 
+cols_ignore = c('Age', 'Salary', 'ZipCode10001', 'ZipCode20002', 'ZipCode30003'),
+repeat_feature_names = c("Y1", "Y2", "Y3", "Y4", "Y5"))
+
+
+print("Missingness proportion matrix dimensions:")
+print(dim(prop_matrix))
+print("Sample of proportion matrix:")
+print(head(prop_matrix[, 1:5]))
+
+# Use proportion matrix with scaling for better clustering
+advanced_result <- run_cissvae(
+  data = df_missing,
+  index_col = "index",
+  clusters = NULL,  # Let function cluster using prop_matrix
+  columns_ignore = c('Age', 'Salary', 'ZipCode10001', 'ZipCode20002', 'ZipCode30003'), 
+  missingness_proportion_matrix = prop_matrix,
+  scale_features = TRUE,  # Standardize features before clustering
+  n_clusters = 4,
+  leiden_resolution = 0.1,  # HDBSCAN parameter
+  epochs = 5,
+  return_history = TRUE,
+  return_silhouettes = TRUE,
+  device = "cpu",
+  verbose = FALSE
+)
+
+print("Clustering quality:")
+print(paste("Silhouette score:", round(advanced_result$silhouette_width, 3)))
+
+# Plot training history
+if (!is.null(advanced_result$history)) {
+  plot(advanced_result$history$epoch, advanced_result$history$val_mse, 
+       type = "l", main = "Validation MSE During Training", 
+       xlab = "Epoch", ylab = "Validation MSE")
+}
+```
 
 ## Advanced Hyperparameter Optimization with Autotune
 
@@ -491,87 +546,4 @@ plot_vae_architecture(best_model, title = "Optimized CISSVAE Architecture", save
 
 ![Autotuned VAE Architecture](autotune_vae_arch.png)
 
-
-
-```{r useprecompmissingprop, eval=TRUE, echo = TRUE}
-## Using Pre-computed Missingness Proportion Matrix -- not quite working yet
-
-##For advanced control over the clustering process, you can provide a pre-computed missingness proportion matrix directly to `run_cissvae()`:
-
-## Standardize df_missing column names to feature_timepoint format
-colnames(df_missing) = c('index', 'Age', 'Salary', 'ZipCode10001', 'ZipCode20002', 'ZipCode30003', 'Y1_1', 'Y1_2', 'Y1_3', 'Y1_4', 'Y1_5', 'Y2_1', 'Y2_2', 'Y2_3', 'Y2_4', 'Y2_5', 'Y3_1', 'Y3_2', 'Y3_3', 'Y3_4', 'Y3_5', 'Y4_1', 'Y4_2', 'Y4_3', 'Y4_4', 'Y4_5', 'Y5_1', 'Y5_2', 'Y5_3', 'Y5_4', 'Y5_5')
-
-# Create and examine missingness proportion matrix
-prop_matrix <- create_missingness_prop_matrix(df_missing, 
-index_col = "index", 
-cols_ignore = c('Age', 'Salary', 'ZipCode10001', 'ZipCode20002', 'ZipCode30003'),
-repeat_feature_names = c("Y1", "Y2", "Y3", "Y4", "Y5"))
-
-
-print("Missingness proportion matrix dimensions:")
-print(dim(prop_matrix))
-print("Sample of proportion matrix:")
-print(head(prop_matrix[, 1:5]))
-
-# Use proportion matrix with scaling for better clustering
-advanced_result <- run_cissvae(
-  data = df_missing,
-  index_col = "index",
-  clusters = NULL,  # Let function cluster using prop_matrix
-  columns_ignore = c('Age', 'Salary', 'ZipCode10001', 'ZipCode20002', 'ZipCode30003'), 
-  missingness_proportion_matrix = prop_matrix,
-  scale_features = TRUE,  # Standardize features before clustering
-  n_clusters = 4,
-  leiden_resolution = 0.1,  # HDBSCAN parameter
-  epochs = 5,
-  return_history = TRUE,
-  return_silhouettes = TRUE,
-  device = "cpu",
-  verbose = FALSE
-)
-
-print("Clustering quality:")
-print(paste("Silhouette score:", round(advanced_result$silhouette_width, 3)))
-
-# Plot training history
-if (!is.null(advanced_result$history)) {
-  plot(advanced_result$history$epoch, advanced_result$history$val_mse, 
-       type = "l", main = "Validation MSE During Training", 
-       xlab = "Epoch", ylab = "Validation MSE")
-}
-```
-
-```{r show_missingpropmatrix, echo=FALSE, eval=FALSE}
-prop_matrix <- create_missingness_prop_matrix(df_missing, index_col = "index")
-print("Missingness proportion matrix dimensions:")
-print(dim(prop_matrix))
-print("Sample of proportion matrix:")
-print(head(prop_matrix[, 1:5]))
-
-advanced_result <- run_cissvae(
-  data = df_missing,
-  index_col = "index",
-  clusters = NULL,
-  missingness_proportion_matrix = prop_matrix,
-  scale_features = TRUE,
-  n_clusters = 4,
-  epochs = 5,  # Reduced for demo
-  return_history = TRUE,
-  return_silhouettes = TRUE,
-  device = "cpu",
-  verbose = FALSE
-)
-
-print("Clustering quality:")
-print(paste("Silhouette score:", round(advanced_result$silhouettes, 3)))
-
-if (!is.null(advanced_result$history)) {
-  plot(advanced_result$history$epoch, advanced_result$history$val_mse, 
-       type = "l", main = "Validation MSE During Training", 
-       xlab = "Epoch", ylab = "Validation MSE")
-}
-```
-
-
-
-
+For more information on using optuna dashboard, see the [Optuna Dashboard tutorial](ciss-vae.github.io/rCISS-VAE/articles/optunadb.html)

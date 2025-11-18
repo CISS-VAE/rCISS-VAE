@@ -82,6 +82,9 @@
 #'   containing loss values and metrics over epochs. Default `FALSE`.
 #' @param return_dataset Logical. If `TRUE`, returns the ClusterDataset object used
 #'   during training (contains validation data, masks, etc.). Default `FALSE`.
+#' 
+#' @example inst/examples/runcissvae_ex.R
+#' 
 #'
 #' @details
 #' The CISS-VAE method works in two main phases:

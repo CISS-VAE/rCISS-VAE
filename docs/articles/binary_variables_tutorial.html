@@ -346,19 +346,19 @@ create a <code>binary_feature_mask</code> and impute with
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">imputed_dataset</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   year bill_length_mm bill_depth_mm flipper_length_mm body_mass_g</span></span>
-<span><span class="co">## 0 2007       39.10000      18.94397          181.0000    3750.000</span></span>
-<span><span class="co">## 1 2007       39.50000      17.40000          186.0000    3800.000</span></span>
-<span><span class="co">## 2 2007       40.30000      18.00000          195.0000    3250.000</span></span>
-<span><span class="co">## 3 2007       40.80159      16.83186          193.0000    3450.000</span></span>
-<span><span class="co">## 4 2007       39.30000      17.01959          190.0000    3650.000</span></span>
-<span><span class="co">## 5 2007       38.90000      18.13265          185.1796    3692.932</span></span>
-<span><span class="co">##   species_Chinstrap species_Gentoo island_Dream island_Torgersen    sex_male</span></span>
-<span><span class="co">## 0      0.000000e+00   0.000000e+00 0.000000e+00     1.0000000000 1.00000e+00</span></span>
-<span><span class="co">## 1      2.437442e-08   1.341910e-08 1.485856e-05     0.2325963527 0.00000e+00</span></span>
-<span><span class="co">## 2      0.000000e+00   0.000000e+00 0.000000e+00     1.0000000000 0.00000e+00</span></span>
-<span><span class="co">## 3      9.223840e-06   1.407677e-06 7.667059e-04     0.0004899421 0.00000e+00</span></span>
-<span><span class="co">## 4      0.000000e+00   0.000000e+00 2.522155e-03     0.0009408559 7.15132e-06</span></span>
-<span><span class="co">## 5      0.000000e+00   0.000000e+00 0.000000e+00     1.0000000000 0.00000e+00</span></span></code></pre>
+<span><span class="co">## 0 2007        39.1000      18.47074          181.0000    3750.000</span></span>
+<span><span class="co">## 1 2007        39.5000      17.40000          186.0000    3800.000</span></span>
+<span><span class="co">## 2 2007        40.3000      18.00000          195.0000    3250.000</span></span>
+<span><span class="co">## 3 2007        43.0293      16.84038          193.0000    3450.000</span></span>
+<span><span class="co">## 4 2007        39.3000      17.63371          190.0000    3650.000</span></span>
+<span><span class="co">## 5 2007        38.9000      17.86152          185.8547    3845.011</span></span>
+<span><span class="co">##   species_Chinstrap species_Gentoo island_Dream island_Torgersen     sex_male</span></span>
+<span><span class="co">## 0      0.000000e+00   0.000000e+00 0.000000e+00     1.000000e+00 1.0000000000</span></span>
+<span><span class="co">## 1      1.175495e-08   3.426607e-09 2.826521e-03     1.400356e-06 0.0000000000</span></span>
+<span><span class="co">## 2      0.000000e+00   0.000000e+00 0.000000e+00     1.000000e+00 0.0000000000</span></span>
+<span><span class="co">## 3      3.513511e-06   3.189500e-05 2.832035e-03     1.170487e-06 0.0000000000</span></span>
+<span><span class="co">## 4      0.000000e+00   0.000000e+00 4.273129e-05     1.389857e-04 0.0004408734</span></span>
+<span><span class="co">## 5      0.000000e+00   0.000000e+00 0.000000e+00     1.000000e+00 0.0000000000</span></span></code></pre>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">penguin_dummies</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 6 × 10</span></span></span>
@@ -388,12 +388,12 @@ values.</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">imputed_dataset</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   year bill_length_mm bill_depth_mm flipper_length_mm body_mass_g</span></span>
-<span><span class="co">## 0 2007       39.10000      18.94397          181.0000    3750.000</span></span>
-<span><span class="co">## 1 2007       39.50000      17.40000          186.0000    3800.000</span></span>
-<span><span class="co">## 2 2007       40.30000      18.00000          195.0000    3250.000</span></span>
-<span><span class="co">## 3 2007       40.80159      16.83186          193.0000    3450.000</span></span>
-<span><span class="co">## 4 2007       39.30000      17.01959          190.0000    3650.000</span></span>
-<span><span class="co">## 5 2007       38.90000      18.13265          185.1796    3692.932</span></span>
+<span><span class="co">## 0 2007        39.1000      18.47074          181.0000    3750.000</span></span>
+<span><span class="co">## 1 2007        39.5000      17.40000          186.0000    3800.000</span></span>
+<span><span class="co">## 2 2007        40.3000      18.00000          195.0000    3250.000</span></span>
+<span><span class="co">## 3 2007        43.0293      16.84038          193.0000    3450.000</span></span>
+<span><span class="co">## 4 2007        39.3000      17.63371          190.0000    3650.000</span></span>
+<span><span class="co">## 5 2007        38.9000      17.86152          185.8547    3845.011</span></span>
 <span><span class="co">##   species_Chinstrap species_Gentoo island_Dream island_Torgersen sex_male</span></span>
 <span><span class="co">## 0                 0              0            0                1        1</span></span>
 <span><span class="co">## 1                 0              0            0                0        0</span></span>

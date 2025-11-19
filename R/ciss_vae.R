@@ -27,10 +27,11 @@
 #'   labels for samples. If `NULL`, clustering will be performed automatically. Default `NULL`.
 #' @param n_clusters Integer. Number of clusters for KMeans clustering when `clusters`
 #'   is `NULL`. Number of clusters for KMeans clustering when 'clusters' is NULL. If `NULL`, 
-#'   will use [HDBSCAN](https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html) for clustering.  
+#'   will use [Leiden](https://leidenalg.readthedocs.io/en/stable/intro.html) for clustering.  
 #'   Default `NULL`.
-#' @param cluster_selection_epsilon Numeric. Epsilon parameter for HDBSCAN clustering
-#'   when automatic clustering is used. Default `0.25`.
+#' @param k_neighbors Integer. Number of nearest neighbors for Leiden clustering. Defaults to 15.
+#' @param leiden_resolution Float. Resolution parameter for Leiden clustering. Defaults to 0.5. 
+#' @param leiden_objective Character. Objective function for Leiden clustering. One of {"CPM", "RB", "Modularity"}
 #' @param seed Integer. Random seed for reproducible results. Default `42`.
 #' @param missingness_proportion_matrix Optional pre-computed missingness proportion
 #'   matrix for biomarker-based clustering. If provided, clustering will be based on
@@ -117,15 +118,14 @@
 #'
 #' @section Requirements:
 #' This function requires the Python `ciss_vae` package to be installed and
-#' accessible via `reticulate`. The package handles automatic device selection
-#' (CPU/GPU) based on availability.
+#' accessible via `reticulate`. 
 #'
 #' @section Performance Tips:
 #' \itemize{
-#'   \item Use GPU computation when available for faster training on large datasets
+#'   \item If leiden clustering yields too many clusters, consider increasing `k_neighbors` or reducing `leiden_resolution``
+#'   \item Use GPU computation when available for faster training on large datasets. Use `rCISSVAE::check_devices()` to see what devices are available.
 #'   \item Adjust `batch_size` based on available memory (larger = faster but more memory)
-#'   \item Start with default hyperparameters and adjust based on validation performance
-#'   \item Use `verbose=TRUE` to monitor training progress on large datasets
+#'   \item Use `verbose=TRUE` to monitor training progress
 #' }
 #'
 #' @export

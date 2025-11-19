@@ -88,13 +88,18 @@ reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
 # reticulate::use_virtualenv("./your_environment_name", required = TRUE)
 ```
 
-```{r usevenv, echo=FALSE, include=FALSE}
-reticulate::use_virtualenv("/home/nfs/vaithid1/CISS-VAE/.venv", required = TRUE)
-```
-
 ### (optional) Installing other python packages
 
 If you want to install other python packages (eg seaborn) to your environment, you can use [`reticulate::virtualenv_install()`](https://rstudio.github.io/reticulate/reference/virtualenv-tools.html). 
+
+
+### (optional) Use `check_devices()` to see available gpu devices
+
+Use `check_devices()` to see what cpu/gpu devices are available for model training. Optionally pass the path to your virtual environment using the parameter `env_path` to make sure that the correct environment is activated. 
+
+```{r check_devices}
+rCISSVAE::check_devices()
+```
 
 # Quickstart
 
@@ -131,8 +136,6 @@ tbl_summary(df_missing, include = -"index") %>%
 
 Age, Salary and ZipCode columns represent demographic data with no missingness and columns Y1t-Y5t represent biomarker data obtained at different timepoints t. 
 
-
-
 ### Explanation of `run_cissvae()` Parameters
 
 The `run_cissvae()` function is a comprehensive wrapper for all basic steps in running the CISS-VAE model, including dataset preparation, optional clustering, and running the imputation model. 
@@ -151,7 +154,9 @@ The `run_cissvae()` function is a comprehensive wrapper for all basic steps in r
 **Clustering Parameters (optional)**    
 - clusters: Vector of one cluster label per row of 'data' dataframe. If NULL, will automatically determine clusters using [HDBSCAN]() or [KMeans](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html).   
 - n_clusters: Number of clusters for KMeans clustering when 'clusters' is NULL. If n_clusters is NULL, will use [HDBSCAN]() for clustering.  
-- leiden_resolution: Epsilon parameter for [HDBSCAN]() clustering when automatic clustering is used.   
+- leiden_resolution: Resolution parameter for Leiden clustering. Defaults to 0.5.
+- k_neighbors: Number of nearest neighbors for the Leiden KNN graph construction. Defaults to 15.
+- leiden_objective: Objective function for Leiden clustering. One of {"CPM", "RB", "Modularity"}. Defaults to "CPM".
 - missingness_proportion_matrix: Optional pre-computed missingness proportion matrix for feature-based clustering. If provided, clustering will be based on these proportions instead of direct 0/1 missingness pattern.    
 - scale_features: Set `TRUE` to scale features when using missingness proportion matrix clustering.  
 
@@ -187,7 +192,7 @@ The `run_cissvae()` function is a comprehensive wrapper for all basic steps in r
 
 ### Running the imputation
 
-To run the imputation model, first load your data. You can use the `cluster_summary()` function to visualize the missingness by cluster. 
+To run the imputation model, first load your data. You can use the `cluster_summary()` function to visualize the missingness by cluster. The `cluster_summary()` function builds off of {[gtsummary](https://www.danieldsjoberg.com/gtsummary/index.html)}.
 
 ```{r eval=FALSE, message=FALSE, warning=FALSE}
   library(tidyverse)

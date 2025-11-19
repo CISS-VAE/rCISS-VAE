@@ -9,12 +9,12 @@ library(purrr)
 #' 
 #' @param data Data frame or matrix containing the input data
 #' @param index_col String name of index column to preserve (optional)
-#' @param clusters Integer vector specifying cluster assignments for each row
+#' @param clusters Integer vector specifying cluster assignments for each row.
 #' @param save_model_path Optional path to save the best model's state_dict
 #' @param save_search_space_path Optional path to save search space configuration  
 #' @param n_trials Number of Optuna trials to run
 #' @param study_name Name identifier for the Optuna study
-#' @param device_preference Preferred device ("cuda" or "cpu")
+#' @param device_preference Preferred device ("cuda", "mps", "cpu")
 #' @param show_progress Whether to display Rich progress bars during training
 #' @param optuna_dashboard_db RDB storage URL/file for Optuna dashboard
 #' @param load_if_exists Whether to load existing study from storage
@@ -44,6 +44,15 @@ library(purrr)
 #' 
 #' @return List containing imputed data, best model, study object, and results dataframe
 #' 
+#' @section Tips:
+#' \itemize{
+#'   \item `rCISSVAE::cluster_on_missing()` or `rCISSVAE::cluster_on_missing_prop()` can be used to get cluster assignments.
+#'   \item Use GPU computation when available for faster training on large datasets. Use `rCISSVAE::check_devices()` to see what devices are available.
+#'   \item Adjust `batch_size` based on available memory (larger = faster but more memory).
+#'   \item Use `verbose=TRUE` or `show_progress=TRUE` to monitor training progress
+#'   \item Use `optuna-dashboard` [(see vignette)](https://ciss-vae.github.io/rCISS-VAE/articles/optunadb.html) to examine hyperparameter importance  
+#' }
+#' 
 #' @example inst/examples/autotune_ex.R
 #' @export
 autotune_cissvae <- function(
@@ -54,7 +63,7 @@ autotune_cissvae <- function(
   columns_ignore         = NULL,
   imputable_matrix   = NULL,
   binary_feature_mask = NULL,
-  clusters, ## for the autotune function user does clusters themself
+  clusters, ## cluster identities must be provided by user
   save_model_path        = NULL,
   save_search_space_path = NULL,
   n_trials               = 20,

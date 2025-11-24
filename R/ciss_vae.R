@@ -200,7 +200,7 @@ run_cissvae <- function(
   columns_ignore         = NULL,
   imputable_matrix   = NULL,
   binary_feature_mask = NULL,
-  print_dataset          = TRUE, ## take out this option (leave as legacy). Print_dataset should signal by verbose...? Instead of true/false do verbose by levels.... (maybe deal with that later)
+  print_dataset          = TRUE, 
   ## Cluster stuff
   clusters               = NULL,
   n_clusters             = NULL,
@@ -238,9 +238,6 @@ run_cissvae <- function(
   return_history         = FALSE,
   return_dataset         = FALSE,
   return_validation_dataset = FALSE,
-  ## NEw stuff from the ptyhon update
-
-  
   debug                  = FALSE
 ){
   is_py_obj <- function(x) inherits(x, "python.builtin.object")

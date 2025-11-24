@@ -6,11 +6,11 @@
 #' @param data A data.frame or matrix (samples × features), may contain `NA`.
 #' @param cols_ignore Character vector of column names to ignore when clustering.
 #' @param n_clusters Integer; if provided, will run KMeans with this many clusters.
-#'                   If `NULL`, will use HDBSCAN.
-#' @param seed Integer; random seed for KMeans (or reproducibility in HDBSCAN).
-#' @param k_neighbors Integer; minimum cluster size for HDBSCAN.
+#'                   If `NULL`, will use Leiden.
+#' @param seed Integer; random seed for KMeans (or reproducibility in Leiden).
+#' @param k_neighbors Integer; minimum cluster size for Leiden.
 #'                           If `NULL`, defaults to `nrow(data) %/% 25`.
-#' @param leiden_resolution Numeric; epsilon parameter for HDBSCAN.
+#' @param leiden_resolution Resolution for Leiden Clustering.
 #'
 #' @return A list with components:
 #'   * `clusters`   — integer vector of cluster labels  
@@ -83,33 +83,27 @@ cluster_on_missing <- function(
 #' Cluster Samples Based on Missingness Proportions
 #'
 #' Groups **samples** with similar patterns of missingness across features using either
-#' K-means clustering (when `n_clusters` is specified) or HDBSCAN (when `n_clusters` is `NULL`).
+#' K-means clustering (when `n_clusters` is specified) or Leiden (when `n_clusters` is `NULL`).
 #' This is useful for detecting cohorts with shared missing-data behavior (e.g., site/batch effects).
 #'
 #' @param prop_matrix Matrix or data frame where **rows are samples** and **columns are features**,
 #'   entries are missingness proportions in `[0,1]`. Can be created with `create_missingness_prop_matrix()`.
-#' @param n_clusters Integer; number of clusters for KMeans. If `NULL`, uses HDBSCAN (default: `NULL`).
+#' @param n_clusters Integer; number of clusters for KMeans. If `NULL`, uses Leiden (default: `NULL`).
 #' @param seed Integer; random seed for KMeans reproducibility (default: `NULL`).
-#' @param k_neighbors Integer; HDBSCAN minimum cluster size. If `NULL`, Python default is used
+#' @param k_neighbors Integer; Leiden minimum cluster size. If `NULL`, Python default is used
 #'   (typically a function of the number of samples) (default: `NULL`).
-#' @param leiden_resolution Numeric; HDBSCAN cluster selection threshold (default: `0.25`).
+#' @param leiden_resolution Numeric; Leiden cluster selection threshold (default: `0.25`).
 #' @param metric Character; distance metric `"euclidean"` or `"cosine"` (default: `"euclidean"`).
 #' @param scale_features Logical; whether to standardize **feature columns** before clustering samples (default: `FALSE`).
-#' @param handle_noise Character; how to handle HDBSCAN noise points (`-1`):
+#' @param handle_noise Character; how to handle Leiden noise points (`-1`):
 #'   `"keep"` (each noise sample gets its own new cluster ID), `"separate"` (all noise samples share one new ID),
 #'   or `"merge"` (noise samples assigned to largest existing cluster) (default: `"keep"`).
 #'
 #' @return A list with:
 #' \itemize{
-#'   \item \code{clusters}: Integer vector of cluster assignments per **sample** (may include -1 for HDBSCAN noise).
-#'   \item \code{clusters_positive}: Integer vector with all labels non-negative after applying \code{handle_noise}.
+#'   \item \code{clusters}: Integer vector of cluster assignments per **sample**.
 #'   \item \code{silhouette_score}: Numeric silhouette score, or \code{NULL} if not computable.
-#'   \item \code{sample_names}: Character vector of sample names corresponding to \code{clusters}.
-#'   \item \code{n_samples}: Integer; number of samples (rows).
-#'   \item \code{n_clusters_found}: Integer; number of clusters found (excluding noise).
-#'   \item \code{n_clusters_final}: Integer; final number of clusters after noise handling.
-#'   \item \code{n_noise}: Integer; number of samples assigned to noise (HDBSCAN only).
-#'   \item \code{handle_noise}: The noise handling mode used.
+
 #' }
 #'
 #' @examples

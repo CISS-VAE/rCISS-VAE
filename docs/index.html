@@ -103,12 +103,33 @@ Additionally, CISS-VAE incorporates an iterative learning procedure, with a vali
 <h2 id="quickstart">Quickstart<a class="anchor" aria-label="anchor" href="#quickstart"></a>
 </h2>
 <p>The input dataset should be a <code>matrix</code> or <code>data.frame</code> and missing values should be represented with <code>NA</code> or <code>NaN</code>. Precomputed clusters should be passed as a numeric vector of length ‘n’ for an ‘n x p’ dataset. For more information on having <code><a href="reference/run_cissvae.html">run_cissvae()</a></code> handle the clustering see (vignette)[<a href="https://ciss-vae.github.io/rCISS-VAE/articles/vignette.html#clustering-features-by-missingness-patterns" class="uri">https://ciss-vae.github.io/rCISS-VAE/articles/vignette.html#clustering-features-by-missingness-patterns</a>].</p>
-<p>```{r} library(reticulate) library(rCISSVAE)</p>
-<p>data(df_missing) data(clusters)</p>
-<p>dat = run_cissvae( data = df_missing, index_col = “index”, val_proportion = 0.1, ## pass a vector for different proportions by cluster columns_ignore = c(“Age”, “Salary”, “ZipCode10001”, “ZipCode20002”, “ZipCode30003”), ## If there are columns in addition to the index you want to ignore when selecting validation set, list them here. In this case, we ignore the ‘demographic’ columns because we do not want to remove data from them for validation purposes. clusters = clusters$clusters, ## we have precomputed cluster labels so we pass them here epochs = 5, return_silhouettes = FALSE, return_history = TRUE, # Get detailed training history verbose = FALSE, return_model = TRUE, ## Allows for plotting model schematic device = “cpu”, # Explicit device selection layer_order_enc = c(“unshared”, “shared”, “unshared”), layer_order_dec = c(“shared”, “unshared”, “shared”), latent_shared = FALSE, output_shared = FALSE )</p>
-<p>plot_vae_architecture(model = dat$model) ```</p>
-<div class="float">
-<img src="test_plot_arch.png" alt="Architecture of Above Model"><div class="figcaption"><strong>Architecture of Above Model</strong></div>
+<pre class="{r}"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ciss-vae.github.io/rCISS-VAE">rCISSVAE</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">df_missing</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clusters</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">dat</span> <span class="op">=</span> <span class="fu"><a href="reference/run_cissvae.html">run_cissvae</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">df_missing</span>,</span>
+<span>  index_col <span class="op">=</span> <span class="st">"index"</span>,</span>
+<span>  val_proportion <span class="op">=</span> <span class="fl">0.1</span>, <span class="co">## pass a vector for different proportions by cluster</span></span>
+<span>  columns_ignore <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Age"</span>, <span class="st">"Salary"</span>, <span class="st">"ZipCode10001"</span>, <span class="st">"ZipCode20002"</span>, <span class="st">"ZipCode30003"</span><span class="op">)</span>, <span class="co">## If there are columns in addition to the index you want to ignore when selecting validation set, list them here. In this case, we ignore the 'demographic' columns because we do not want to remove data from them for validation purposes.</span></span>
+<span>  clusters <span class="op">=</span> <span class="va">clusters</span><span class="op">$</span><span class="va">clusters</span>, <span class="co">## we have precomputed cluster labels so we pass them here</span></span>
+<span>  epochs <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  return_silhouettes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  return_history <span class="op">=</span> <span class="cn">TRUE</span>,  <span class="co"># Get detailed training history</span></span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  return_model <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co">## Allows for plotting model schematic</span></span>
+<span>  device <span class="op">=</span> <span class="st">"cpu"</span>,  <span class="co"># Explicit device selection</span></span>
+<span>  layer_order_enc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"unshared"</span>, <span class="st">"shared"</span>, <span class="st">"unshared"</span><span class="op">)</span>,</span>
+<span>  layer_order_dec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shared"</span>, <span class="st">"unshared"</span>, <span class="st">"shared"</span><span class="op">)</span>,</span>
+<span>  latent_shared <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  output_shared <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/plot_vae_architecture.html">plot_vae_architecture</a></span><span class="op">(</span>model <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">model</span><span class="op">)</span></span></code></pre>
+<div class="figure">
+<img src="test_plot_arch.png" alt=""><p class="caption"><strong>Architecture of Above Model</strong></p>
 </div>
 <p>For a full tutorial, see <a href="https://ciss-vae.github.io/rCISS-VAE/articles/vignette.html">vignette</a>.</p>
 </div>

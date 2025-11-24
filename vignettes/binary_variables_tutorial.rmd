@@ -38,7 +38,7 @@ if (py_module_available("ciss_vae")) {
 }
 ```
 
-The [Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/) dataset has both continuous (bill_length, bill_depth, flipper_length, body_mass) and categorical (species, island, sex) values so it makes a good example for this. We can use the `dummy_cols()` function from the `fastDummies` package to create dummy variables for our categoricals. To avoid multicolinearity, we can remove the first dummy variable for each categorical by setting `remove_first_dummy = TRUE`. Set `ignore_na = TRUE` and `remove_selected_columns = TRUE` to avoid creating a new column for NA values and to remove the original categoricals once the dummies are created. 
+The [Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/) dataset has both continuous (bill_length, bill_depth, flipper_length, body_mass) and categorical (species, island, sex) values so it makes a good example for this. We can use the `dummy_cols()` function from the `fastDummies` package to create dummy variables for our categories. Set `ignore_na = TRUE` and `remove_selected_columns = TRUE` to avoid creating a new column for NA values and to remove the original categoricals once the dummies are created. 
 
 ```{r start}
 library(tidyverse)

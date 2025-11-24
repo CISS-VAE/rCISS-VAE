@@ -83,7 +83,7 @@ creating an Optuna Dashboard database.</p>
 <pre><code><span><span class="co">## ── <span style="font-weight: bold;">Attaching core tidyverse packages</span> ──────────────────────── tidyverse 2.0.0 ──</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">dplyr    </span> 1.1.4     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">readr    </span> 2.1.5</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">forcats  </span> 1.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">stringr  </span> 1.6.0</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">ggplot2  </span> 4.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tibble   </span> 3.3.0</span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">ggplot2  </span> 4.0.1     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tibble   </span> 3.3.0</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">lubridate</span> 1.9.3     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tidyr    </span> 1.3.1</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">purrr    </span> 1.2.0     </span></span>
 <span><span class="co">## ── <span style="font-weight: bold;">Conflicts</span> ────────────────────────────────────────── tidyverse_conflicts() ──</span></span>
@@ -144,7 +144,7 @@ creating an Optuna Dashboard database.</p>
 <span>  reset_lr_refit <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Starting Optuna optimization with 3 trials...</span></span>
-<span><span class="co">## Optimization complete. Best trial: 17 (Total Imputation Error: 11.381245)</span></span>
+<span><span class="co">## Optimization complete. Best trial: 23 (Total Imputation Error: 9.914013)</span></span>
 <span><span class="co">## Training final model with best parameters...</span></span>
 <span><span class="co">## Final model training complete.</span></span></code></pre>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -156,7 +156,7 @@ creating an Optuna Dashboard database.</p>
 <span></span>
 <span><span class="co"># View best hyperparameters</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Best validation MSE:"</span>, <span class="va">study</span><span class="op">$</span><span class="va">best_value</span>, <span class="st">"\n"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Best validation MSE: 11.38124</span></span></code></pre>
+<pre><code><span><span class="co">## Best validation MSE: 9.914013</span></span></code></pre>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Trial results:"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "Trial results:"</span></span></code></pre>
@@ -288,7 +288,7 @@ NA
 1
 </td>
 <td style="text-align:right;">
-16.93886
+16.938858
 </td>
 <td style="text-align:right;">
 2
@@ -347,7 +347,7 @@ S,S
 2
 </td>
 <td style="text-align:right;">
-22.51319
+22.513189
 </td>
 <td style="text-align:right;">
 5
@@ -406,7 +406,7 @@ S,U,S,S,U
 3
 </td>
 <td style="text-align:right;">
-22.72697
+22.726973
 </td>
 <td style="text-align:right;">
 5
@@ -465,7 +465,7 @@ S,S,S,U,U
 4
 </td>
 <td style="text-align:right;">
-23.87685
+23.876852
 </td>
 <td style="text-align:right;">
 5
@@ -524,7 +524,7 @@ U,U,U,U,U
 5
 </td>
 <td style="text-align:right;">
-27.18307
+27.183075
 </td>
 <td style="text-align:right;">
 5
@@ -583,7 +583,7 @@ S,S,S,U,U
 6
 </td>
 <td style="text-align:right;">
-11.89758
+11.897576
 </td>
 <td style="text-align:right;">
 2
@@ -642,7 +642,7 @@ S,S
 7
 </td>
 <td style="text-align:right;">
-24.16442
+24.164423
 </td>
 <td style="text-align:right;">
 2
@@ -701,7 +701,7 @@ U,S
 8
 </td>
 <td style="text-align:right;">
-61.75721
+61.757214
 </td>
 <td style="text-align:right;">
 5
@@ -760,7 +760,7 @@ S,U,S,U,S
 9
 </td>
 <td style="text-align:right;">
-155.04739
+155.047394
 </td>
 <td style="text-align:right;">
 5
@@ -819,7 +819,7 @@ U,U,U,U,U
 10
 </td>
 <td style="text-align:right;">
-21.66846
+21.668463
 </td>
 <td style="text-align:right;">
 2
@@ -878,7 +878,7 @@ S,S
 11
 </td>
 <td style="text-align:right;">
-311.36960
+311.369598
 </td>
 <td style="text-align:right;">
 2
@@ -937,7 +937,7 @@ S,S
 12
 </td>
 <td style="text-align:right;">
-11.51484
+11.514836
 </td>
 <td style="text-align:right;">
 2
@@ -996,7 +996,7 @@ S,S
 13
 </td>
 <td style="text-align:right;">
-13.52321
+13.523214
 </td>
 <td style="text-align:right;">
 2
@@ -1055,7 +1055,7 @@ S,S
 14
 </td>
 <td style="text-align:right;">
-17.68553
+17.685528
 </td>
 <td style="text-align:right;">
 2
@@ -1114,7 +1114,7 @@ S,S
 15
 </td>
 <td style="text-align:right;">
-59.42603
+59.426025
 </td>
 <td style="text-align:right;">
 2
@@ -1173,7 +1173,7 @@ S,S
 16
 </td>
 <td style="text-align:right;">
-37.65752
+37.657520
 </td>
 <td style="text-align:right;">
 2
@@ -1232,7 +1232,7 @@ U,S
 17
 </td>
 <td style="text-align:right;">
-11.38124
+11.381245
 </td>
 <td style="text-align:right;">
 2
@@ -1291,7 +1291,7 @@ S,S
 18
 </td>
 <td style="text-align:right;">
-11.56764
+11.567643
 </td>
 <td style="text-align:right;">
 2
@@ -1350,7 +1350,7 @@ S,S
 19
 </td>
 <td style="text-align:right;">
-218.53053
+218.530533
 </td>
 <td style="text-align:right;">
 2
@@ -1409,7 +1409,7 @@ S,S
 20
 </td>
 <td style="text-align:right;">
-12.27380
+12.273798
 </td>
 <td style="text-align:right;">
 2
@@ -1468,7 +1468,7 @@ S,U
 21
 </td>
 <td style="text-align:right;">
-12.10577
+12.105775
 </td>
 <td style="text-align:right;">
 2
@@ -1520,6 +1520,360 @@ U,U
 </td>
 <td style="text-align:left;">
 U,U
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+10.204748
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+at_end
+</td>
+<td style="text-align:left;">
+at_start
+</td>
+<td style="text-align:left;">
+NaN
+</td>
+<td style="text-align:left;">
+U,U
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+23
+</td>
+<td style="text-align:right;">
+9.914013
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+at_end
+</td>
+<td style="text-align:left;">
+at_start
+</td>
+<td style="text-align:left;">
+NaN
+</td>
+<td style="text-align:left;">
+U,U
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+24
+</td>
+<td style="text-align:right;">
+10.324838
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+at_end
+</td>
+<td style="text-align:left;">
+at_start
+</td>
+<td style="text-align:left;">
+NaN
+</td>
+<td style="text-align:left;">
+U,U
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+11.707946
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+at_end
+</td>
+<td style="text-align:left;">
+at_start
+</td>
+<td style="text-align:left;">
+NaN
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+26
+</td>
+<td style="text-align:right;">
+10.325308
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+1000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+at_end
+</td>
+<td style="text-align:left;">
+at_start
+</td>
+<td style="text-align:left;">
+NaN
+</td>
+<td style="text-align:left;">
+U,U
+</td>
+<td style="text-align:left;">
+S,S
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:right;">
+95.892349
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+512
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:right;">
+4000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+at_end
+</td>
+<td style="text-align:left;">
+at_start
+</td>
+<td style="text-align:left;">
+NaN
+</td>
+<td style="text-align:left;">
+U,U
+</td>
+<td style="text-align:left;">
+S,S
 </td>
 </tr>
 </tbody>

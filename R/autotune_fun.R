@@ -4,8 +4,7 @@ library(dplyr)
 library(purrr)
 #' Autotune CISS-VAE hyperparameters with Optuna
 #' 
-#' Performs hyperparameter optimization for CISS-VAE using Optuna, with support for
-#' Rich progress bars and flexible layer arrangement strategies.
+#' Performs hyperparameter optimization for CISS-VAE using Optuna with support for both tunable and fixed parameters. 
 #' 
 #' @param data Data frame or matrix containing the input data
 #' @param index_col String name of index column to preserve (optional)

@@ -41,7 +41,7 @@
 #' Cluster assignments based on missingness patterns
 #'
 #' A tibble assigning each observation in `df_missing`/`df_complete` to a cluster
-#' determined by its missingness pattern.  Useful for stratifying downstream analyses.
+#' determined by its missingness pattern. 
 #'
 #' @docType data
 #' @format A tibble with *8000* rows and 2 variables:
@@ -58,7 +58,7 @@
 
 #' Example dni matrix for demo of imputable_matrix
 #'
-#' A sample imputable_matrix (dataframe)
+#' A sample imputable_matrix (dataframe).
 #'
 #' @docType data
 #' @format A dataframe:

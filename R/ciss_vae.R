@@ -1,7 +1,7 @@
 #' Run the CISS-VAE pipeline for missing data imputation
 #'
 #' @description
-#' This function wraps the Python `run_cissvae` function from the `ciss_vae` module,
+#' This function wraps the Python `run_cissvae` function from the `ciss_vae` package,
 #' providing a complete pipeline for missing data imputation using a Cluster-Informed
 #' Shared and Specific Variational Autoencoder (CISS-VAE). The function handles data
 #' preprocessing, model training, and returns imputed data along with optional
@@ -252,7 +252,7 @@ run_cissvae <- function(
   ## preserve raw data
   data_raw = as.data.frame(data)
 
-  ## step 0.5: make everything numeric double; keep NaN for missing
+  ## step 0.5: make everything numeric double; keep NaN for missing -> avoids sentinel vals
   to_numeric_matrix <- function(df, debug) {
   df <- as.data.frame(df)
   # convert factor/character/logical/integer to numeric (double)

@@ -50,8 +50,11 @@ performance_by_cluster <- function(
 ) {
   val_data    <- res$val_data
   val_imputed <- res$val_imputed
+
+  ## If clsuters not passed, take clusters from res
   if (is.null(clusters)) clusters <- res$clusters
 
+  ## make checks
   if (!is.data.frame(val_data) || !is.data.frame(val_imputed))
     stop("`val_data` and `val_imputed` must both be data.frames.")
   if (nrow(val_data) != nrow(val_imputed))
@@ -62,7 +65,7 @@ performance_by_cluster <- function(
   has_group <- !is.null(group_col) && group_col %in% names(val_data)
   if (!has_group) by_group <- FALSE
 
-  # Determine features
+  ## Determine features
   if (is.null(feature_cols)) {
     num_cols <- names(val_data)[vapply(val_data, is.numeric, logical(1))]
     ignores  <- unique(c(cols_ignore, group_col))
@@ -72,7 +75,7 @@ performance_by_cluster <- function(
   if (length(feature_cols) == 0L)
     stop("No feature columns available to score.")
 
-  # Ensure binary_features subset of feature_cols
+  ## Ensure binary_features subset of feature_cols
   if (!all(binary_features %in% feature_cols))
     stop("`binary_features` must be a subset of `feature_cols`.")
 
@@ -80,11 +83,11 @@ performance_by_cluster <- function(
   pred_sub <- val_imputed[, feature_cols, drop = FALSE]
   used_mask <- !is.na(val_sub)
 
-  # Squared error matrix
+  ## Squared error matrix for MSE
   se_mat <- (as.matrix(pred_sub) - as.matrix(val_sub))^2
   se_mat[!used_mask] <- NA_real_
 
-  # Binary cross‐entropy for binary features -- assumes that yhat is prbabilty
+  ## Binary cross‐entropy for binary features -- assumes that yhat is prbabilty
   bce_mat <- matrix(NA_real_, nrow = nrow(val_sub), ncol = ncol(val_sub))
   if (length(binary_features) > 0) {
     idx <- which(colnames(val_sub) %in% binary_features)
@@ -98,7 +101,7 @@ performance_by_cluster <- function(
     bce_mat[!used_mask] <- NA_real_
   }
 
-  # Long format
+  ## Long format
   df_long <- data.frame(
     row     = rep(seq_len(nrow(val_sub)), times = ncol(val_sub)),
     feature = rep(feature_cols, each = nrow(val_sub)),
@@ -115,6 +118,7 @@ performance_by_cluster <- function(
   df_long$metric_value <- ifelse(df_long$type == "binary", df_long$bce, df_long$se)
   df_long <- df_long[, c("row", "feature", "cluster", "type", if (has_group) "group", "metric_value")]
 
+  ## make safe aggrigation
   .safe_aggs <- function(data, keys) {
     m <- stats::aggregate(metric_value ~ ., data = data[, c(keys, "metric_value")], FUN = mean)
     n <- stats::aggregate(metric_value ~ ., data = data[, c(keys, "metric_value")], FUN = length)

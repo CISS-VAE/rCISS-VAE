@@ -3,7 +3,7 @@
 \docType{data}
 \name{mock_surv}
 \alias{mock_surv}
-\title{Example survival data for demo of do_not_impute_matrix}
+\title{Example survival data for demo of imputable_matrix}
 \format{
 A dataframe:
 \describe{

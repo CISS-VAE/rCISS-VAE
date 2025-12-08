@@ -10,6 +10,8 @@ run_cissvae(
   val_proportion = 0.1,
   replacement_value = 0,
   columns_ignore = NULL,
+  imputable_matrix = NULL,
+  binary_feature_mask = NULL,
   print_dataset = TRUE,
   clusters = NULL,
   n_clusters = NULL,
@@ -29,6 +31,7 @@ run_cissvae(
   epochs = 500,
   initial_lr = 0.01,
   decay_factor = 0.999,
+  weight_decay = 0.001,
   beta = 0.001,
   device = NULL,
   max_loops = 100,
@@ -43,7 +46,7 @@ run_cissvae(
   return_silhouettes = FALSE,
   return_history = FALSE,
   return_dataset = FALSE,
-  do_not_impute_matrix = NULL,
+  return_validation_dataset = FALSE,
   debug = FALSE
 )
 }
@@ -71,7 +74,7 @@ labels for samples. If \code{NULL}, clustering will be performed automatically. 
 
 \item{n_clusters}{Integer. Number of clusters for KMeans clustering when \code{clusters}
 is \code{NULL}. Number of clusters for KMeans clustering when 'clusters' is NULL. If \code{NULL},
-will use \href{https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html}{HDBSCAN} for clustering.
+will use \href{https://leidenalg.readthedocs.io/en/stable/intro.html}{Leiden} for clustering.
 Default \code{NULL}.}
 
 \item{seed}{Integer. Random seed for reproducible results. Default \code{42}.}
@@ -82,6 +85,12 @@ these proportions. Default \code{NULL}.}
 
 \item{scale_features}{Logical. Whether to scale features when using missingness
 proportion matrix clustering. Default \code{FALSE}.}
+
+\item{k_neighbors}{Integer. Number of nearest neighbors for Leiden clustering. Defaults to 15.}
+
+\item{leiden_resolution}{Float. Resolution parameter for Leiden clustering. Defaults to 0.5.}
+
+\item{leiden_objective}{Character. Objective function for Leiden clustering. One of {"CPM", "RB", "Modularity"}}
 
 \item{hidden_dims}{Integer vector. Sizes of hidden layers in encoder/decoder.
 Length determines number of hidden layers. Default \code{c(150, 120, 60)}.}
@@ -150,9 +159,6 @@ containing loss values and metrics over epochs. Default \code{FALSE}.}
 
 \item{return_dataset}{Logical. If \code{TRUE}, returns the ClusterDataset object used
 during training (contains validation data, masks, etc.). Default \code{FALSE}.}
-
-\item{cluster_selection_epsilon}{Numeric. Epsilon parameter for HDBSCAN clustering
-when automatic clustering is used. Default \code{0.25}.}
 }
 \value{
 A list containing imputed data and optional additional outputs:
@@ -172,7 +178,7 @@ history with columns for epoch, losses, and validation metrics.}
 }
 }
 \description{
-This function wraps the Python \code{run_cissvae} function from the \code{ciss_vae} module,
+This function wraps the Python \code{run_cissvae} function from the \code{ciss_vae} package,
 providing a complete pipeline for missing data imputation using a Cluster-Informed
 Shared and Specific Variational Autoencoder (CISS-VAE). The function handles data
 preprocessing, model training, and returns imputed data along with optional
@@ -200,21 +206,38 @@ The architecture uses both shared and cluster-specific layers to capture:
 \section{Requirements}{
 
 This function requires the Python \code{ciss_vae} package to be installed and
-accessible via \code{reticulate}. The package handles automatic device selection
-(CPU/GPU) based on availability.
+accessible via \code{reticulate}.
 }
 
 \section{Performance Tips}{
 
 \itemize{
-\item Use GPU computation when available for faster training on large datasets
-\item Adjust \code{batch_size} based on available memory (larger = faster but more memory)
-\item Start with default hyperparameters and adjust based on validation performance
-\item Use \code{verbose=TRUE} to monitor training progress on large datasets
+\item If leiden clustering yields too many clusters, consider increasing \code{k_neighbors} or reducing \verb{leiden_resolution`` \\item Use GPU computation when available for faster training on large datasets. Use }rCISSVAE::check_devices()\verb{to see what devices are available. \\item Adjust}batch_size\verb{based on available memory (larger = faster but more memory) \\item Use}verbose=TRUE` to monitor training progress
 }
 }
 
 \examples{
+library(reticulate)
+library(rCISSVAE)
+
+data(df_missing)
+data(clusters)
+
+dat = run_cissvae(
+  data = df_missing,
+  index_col = "index",
+  val_proportion = 0.1, ## pass a vector for different proportions by cluster
+  columns_ignore = c("Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"), ## If there are columns in addition to the index you want to ignore when selecting validation set, list them here. In this case, we ignore the 'demographic' columns because we do not want to remove data from them for validation purposes. 
+  clusters = clusters$clusters, ## we have precomputed cluster labels so we pass them here
+  epochs = 5,
+  return_silhouettes = FALSE,
+  return_history = TRUE,  # Get detailed training history
+  verbose = FALSE,
+  return_model = TRUE, ## Allows for plotting model schematic
+  device = "cpu",  # Explicit device selection
+  layer_order_enc = c("unshared", "shared", "unshared"),
+  layer_order_dec = c("shared", "unshared", "shared")
+)
 \dontrun{
 # Basic usage with automatic clustering
 result <- run_cissvae(

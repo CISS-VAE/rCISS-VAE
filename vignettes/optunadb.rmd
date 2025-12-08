@@ -1,5 +1,6 @@
 ---
 title: "Using Optuna Dashboard with rCISSVAE"
+date: "`r format(Sys.Date(), '%Y-%m-%d')`"
 output: 
   rmarkdown::html_vignette:
     toc: true
@@ -24,7 +25,7 @@ If you are using [Positron](https://positron.posit.co/welcome.html) as your IDE,
 The `autotune_cissvae()` function has an option for creating an Optuna Dashboard database. 
 
 **In R:**  
-```{r run_autotune}
+```{r run_autotune, eval=FALSE}
 library(tidyverse)
 library(reticulate)
 library(rCISSVAE)
@@ -76,14 +77,25 @@ aut <- autotune_cissvae(
 # Analyze results
 imputed <- aut$imputed
 best_model <- aut$model
-study <- aut$study
 results <- aut$results
 
 # View best hyperparameters
-cat("Best validation MSE:", study$best_value, "\n")
 print("Trial results:")
 results %>% kable() %>%
   kable_styling(font_size=12)
+
+```
+
+```{r showres, echo=FALSE}
+aut = readRDS(system.file("extdata", "autotune.rds", package = "rCISSVAE"))
+
+imputed <- aut$imputed
+best_model <- aut$model
+results <- aut$results
+
+print("Trial results:")
+results %>% kableExtra::kable() %>%
+  kableExtra::kable_styling(font_size=12)
 
 ```
 

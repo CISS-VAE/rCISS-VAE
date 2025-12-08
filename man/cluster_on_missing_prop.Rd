@@ -8,51 +8,45 @@ cluster_on_missing_prop(
   prop_matrix,
   n_clusters = NULL,
   seed = NULL,
-  min_cluster_size = NULL,
-  cluster_selection_epsilon = 0.25,
+  k_neighbors = NULL,
+  leiden_resolution = 0.25,
+  use_snn = TRUE,
+  leiden_objective = "CPM",
   metric = "euclidean",
-  scale_features = FALSE,
-  handle_noise = "keep"
+  scale_features = FALSE
 )
 }
 \arguments{
 \item{prop_matrix}{Matrix or data frame where \strong{rows are samples} and \strong{columns are features},
 entries are missingness proportions in \verb{[0,1]}. Can be created with \code{create_missingness_prop_matrix()}.}
 
-\item{n_clusters}{Integer; number of clusters for KMeans. If \code{NULL}, uses HDBSCAN (default: \code{NULL}).}
+\item{n_clusters}{Integer; number of clusters for KMeans. If \code{NULL}, uses Leiden (default: \code{NULL}).}
 
 \item{seed}{Integer; random seed for KMeans reproducibility (default: \code{NULL}).}
 
-\item{min_cluster_size}{Integer; HDBSCAN minimum cluster size. If \code{NULL}, Python default is used
+\item{k_neighbors}{Integer; Leiden minimum cluster size. If \code{NULL}, Python default is used
 (typically a function of the number of samples) (default: \code{NULL}).}
 
-\item{cluster_selection_epsilon}{Numeric; HDBSCAN cluster selection threshold (default: \code{0.25}).}
+\item{leiden_resolution}{Numeric; Leiden cluster selection threshold (default: \code{0.25}).}
 
 \item{metric}{Character; distance metric \code{"euclidean"} or \code{"cosine"} (default: \code{"euclidean"}).}
 
 \item{scale_features}{Logical; whether to standardize \strong{feature columns} before clustering samples (default: \code{FALSE}).}
 
-\item{handle_noise}{Character; how to handle HDBSCAN noise points (\code{-1}):
+\item{handle_noise}{Character; how to handle Leiden noise points (\code{-1}):
 \code{"keep"} (each noise sample gets its own new cluster ID), \code{"separate"} (all noise samples share one new ID),
 or \code{"merge"} (noise samples assigned to largest existing cluster) (default: \code{"keep"}).}
 }
 \value{
 A list with:
 \itemize{
-\item \code{clusters}: Integer vector of cluster assignments per \strong{sample} (may include -1 for HDBSCAN noise).
-\item \code{clusters_positive}: Integer vector with all labels non-negative after applying \code{handle_noise}.
+\item \code{clusters}: Integer vector of cluster assignments per \strong{sample}.
 \item \code{silhouette_score}: Numeric silhouette score, or \code{NULL} if not computable.
-\item \code{sample_names}: Character vector of sample names corresponding to \code{clusters}.
-\item \code{n_samples}: Integer; number of samples (rows).
-\item \code{n_clusters_found}: Integer; number of clusters found (excluding noise).
-\item \code{n_clusters_final}: Integer; final number of clusters after noise handling.
-\item \code{n_noise}: Integer; number of samples assigned to noise (HDBSCAN only).
-\item \code{handle_noise}: The noise handling mode used.
 }
 }
 \description{
 Groups \strong{samples} with similar patterns of missingness across features using either
-K-means clustering (when \code{n_clusters} is specified) or HDBSCAN (when \code{n_clusters} is \code{NULL}).
+K-means clustering (when \code{n_clusters} is specified) or Leiden (when \code{n_clusters} is \code{NULL}).
 This is useful for detecting cohorts with shared missing-data behavior (e.g., site/batch effects).
 }
 \examples{

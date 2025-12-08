@@ -1,0 +1,3251 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.555">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2025-12-08">
+
+<title>rCISSVAE Vignette</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="vignette_files/libs/clipboard/clipboard.min.js"></script>
+<script src="vignette_files/libs/quarto-html/quarto.js"></script>
+<script src="vignette_files/libs/quarto-html/popper.min.js"></script>
+<script src="vignette_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="vignette_files/libs/quarto-html/anchor.min.js"></script>
+<link href="vignette_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="vignette_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="vignette_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="vignette_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="vignette_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="vignette_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="vignette_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">rCISSVAE Vignette</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">December 8, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="installing-package" class="level2">
+<h2 class="anchored" data-anchor-id="installing-package">Installing package</h2>
+<p>Install devtools or remotes if not already installed:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"remotes"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># or</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"devtools"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The rCISSVAE package can be installed with:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"CISS-VAE/rCISS-VAE"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># or</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"CISS-VAE/rCISS-VAE"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="ensuring-correct-virtual-environment-for-reticulate" class="level2">
+<h2 class="anchored" data-anchor-id="ensuring-correct-virtual-environment-for-reticulate">Ensuring correct virtual environment for reticulate</h2>
+<p>This package uses <code>reticulate</code> to interface with the python version of the package <code>cissvae</code>. Therefore, it is necessary to make sure that you have a venv or conda environment set up that has the <code>cissvae</code> package installed. If you are comfortable creating an environment and installing the package, great! Then all you need to do is tell reticulate where to point.</p>
+<p><strong>For Venv</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">use_virtualenv</span>(<span class="st">"./.venv"</span>, <span class="at">required =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>For conda</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">use_condaenv</span>(<span class="st">"myenv"</span>, <span class="at">required =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="virtual-environment-helper-function" class="level3">
+<h3 class="anchored" data-anchor-id="virtual-environment-helper-function">Virtual environment helper function</h3>
+<p>If you do not want to manually create the virtual environment, you can use the helper function <code>create_cissvae_env()</code> to create a virtual environment (venv) in your current working directory.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">create_cissvae_env</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">envname =</span> <span class="st">"cissvae_environment"</span>, <span class="do">## name of environment</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> <span class="cn">NULL</span>, <span class="do">## add path to wherever you want virtual environment to be</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">install_python =</span> <span class="cn">FALSE</span>, <span class="do">## set to TRUE if you want create_cisssvae_env to install python for you</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">python_version =</span> <span class="st">"3.10"</span> <span class="do">## set to whatever version you want &gt;=3.10. Python 3.10 or 3.11 recommended</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Note:</strong> If you run into issues with create_cissvae_env(), you can create the virtual environment manually by following this <a href="virtual_environment_tutorial.html">tutorial</a></p>
+</blockquote>
+<p>Once the environment is created, activate it using:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">use_virtualenv</span>(<span class="st">"./cissvae_environment"</span>, <span class="at">required =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># If you used a non-default environment name then,</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># reticulate::use_virtualenv("./your_environment_name", required = TRUE)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="optional-installing-other-python-packages" class="level3">
+<h3 class="anchored" data-anchor-id="optional-installing-other-python-packages">(optional) Installing other python packages</h3>
+<p>If you want to install other python packages (eg seaborn) to your environment, you can use <a href="https://rstudio.github.io/reticulate/reference/virtualenv-tools.html"><code>reticulate::virtualenv_install()</code></a>.</p>
+</section>
+<section id="optional-use-check_devices-to-see-available-gpu-devices" class="level3">
+<h3 class="anchored" data-anchor-id="optional-use-check_devices-to-see-available-gpu-devices">(optional) Use <code>check_devices()</code> to see available gpu devices</h3>
+<p>Use <code>check_devices()</code> to see what cpu/gpu devices are available for model training. Optionally pass the path to your virtual environment using the parameter <code>env_path</code> to make sure that the correct environment is activated.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>rCISSVAE<span class="sc">::</span><span class="fu">check_devices</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<pre><code>Available Devices:
+  • cpu  (Main system processor) 
+
+[1] "cpu"</code></pre>
+</section>
+</section>
+<section id="quickstart" class="level1">
+<h1>Quickstart</h1>
+<p>Once reticulate is pointing to the virtual environment containing the <code>ciss_vae</code> python package, you can either use the <code>run_cissvae</code> function or the <code>autotune_cissvae</code> function. For details on using the CISSVAE model with binary/categorical values see <a href="https://ciss-vae.github.io/rCISS-VAE/articles/binary_variables_tutorial.html">binary variables tutorial</a>.</p>
+<p>If you know what hyperparameters you want to use for the model, use the <code>run_cissvae</code> function.</p>
+<section id="run-cissvae-with-training-history-and-progress-tracking" class="level2">
+<h2 class="anchored" data-anchor-id="run-cissvae-with-training-history-and-progress-tracking">Run CISSVAE with Training History and Progress Tracking</h2>
+<p>Your data should be in a <code>DataFrame</code> format with optional index column. If you already have clusters you want to use, they should be in a separate vector from the dataframe. If you do not have clusters to begin with, set ‘clusters’ in <code>run_cissvae()</code> to NULL.</p>
+<section id="example-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="example-dataset">Example Dataset</h3>
+<p>With the rCISSVAE package comes a sample dataset with predetermined clusters. We will use this for the sake of the tutorial.</p>
+<p>The dataset, <code>df_missing</code> contains an index column as well as the following:</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table caption-top table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">**Characteristic**</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">**N = 8,000**</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Age</td>
+<td style="text-align: left;">9.99 (8.73, 11.44)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Salary</td>
+<td style="text-align: left;">5.70 (5.34, 6.17)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ZipCode10001</td>
+<td style="text-align: left;">2,628 (33%)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ZipCode20002</td>
+<td style="text-align: left;">2,697 (34%)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ZipCode30003</td>
+<td style="text-align: left;">2,675 (33%)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y11</td>
+<td style="text-align: left;">0 (-11, 7)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">3,122</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y12</td>
+<td style="text-align: left;">49 (-22, 58)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">3,118</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y13</td>
+<td style="text-align: left;">72 (-17, 95)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">3,110</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y14</td>
+<td style="text-align: left;">69 (-12, 119)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">3,129</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y15</td>
+<td style="text-align: left;">72 (-12, 134)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">3,141</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y21</td>
+<td style="text-align: left;">-9 (-22, 0)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">3,135</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y22</td>
+<td style="text-align: left;">47 (-35, 58)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">3,094</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y23</td>
+<td style="text-align: left;">74 (-29, 100)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">3,098</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y24</td>
+<td style="text-align: left;">71 (-22, 128)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">3,146</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y25</td>
+<td style="text-align: left;">73 (-22, 145)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">3,106</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y31</td>
+<td style="text-align: left;">0 (-14, 11)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">2,067</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y32</td>
+<td style="text-align: left;">59 (-17, 69)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">2,056</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y33</td>
+<td style="text-align: left;">81 (-13, 101)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">2,013</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y34</td>
+<td style="text-align: left;">79 (-6, 124)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">2,051</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y35</td>
+<td style="text-align: left;">81 (-6, 139)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">2,054</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y41</td>
+<td style="text-align: left;">0 (-6, 5)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">2,032</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y42</td>
+<td style="text-align: left;">27 (-8, 32)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">2,022</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y43</td>
+<td style="text-align: left;">37 (-5, 46)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">2,013</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y44</td>
+<td style="text-align: left;">36 (-3, 56)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">2,023</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y45</td>
+<td style="text-align: left;">37 (-3, 63)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">2,086</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y51</td>
+<td style="text-align: left;">1.8 (-3.6, 5.8)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">2,077</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y52</td>
+<td style="text-align: left;">25 (-5, 29)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">2,034</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y53</td>
+<td style="text-align: left;">34 (-3, 41)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">1,976</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y54</td>
+<td style="text-align: left;">33 (-1, 50)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">2,047</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y55</td>
+<td style="text-align: left;">34 (-1, 56)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: left;">2,050</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<p>Age, Salary and ZipCode columns represent demographic data with no missingness and columns Y1t-Y5t represent biomarker data obtained at different timepoints t.</p>
+</section>
+<section id="explanation-of-run_cissvae-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="explanation-of-run_cissvae-parameters">Explanation of <code>run_cissvae()</code> Parameters</h3>
+<p>The <code>run_cissvae()</code> function is a comprehensive wrapper for all basic steps in running the CISS-VAE model, including dataset preparation, optional clustering, and running the imputation model.</p>
+<details>
+<summary>
+Click for a detailed explanation of all parameters
+</summary>
+<p><strong>Dataset Parameters</strong> - data: A <code>DataFrame</code> containing the dataset to be imputed. Contains optional index column.<br>
+- index_col: Name of index column to be preserved when imputing. Index column will not have any values held out for validation<br>
+- val_proportion: Fraction of non-missing entries to hold out for validation during training. To use different proportions for each cluster, pass a vector.<br>
+- replacement_value: Fill value for masked entries during training. Default is 0.0.<br>
+- columns_ignore: Character or integer vector containing columns to exclude when selecting validation data. These columns will be used during training. - print_dataset: Set <code>TRUE</code> to print dataset summary information during processing.</p>
+<p><strong>Clustering Parameters (optional)</strong><br>
+- clusters: Vector of one cluster label per row of ‘data’ dataframe. If NULL, will automatically determine clusters using Leiden Clustering or <a href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html">KMeans</a>.<br>
+- n_clusters: Number of clusters for KMeans clustering when ‘clusters’ is NULL. If n_clusters is NULL, will use Leiden Clustering for clustering.<br>
+- leiden_resolution: Resolution parameter for Leiden clustering. Defaults to 0.5. - k_neighbors: Number of nearest neighbors for the Leiden KNN graph construction. Defaults to 15. - leiden_objective: Objective function for Leiden clustering. One of {“CPM”, “RB”, “Modularity”}. Defaults to “CPM”. - missingness_proportion_matrix: Optional pre-computed missingness proportion matrix for feature-based clustering. If provided, clustering will be based on these proportions instead of direct 0/1 missingness pattern.<br>
+- scale_features: Set <code>TRUE</code> to scale features when using missingness proportion matrix clustering.</p>
+<p><strong>Model Parameters</strong><br>
+- hidden_dims: A vector containing the sizes of hidden layers in encoder/decoder. The length of this vector determines number of hidden layers.<br>
+- latent_dim: The dimension of the latent space representation.<br>
+- layer_order_enc: A vector stating the pattern of ‘shared’ and ‘unshared’ layers for the encoder. The length must match <code>length(hidden_dims)</code>. Default c(‘unshared’, ‘unshared’, ‘unshared’).<br>
+- layer_order_dec: A vector stating the pattern of ‘shared’ and ‘unshared’ layers for the decoder. The length must match <code>length(hidden_dims)</code>. Default c(‘shared’, ‘shared’, ‘shared’).<br>
+- latent_shared: Whether latent space weights are shared across clusters. If FALSE, will have separate latent weights for each cluster.<br>
+- ouput_shared: If FALSE, will have separate output layer for each cluster.<br>
+- batch_size: Integer. Mini-batch size for training. Larger values may improve training stability but require more memory.<br>
+- return_model: If TRUE, returns the model object. Set TRUE to use <code>plot_vae_architecture()</code> after running.<br>
+- epochs: Number of epochs for initial training phase<br>
+- initial_lr: Initial learning rate for optimizer.<br>
+- decay_factor: Exponential decay factor for learning rate.<br>
+- beta: Weight for KL divergence term in VAE loss function.<br>
+- device: Device specification for computation (“cpu” or “cuda”). If NULL, automatically selects best available device.<br>
+- max-loops: Max number of impute-refit loops to perform.<br>
+- patience: Training stops if validation loss doesn’t improve for this many consecutive impute-refit loops.<br>
+- epochs-per-loop: Number of epochs per refit loop. If null, uses same value as <code>epochs</code>. Default NULL.<br>
+- decay_factor_refit: Decay factor for refit loops. If NULL, uses same value as decay_factor. Default NULL.<br>
+- beta_refit: KL weight for refit loops. If NULL, uses same value as beta. Default NULL.</p>
+<p><strong>Optional Parameters</strong><br>
+- verbose: Set <code>TRUE</code> to print MSE for each loop as it runs. - return_silhouettes: If clusters not given, will return silhouette scores for automatic clustering. - return_history: If <code>TRUE</code>, returns training history as data.frame. Good for checking for overfitting. - return_dataset: If <code>TRUE</code>, returns ClusterDataset object.</p>
+</details>
+</section>
+<section id="running-the-imputation" class="level3">
+<h3 class="anchored" data-anchor-id="running-the-imputation">Running the imputation</h3>
+<p>To run the imputation model, first load your data. You can use the <code>cluster_summary()</code> function to visualize the missingness by cluster. The <code>cluster_summary()</code> function builds off of {<a href="https://www.danieldsjoberg.com/gtsummary/index.html">gtsummary</a>}.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(tidyverse)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(reticulate)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(rCISSVAE)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(gtsummary)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Set correct virtualenv</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">use_virtualenv</span>(<span class="st">"./cissvae_environment"</span>, <span class="at">required =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Load the data</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(df_missing)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(clusters) <span class="do">## actual cluster labels in clusters$clusters (other column is index)</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="fu">cluster_summary</span>(</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_missing, </span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">clusters =</span> clusters<span class="sc">$</span>clusters, </span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">include =</span><span class="fu">setdiff</span>(<span class="fu">names</span>(df_missing), <span class="st">"index"</span>),</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">statistic =</span> <span class="fu">list</span>(</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">all_continuous</span>() <span class="sc">~</span> <span class="st">"{mean} ({sd})"</span>,</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">all_categorical</span>() <span class="sc">~</span> <span class="st">"{n} / {N}</span><span class="sc">\n</span><span class="st"> ({p}%)"</span>), </span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">missing =</span> <span class="st">"always"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="ihdyyotyfi" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#ihdyyotyfi table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#ihdyyotyfi thead, #ihdyyotyfi tbody, #ihdyyotyfi tfoot, #ihdyyotyfi tr, #ihdyyotyfi td, #ihdyyotyfi th {
+  border-style: none;
+}
+
+#ihdyyotyfi p {
+  margin: 0;
+  padding: 0;
+}
+
+#ihdyyotyfi .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#ihdyyotyfi .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#ihdyyotyfi .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#ihdyyotyfi .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#ihdyyotyfi .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ihdyyotyfi .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ihdyyotyfi .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ihdyyotyfi .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#ihdyyotyfi .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#ihdyyotyfi .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#ihdyyotyfi .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#ihdyyotyfi .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#ihdyyotyfi .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#ihdyyotyfi .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#ihdyyotyfi .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ihdyyotyfi .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ihdyyotyfi .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ihdyyotyfi .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#ihdyyotyfi .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ihdyyotyfi .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#ihdyyotyfi .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#ihdyyotyfi .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#ihdyyotyfi .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ihdyyotyfi .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#ihdyyotyfi .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#ihdyyotyfi .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ihdyyotyfi .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ihdyyotyfi .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#ihdyyotyfi .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ihdyyotyfi .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#ihdyyotyfi .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ihdyyotyfi .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ihdyyotyfi .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ihdyyotyfi .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ihdyyotyfi .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ihdyyotyfi .gt_left {
+  text-align: left;
+}
+
+#ihdyyotyfi .gt_center {
+  text-align: center;
+}
+
+#ihdyyotyfi .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#ihdyyotyfi .gt_font_normal {
+  font-weight: normal;
+}
+
+#ihdyyotyfi .gt_font_bold {
+  font-weight: bold;
+}
+
+#ihdyyotyfi .gt_font_italic {
+  font-style: italic;
+}
+
+#ihdyyotyfi .gt_super {
+  font-size: 65%;
+}
+
+#ihdyyotyfi .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#ihdyyotyfi .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#ihdyyotyfi .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#ihdyyotyfi .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#ihdyyotyfi .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#ihdyyotyfi .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#ihdyyotyfi .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#ihdyyotyfi .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#ihdyyotyfi div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header gt_col_headings">
+<th id="label" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"><strong>Characteristic</strong></th>
+<th id="n" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>N</strong></th>
+<th id="stat_1" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>0</strong><br>
+N = 2,000<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+<th id="stat_2" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>1</strong><br>
+N = 2,000<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+<th id="stat_3" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>2</strong><br>
+N = 2,000<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+<th id="stat_4" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>3</strong><br>
+N = 2,000<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Age</td>
+<td class="gt_row gt_center" headers="n">8,000</td>
+<td class="gt_row gt_center" headers="stat_1">10.10 (2.04)</td>
+<td class="gt_row gt_center" headers="stat_2">10.19 (2.08)</td>
+<td class="gt_row gt_center" headers="stat_3">10.21 (2.14)</td>
+<td class="gt_row gt_center" headers="stat_4">10.29 (2.06)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">0</td>
+<td class="gt_row gt_center" headers="stat_2">0</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Salary</td>
+<td class="gt_row gt_center" headers="n">8,000</td>
+<td class="gt_row gt_center" headers="stat_1">5.81 (0.61)</td>
+<td class="gt_row gt_center" headers="stat_2">5.83 (0.62)</td>
+<td class="gt_row gt_center" headers="stat_3">5.83 (0.61)</td>
+<td class="gt_row gt_center" headers="stat_4">5.81 (0.60)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">0</td>
+<td class="gt_row gt_center" headers="stat_2">0</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">ZipCode10001</td>
+<td class="gt_row gt_center" headers="n">8,000</td>
+<td class="gt_row gt_center" headers="stat_1">646 / 2,000 (32%)</td>
+<td class="gt_row gt_center" headers="stat_2">674 / 2,000 (34%)</td>
+<td class="gt_row gt_center" headers="stat_3">663 / 2,000 (33%)</td>
+<td class="gt_row gt_center" headers="stat_4">645 / 2,000 (32%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">0</td>
+<td class="gt_row gt_center" headers="stat_2">0</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">ZipCode20002</td>
+<td class="gt_row gt_center" headers="n">8,000</td>
+<td class="gt_row gt_center" headers="stat_1">703 / 2,000 (35%)</td>
+<td class="gt_row gt_center" headers="stat_2">652 / 2,000 (33%)</td>
+<td class="gt_row gt_center" headers="stat_3">655 / 2,000 (33%)</td>
+<td class="gt_row gt_center" headers="stat_4">687 / 2,000 (34%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">0</td>
+<td class="gt_row gt_center" headers="stat_2">0</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">ZipCode30003</td>
+<td class="gt_row gt_center" headers="n">8,000</td>
+<td class="gt_row gt_center" headers="stat_1">651 / 2,000 (33%)</td>
+<td class="gt_row gt_center" headers="stat_2">674 / 2,000 (34%)</td>
+<td class="gt_row gt_center" headers="stat_3">682 / 2,000 (34%)</td>
+<td class="gt_row gt_center" headers="stat_4">668 / 2,000 (33%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">0</td>
+<td class="gt_row gt_center" headers="stat_2">0</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y11</td>
+<td class="gt_row gt_center" headers="n">4,878</td>
+<td class="gt_row gt_center" headers="stat_1">-21 (10)</td>
+<td class="gt_row gt_center" headers="stat_2">-16 (9)</td>
+<td class="gt_row gt_center" headers="stat_3">8 (5)</td>
+<td class="gt_row gt_center" headers="stat_4">-3 (6)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">1,281</td>
+<td class="gt_row gt_center" headers="stat_2">1,288</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">553</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y12</td>
+<td class="gt_row gt_center" headers="n">4,882</td>
+<td class="gt_row gt_center" headers="stat_1">69 (11)</td>
+<td class="gt_row gt_center" headers="stat_2">-26 (9)</td>
+<td class="gt_row gt_center" headers="stat_3">55 (6)</td>
+<td class="gt_row gt_center" headers="stat_4">-24 (8)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">1,264</td>
+<td class="gt_row gt_center" headers="stat_2">1,283</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">571</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y13</td>
+<td class="gt_row gt_center" headers="n">4,890</td>
+<td class="gt_row gt_center" headers="stat_1">77 (12)</td>
+<td class="gt_row gt_center" headers="stat_2">-25 (9)</td>
+<td class="gt_row gt_center" headers="stat_3">98 (12)</td>
+<td class="gt_row gt_center" headers="stat_4">-17 (7)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">1,289</td>
+<td class="gt_row gt_center" headers="stat_2">1,264</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">557</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y14</td>
+<td class="gt_row gt_center" headers="n">4,871</td>
+<td class="gt_row gt_center" headers="stat_1">73 (12)</td>
+<td class="gt_row gt_center" headers="stat_2">-21 (8)</td>
+<td class="gt_row gt_center" headers="stat_3">125 (16)</td>
+<td class="gt_row gt_center" headers="stat_4">-11 (6)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">1,300</td>
+<td class="gt_row gt_center" headers="stat_2">1,283</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">546</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y15</td>
+<td class="gt_row gt_center" headers="n">4,859</td>
+<td class="gt_row gt_center" headers="stat_1">76 (12)</td>
+<td class="gt_row gt_center" headers="stat_2">-12 (6)</td>
+<td class="gt_row gt_center" headers="stat_3">141 (19)</td>
+<td class="gt_row gt_center" headers="stat_4">-14 (6)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">1,273</td>
+<td class="gt_row gt_center" headers="stat_2">1,293</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">575</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y21</td>
+<td class="gt_row gt_center" headers="n">4,865</td>
+<td class="gt_row gt_center" headers="stat_1">-33 (12)</td>
+<td class="gt_row gt_center" headers="stat_2">-28 (11)</td>
+<td class="gt_row gt_center" headers="stat_3">1 (7)</td>
+<td class="gt_row gt_center" headers="stat_4">-12 (7)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">1,266</td>
+<td class="gt_row gt_center" headers="stat_2">1,292</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">577</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y22</td>
+<td class="gt_row gt_center" headers="n">4,906</td>
+<td class="gt_row gt_center" headers="stat_1">69 (12)</td>
+<td class="gt_row gt_center" headers="stat_2">-40 (12)</td>
+<td class="gt_row gt_center" headers="stat_3">54 (6)</td>
+<td class="gt_row gt_center" headers="stat_4">-36 (10)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">1,266</td>
+<td class="gt_row gt_center" headers="stat_2">1,276</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">552</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y23</td>
+<td class="gt_row gt_center" headers="n">4,902</td>
+<td class="gt_row gt_center" headers="stat_1">79 (13)</td>
+<td class="gt_row gt_center" headers="stat_2">-38 (11)</td>
+<td class="gt_row gt_center" headers="stat_3">104 (13)</td>
+<td class="gt_row gt_center" headers="stat_4">-29 (9)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">1,273</td>
+<td class="gt_row gt_center" headers="stat_2">1,275</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">550</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y24</td>
+<td class="gt_row gt_center" headers="n">4,854</td>
+<td class="gt_row gt_center" headers="stat_1">75 (12)</td>
+<td class="gt_row gt_center" headers="stat_2">-32 (10)</td>
+<td class="gt_row gt_center" headers="stat_3">135 (18)</td>
+<td class="gt_row gt_center" headers="stat_4">-22 (7)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">1,302</td>
+<td class="gt_row gt_center" headers="stat_2">1,287</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">557</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y25</td>
+<td class="gt_row gt_center" headers="n">4,894</td>
+<td class="gt_row gt_center" headers="stat_1">78 (13)</td>
+<td class="gt_row gt_center" headers="stat_2">-22 (8)</td>
+<td class="gt_row gt_center" headers="stat_3">153 (21)</td>
+<td class="gt_row gt_center" headers="stat_4">-25 (8)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">1,257</td>
+<td class="gt_row gt_center" headers="stat_2">1,294</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">555</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y31</td>
+<td class="gt_row gt_center" headers="n">5,933</td>
+<td class="gt_row gt_center" headers="stat_1">-18 (10)</td>
+<td class="gt_row gt_center" headers="stat_2">-13 (9)</td>
+<td class="gt_row gt_center" headers="stat_3">13 (5)</td>
+<td class="gt_row gt_center" headers="stat_4">1 (6)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">192</td>
+<td class="gt_row gt_center" headers="stat_2">1,285</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">590</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y32</td>
+<td class="gt_row gt_center" headers="n">5,944</td>
+<td class="gt_row gt_center" headers="stat_1">74 (11)</td>
+<td class="gt_row gt_center" headers="stat_2">-24 (10)</td>
+<td class="gt_row gt_center" headers="stat_3">62 (7)</td>
+<td class="gt_row gt_center" headers="stat_4">-21 (8)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">206</td>
+<td class="gt_row gt_center" headers="stat_2">1,287</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">563</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y33</td>
+<td class="gt_row gt_center" headers="n">5,987</td>
+<td class="gt_row gt_center" headers="stat_1">84 (13)</td>
+<td class="gt_row gt_center" headers="stat_2">-23 (10)</td>
+<td class="gt_row gt_center" headers="stat_3">108 (13)</td>
+<td class="gt_row gt_center" headers="stat_4">-14 (7)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">203</td>
+<td class="gt_row gt_center" headers="stat_2">1,267</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">543</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y34</td>
+<td class="gt_row gt_center" headers="n">5,949</td>
+<td class="gt_row gt_center" headers="stat_1">81 (13)</td>
+<td class="gt_row gt_center" headers="stat_2">-17 (8)</td>
+<td class="gt_row gt_center" headers="stat_3">136 (17)</td>
+<td class="gt_row gt_center" headers="stat_4">-7 (6)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">195</td>
+<td class="gt_row gt_center" headers="stat_2">1,275</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">581</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y35</td>
+<td class="gt_row gt_center" headers="n">5,946</td>
+<td class="gt_row gt_center" headers="stat_1">83 (13)</td>
+<td class="gt_row gt_center" headers="stat_2">-8 (6)</td>
+<td class="gt_row gt_center" headers="stat_3">153 (20)</td>
+<td class="gt_row gt_center" headers="stat_4">-10 (7)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">204</td>
+<td class="gt_row gt_center" headers="stat_2">1,285</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">565</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y41</td>
+<td class="gt_row gt_center" headers="n">5,968</td>
+<td class="gt_row gt_center" headers="stat_1">-8 (4)</td>
+<td class="gt_row gt_center" headers="stat_2">-5 (3)</td>
+<td class="gt_row gt_center" headers="stat_3">6 (2)</td>
+<td class="gt_row gt_center" headers="stat_4">1 (2)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">184</td>
+<td class="gt_row gt_center" headers="stat_2">1,279</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">569</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y42</td>
+<td class="gt_row gt_center" headers="n">5,978</td>
+<td class="gt_row gt_center" headers="stat_1">35 (6)</td>
+<td class="gt_row gt_center" headers="stat_2">-11 (4)</td>
+<td class="gt_row gt_center" headers="stat_3">29 (4)</td>
+<td class="gt_row gt_center" headers="stat_4">-9 (3)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">199</td>
+<td class="gt_row gt_center" headers="stat_2">1,282</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">541</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y43</td>
+<td class="gt_row gt_center" headers="n">5,987</td>
+<td class="gt_row gt_center" headers="stat_1">39 (7)</td>
+<td class="gt_row gt_center" headers="stat_2">-10 (3)</td>
+<td class="gt_row gt_center" headers="stat_3">49 (6)</td>
+<td class="gt_row gt_center" headers="stat_4">-6 (3)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">217</td>
+<td class="gt_row gt_center" headers="stat_2">1,242</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">554</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y44</td>
+<td class="gt_row gt_center" headers="n">5,977</td>
+<td class="gt_row gt_center" headers="stat_1">37 (7)</td>
+<td class="gt_row gt_center" headers="stat_2">-8 (3)</td>
+<td class="gt_row gt_center" headers="stat_3">62 (9)</td>
+<td class="gt_row gt_center" headers="stat_4">-3 (2)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">186</td>
+<td class="gt_row gt_center" headers="stat_2">1,280</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">557</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y45</td>
+<td class="gt_row gt_center" headers="n">5,914</td>
+<td class="gt_row gt_center" headers="stat_1">39 (7)</td>
+<td class="gt_row gt_center" headers="stat_2">-4 (3)</td>
+<td class="gt_row gt_center" headers="stat_3">70 (10)</td>
+<td class="gt_row gt_center" headers="stat_4">-5 (2)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">204</td>
+<td class="gt_row gt_center" headers="stat_2">1,305</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">577</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y51</td>
+<td class="gt_row gt_center" headers="n">5,923</td>
+<td class="gt_row gt_center" headers="stat_1">-5.4 (3.6)</td>
+<td class="gt_row gt_center" headers="stat_2">-2.9 (3.0)</td>
+<td class="gt_row gt_center" headers="stat_3">6.9 (1.9)</td>
+<td class="gt_row gt_center" headers="stat_4">2.5 (2.0)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">222</td>
+<td class="gt_row gt_center" headers="stat_2">1,279</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">576</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y52</td>
+<td class="gt_row gt_center" headers="n">5,966</td>
+<td class="gt_row gt_center" headers="stat_1">32 (5)</td>
+<td class="gt_row gt_center" headers="stat_2">-8 (3)</td>
+<td class="gt_row gt_center" headers="stat_3">26 (3)</td>
+<td class="gt_row gt_center" headers="stat_4">-6 (3)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">209</td>
+<td class="gt_row gt_center" headers="stat_2">1,283</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">542</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y53</td>
+<td class="gt_row gt_center" headers="n">6,024</td>
+<td class="gt_row gt_center" headers="stat_1">35 (6)</td>
+<td class="gt_row gt_center" headers="stat_2">-6 (3)</td>
+<td class="gt_row gt_center" headers="stat_3">44 (6)</td>
+<td class="gt_row gt_center" headers="stat_4">-3 (2)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">184</td>
+<td class="gt_row gt_center" headers="stat_2">1,243</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">549</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y54</td>
+<td class="gt_row gt_center" headers="n">5,953</td>
+<td class="gt_row gt_center" headers="stat_1">34 (6)</td>
+<td class="gt_row gt_center" headers="stat_2">-5 (3)</td>
+<td class="gt_row gt_center" headers="stat_3">55 (7)</td>
+<td class="gt_row gt_center" headers="stat_4">-1 (2)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">217</td>
+<td class="gt_row gt_center" headers="stat_2">1,281</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">549</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y55</td>
+<td class="gt_row gt_center" headers="n">5,950</td>
+<td class="gt_row gt_center" headers="stat_1">35 (6)</td>
+<td class="gt_row gt_center" headers="stat_2">-2 (2)</td>
+<td class="gt_row gt_center" headers="stat_3">62 (9)</td>
+<td class="gt_row gt_center" headers="stat_4">-2 (2)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">207</td>
+<td class="gt_row gt_center" headers="stat_2">1,292</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">551</td>
+</tr>
+</tbody><tfoot class="gt_footnotes">
+<tr class="odd">
+<td colspan="6" class="gt_footnote"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> Mean (SD); n / N (%)</td>
+</tr>
+</tfoot>
+
+</table>
+
+</div>
+</div>
+</div>
+<p>Then, plug your data and clusters into the <code>run_cissvae()</code> function.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Run the imputation model. </span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">=</span> <span class="fu">run_cissvae</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_missing,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">index_col =</span> <span class="st">"index"</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">val_proportion =</span> <span class="fl">0.1</span>, <span class="do">## pass a vector for different proportions by cluster</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">columns_ignore =</span> <span class="fu">c</span>(<span class="st">"Age"</span>, <span class="st">"Salary"</span>, <span class="st">"ZipCode10001"</span>, <span class="st">"ZipCode20002"</span>, <span class="st">"ZipCode30003"</span>), <span class="do">## If there are columns in addition to the index you want to ignore when selecting validation set, list them here. In this case, we ignore the 'demographic' columns because we do not want to remove data from them for validation purposes. </span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">clusters =</span> clusters<span class="sc">$</span>clusters, <span class="do">## we have precomputed cluster labels so we pass them here</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">500</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">return_silhouettes =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">return_history =</span> <span class="cn">TRUE</span>,  <span class="co"># Get detailed training history</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">return_model =</span> <span class="cn">TRUE</span>, <span class="do">## Allows for plotting model schematic</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">device =</span> <span class="st">"cpu"</span>,  <span class="co"># Explicit device selection</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">layer_order_enc =</span> <span class="fu">c</span>(<span class="st">"unshared"</span>, <span class="st">"shared"</span>, <span class="st">"unshared"</span>),</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">layer_order_dec =</span> <span class="fu">c</span>(<span class="st">"shared"</span>, <span class="st">"unshared"</span>, <span class="st">"shared"</span>)</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="do">## Retrieve results</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>imputed_df <span class="ot">&lt;-</span> dat<span class="sc">$</span>imputed</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>silhouette <span class="ot">&lt;-</span> dat<span class="sc">$</span>silhouettes</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>training_history <span class="ot">&lt;-</span> dat<span class="sc">$</span>history  <span class="co"># Detailed training progress</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot training progress</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(training_history)) {</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(training_history<span class="sc">$</span>epoch, training_history<span class="sc">$</span>loss, </span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">main =</span> <span class="st">"Training Loss Over Time"</span>, </span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">"Epoch"</span>, <span class="at">ylab =</span> <span class="st">"Loss"</span>)</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_vae_architecture</span>(<span class="at">model =</span> dat<span class="sc">$</span>model, <span class="at">save_path =</span> <span class="st">"test_plot_arch.png"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<pre><code>#&gt; Cluster dataset:
+#&gt;  ClusterDataset(n_samples=8000, n_features=30, n_clusters=4)
+#&gt;   • Original missing: 61800 / 200000 (30.90%)
+#&gt;   • Validation held-out: 13783 (9.97% of non-missing)
+#&gt;   • .data shape:     (8000, 30)
+#&gt;   • .masks shape:    (8000, 30)
+#&gt;   • .val_data shape: (8000, 30)
+#&gt; Plot saved to: test_plot_arch.png</code></pre>
+</div>
+<p><img src="test_plot_arch.png" class="img-fluid"></p>
+</section>
+</section>
+<section id="clustering-features-by-missingness-patterns" class="level2">
+<h2 class="anchored" data-anchor-id="clustering-features-by-missingness-patterns">Clustering Features by Missingness Patterns</h2>
+<p>Before running CISS-VAE, you can cluster features based on their missingness patterns. This helps identify features that tend to be missing together systematically, which can improve imputation quality.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rCISSVAE)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(df_missing)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>cluster_result <span class="ot">&lt;-</span> <span class="fu">cluster_on_missing</span>(</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_missing,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">cols_ignore =</span>  <span class="fu">c</span>(<span class="st">"index"</span>, <span class="st">"Age"</span>, <span class="st">"Salary"</span>, <span class="st">"ZipCode10001"</span>, <span class="st">"ZipCode20002"</span>, <span class="st">"ZipCode30003"</span>),</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_clusters =</span> <span class="dv">4</span>,  <span class="co"># Use KMeans with 4 clusters</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cluster_summary</span>(df_missing, <span class="fu">factor</span>(cluster_result<span class="sc">$</span>clusters), <span class="at">include =</span> <span class="fu">setdiff</span>(<span class="fu">names</span>(df_missing), <span class="st">"index"</span>), </span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="at">statistic =</span> <span class="fu">list</span>(</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">all_continuous</span>() <span class="sc">~</span> <span class="st">"{mean} ({sd})"</span>,</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">all_categorical</span>() <span class="sc">~</span> <span class="st">"{n} / {N}</span><span class="sc">\n</span><span class="st"> ({p}%)"</span>), </span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">missing =</span> <span class="st">"always"</span>)  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="stcxlhdrht" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#stcxlhdrht table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#stcxlhdrht thead, #stcxlhdrht tbody, #stcxlhdrht tfoot, #stcxlhdrht tr, #stcxlhdrht td, #stcxlhdrht th {
+  border-style: none;
+}
+
+#stcxlhdrht p {
+  margin: 0;
+  padding: 0;
+}
+
+#stcxlhdrht .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#stcxlhdrht .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#stcxlhdrht .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#stcxlhdrht .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#stcxlhdrht .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#stcxlhdrht .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#stcxlhdrht .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#stcxlhdrht .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#stcxlhdrht .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#stcxlhdrht .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#stcxlhdrht .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#stcxlhdrht .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#stcxlhdrht .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#stcxlhdrht .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#stcxlhdrht .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#stcxlhdrht .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#stcxlhdrht .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#stcxlhdrht .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#stcxlhdrht .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#stcxlhdrht .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#stcxlhdrht .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#stcxlhdrht .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#stcxlhdrht .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#stcxlhdrht .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#stcxlhdrht .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#stcxlhdrht .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#stcxlhdrht .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#stcxlhdrht .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#stcxlhdrht .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#stcxlhdrht .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#stcxlhdrht .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#stcxlhdrht .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#stcxlhdrht .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#stcxlhdrht .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#stcxlhdrht .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#stcxlhdrht .gt_left {
+  text-align: left;
+}
+
+#stcxlhdrht .gt_center {
+  text-align: center;
+}
+
+#stcxlhdrht .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#stcxlhdrht .gt_font_normal {
+  font-weight: normal;
+}
+
+#stcxlhdrht .gt_font_bold {
+  font-weight: bold;
+}
+
+#stcxlhdrht .gt_font_italic {
+  font-style: italic;
+}
+
+#stcxlhdrht .gt_super {
+  font-size: 65%;
+}
+
+#stcxlhdrht .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#stcxlhdrht .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#stcxlhdrht .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#stcxlhdrht .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#stcxlhdrht .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#stcxlhdrht .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#stcxlhdrht .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#stcxlhdrht .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#stcxlhdrht div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header gt_col_headings">
+<th id="label" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"><strong>Characteristic</strong></th>
+<th id="n" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>N</strong></th>
+<th id="stat_1" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>0</strong><br>
+N = 1,089<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+<th id="stat_2" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>1</strong><br>
+N = 4,827<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+<th id="stat_3" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>2</strong><br>
+N = 1,251<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+<th id="stat_4" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>3</strong><br>
+N = 833<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Age</td>
+<td class="gt_row gt_center" headers="n">8,000</td>
+<td class="gt_row gt_center" headers="stat_1">10.20 (2.04)</td>
+<td class="gt_row gt_center" headers="stat_2">10.19 (2.09)</td>
+<td class="gt_row gt_center" headers="stat_3">10.23 (2.09)</td>
+<td class="gt_row gt_center" headers="stat_4">10.22 (2.05)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">0</td>
+<td class="gt_row gt_center" headers="stat_2">0</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Salary</td>
+<td class="gt_row gt_center" headers="n">8,000</td>
+<td class="gt_row gt_center" headers="stat_1">5.85 (0.63)</td>
+<td class="gt_row gt_center" headers="stat_2">5.82 (0.61)</td>
+<td class="gt_row gt_center" headers="stat_3">5.81 (0.59)</td>
+<td class="gt_row gt_center" headers="stat_4">5.80 (0.61)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">0</td>
+<td class="gt_row gt_center" headers="stat_2">0</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">ZipCode10001</td>
+<td class="gt_row gt_center" headers="n">8,000</td>
+<td class="gt_row gt_center" headers="stat_1">369 / 1,089 (34%)</td>
+<td class="gt_row gt_center" headers="stat_2">1,573 / 4,827 (33%)</td>
+<td class="gt_row gt_center" headers="stat_3">397 / 1,251 (32%)</td>
+<td class="gt_row gt_center" headers="stat_4">289 / 833 (35%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">0</td>
+<td class="gt_row gt_center" headers="stat_2">0</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">ZipCode20002</td>
+<td class="gt_row gt_center" headers="n">8,000</td>
+<td class="gt_row gt_center" headers="stat_1">347 / 1,089 (32%)</td>
+<td class="gt_row gt_center" headers="stat_2">1,653 / 4,827 (34%)</td>
+<td class="gt_row gt_center" headers="stat_3">418 / 1,251 (33%)</td>
+<td class="gt_row gt_center" headers="stat_4">279 / 833 (33%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">0</td>
+<td class="gt_row gt_center" headers="stat_2">0</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">ZipCode30003</td>
+<td class="gt_row gt_center" headers="n">8,000</td>
+<td class="gt_row gt_center" headers="stat_1">373 / 1,089 (34%)</td>
+<td class="gt_row gt_center" headers="stat_2">1,601 / 4,827 (33%)</td>
+<td class="gt_row gt_center" headers="stat_3">436 / 1,251 (35%)</td>
+<td class="gt_row gt_center" headers="stat_4">265 / 833 (32%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">0</td>
+<td class="gt_row gt_center" headers="stat_2">0</td>
+<td class="gt_row gt_center" headers="stat_3">0</td>
+<td class="gt_row gt_center" headers="stat_4">0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y11</td>
+<td class="gt_row gt_center" headers="n">4,878</td>
+<td class="gt_row gt_center" headers="stat_1">-3 (5)</td>
+<td class="gt_row gt_center" headers="stat_2">0 (13)</td>
+<td class="gt_row gt_center" headers="stat_3">-4 (7)</td>
+<td class="gt_row gt_center" headers="stat_4">-16 (9)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">1,072</td>
+<td class="gt_row gt_center" headers="stat_2">1,108</td>
+<td class="gt_row gt_center" headers="stat_3">856</td>
+<td class="gt_row gt_center" headers="stat_4">86</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y12</td>
+<td class="gt_row gt_center" headers="n">4,882</td>
+<td class="gt_row gt_center" headers="stat_1">-21 (18)</td>
+<td class="gt_row gt_center" headers="stat_2">41 (35)</td>
+<td class="gt_row gt_center" headers="stat_3">-11 (35)</td>
+<td class="gt_row gt_center" headers="stat_4">-24 (18)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">520</td>
+<td class="gt_row gt_center" headers="stat_2">1,570</td>
+<td class="gt_row gt_center" headers="stat_3">379</td>
+<td class="gt_row gt_center" headers="stat_4">649</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y13</td>
+<td class="gt_row gt_center" headers="n">4,890</td>
+<td class="gt_row gt_center" headers="stat_1">-17 (18)</td>
+<td class="gt_row gt_center" headers="stat_2">70 (47)</td>
+<td class="gt_row gt_center" headers="stat_3">-7 (35)</td>
+<td class="gt_row gt_center" headers="stat_4">-24 (13)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">512</td>
+<td class="gt_row gt_center" headers="stat_2">1,555</td>
+<td class="gt_row gt_center" headers="stat_3">418</td>
+<td class="gt_row gt_center" headers="stat_4">625</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y14</td>
+<td class="gt_row gt_center" headers="n">4,871</td>
+<td class="gt_row gt_center" headers="stat_1">-11 (23)</td>
+<td class="gt_row gt_center" headers="stat_2">78 (60)</td>
+<td class="gt_row gt_center" headers="stat_3">-2 (29)</td>
+<td class="gt_row gt_center" headers="stat_4">-20 (12)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">94</td>
+<td class="gt_row gt_center" headers="stat_2">1,151</td>
+<td class="gt_row gt_center" headers="stat_3">1,244</td>
+<td class="gt_row gt_center" headers="stat_4">640</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y15</td>
+<td class="gt_row gt_center" headers="n">4,859</td>
+<td class="gt_row gt_center" headers="stat_1">-10 (18)</td>
+<td class="gt_row gt_center" headers="stat_2">98 (64)</td>
+<td class="gt_row gt_center" headers="stat_3">0 (33)</td>
+<td class="gt_row gt_center" headers="stat_4">-11 (12)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">530</td>
+<td class="gt_row gt_center" headers="stat_2">1,590</td>
+<td class="gt_row gt_center" headers="stat_3">386</td>
+<td class="gt_row gt_center" headers="stat_4">635</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y21</td>
+<td class="gt_row gt_center" headers="n">4,865</td>
+<td class="gt_row gt_center" headers="stat_1">-13 (8)</td>
+<td class="gt_row gt_center" headers="stat_2">-9 (15)</td>
+<td class="gt_row gt_center" headers="stat_3">-14 (9)</td>
+<td class="gt_row gt_center" headers="stat_4">-27 (11)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">1,073</td>
+<td class="gt_row gt_center" headers="stat_2">1,111</td>
+<td class="gt_row gt_center" headers="stat_3">860</td>
+<td class="gt_row gt_center" headers="stat_4">91</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y22</td>
+<td class="gt_row gt_center" headers="n">4,906</td>
+<td class="gt_row gt_center" headers="stat_1">-34 (21)</td>
+<td class="gt_row gt_center" headers="stat_2">38 (40)</td>
+<td class="gt_row gt_center" headers="stat_3">-23 (39)</td>
+<td class="gt_row gt_center" headers="stat_4">-37 (21)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">530</td>
+<td class="gt_row gt_center" headers="stat_2">1,552</td>
+<td class="gt_row gt_center" headers="stat_3">361</td>
+<td class="gt_row gt_center" headers="stat_4">651</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y23</td>
+<td class="gt_row gt_center" headers="n">4,902</td>
+<td class="gt_row gt_center" headers="stat_1">-28 (22)</td>
+<td class="gt_row gt_center" headers="stat_2">72 (54)</td>
+<td class="gt_row gt_center" headers="stat_3">-18 (40)</td>
+<td class="gt_row gt_center" headers="stat_4">-38 (14)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">504</td>
+<td class="gt_row gt_center" headers="stat_2">1,550</td>
+<td class="gt_row gt_center" headers="stat_3">412</td>
+<td class="gt_row gt_center" headers="stat_4">632</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y24</td>
+<td class="gt_row gt_center" headers="n">4,854</td>
+<td class="gt_row gt_center" headers="stat_1">-22 (26)</td>
+<td class="gt_row gt_center" headers="stat_2">81 (69)</td>
+<td class="gt_row gt_center" headers="stat_3">6 (48)</td>
+<td class="gt_row gt_center" headers="stat_4">-30 (15)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">97</td>
+<td class="gt_row gt_center" headers="stat_2">1,176</td>
+<td class="gt_row gt_center" headers="stat_3">1,237</td>
+<td class="gt_row gt_center" headers="stat_4">636</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y25</td>
+<td class="gt_row gt_center" headers="n">4,894</td>
+<td class="gt_row gt_center" headers="stat_1">-20 (20)</td>
+<td class="gt_row gt_center" headers="stat_2">102 (73)</td>
+<td class="gt_row gt_center" headers="stat_3">-9 (37)</td>
+<td class="gt_row gt_center" headers="stat_4">-21 (14)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">530</td>
+<td class="gt_row gt_center" headers="stat_2">1,548</td>
+<td class="gt_row gt_center" headers="stat_3">387</td>
+<td class="gt_row gt_center" headers="stat_4">641</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y31</td>
+<td class="gt_row gt_center" headers="n">5,933</td>
+<td class="gt_row gt_center" headers="stat_1">-12 (12)</td>
+<td class="gt_row gt_center" headers="stat_2">0 (16)</td>
+<td class="gt_row gt_center" headers="stat_3">-6 (12)</td>
+<td class="gt_row gt_center" headers="stat_4">-13 (9)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">1,029</td>
+<td class="gt_row gt_center" headers="stat_2">255</td>
+<td class="gt_row gt_center" headers="stat_3">697</td>
+<td class="gt_row gt_center" headers="stat_4">86</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y32</td>
+<td class="gt_row gt_center" headers="n">5,944</td>
+<td class="gt_row gt_center" headers="stat_1">-15 (26)</td>
+<td class="gt_row gt_center" headers="stat_2">53 (34)</td>
+<td class="gt_row gt_center" headers="stat_3">-2 (41)</td>
+<td class="gt_row gt_center" headers="stat_4">-18 (25)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">502</td>
+<td class="gt_row gt_center" headers="stat_2">607</td>
+<td class="gt_row gt_center" headers="stat_3">302</td>
+<td class="gt_row gt_center" headers="stat_4">645</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y33</td>
+<td class="gt_row gt_center" headers="n">5,987</td>
+<td class="gt_row gt_center" headers="stat_1">-9 (29)</td>
+<td class="gt_row gt_center" headers="stat_2">79 (45)</td>
+<td class="gt_row gt_center" headers="stat_3">3 (43)</td>
+<td class="gt_row gt_center" headers="stat_4">-21 (20)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">472</td>
+<td class="gt_row gt_center" headers="stat_2">572</td>
+<td class="gt_row gt_center" headers="stat_3">339</td>
+<td class="gt_row gt_center" headers="stat_4">630</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y34</td>
+<td class="gt_row gt_center" headers="n">5,949</td>
+<td class="gt_row gt_center" headers="stat_1">-7 (24)</td>
+<td class="gt_row gt_center" headers="stat_2">85 (57)</td>
+<td class="gt_row gt_center" headers="stat_3">79 (19)</td>
+<td class="gt_row gt_center" headers="stat_4">-11 (24)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">109</td>
+<td class="gt_row gt_center" headers="stat_2">216</td>
+<td class="gt_row gt_center" headers="stat_3">1,095</td>
+<td class="gt_row gt_center" headers="stat_4">631</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y35</td>
+<td class="gt_row gt_center" headers="n">5,946</td>
+<td class="gt_row gt_center" headers="stat_1">-2 (26)</td>
+<td class="gt_row gt_center" headers="stat_2">101 (60)</td>
+<td class="gt_row gt_center" headers="stat_3">10 (39)</td>
+<td class="gt_row gt_center" headers="stat_4">-4 (19)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">497</td>
+<td class="gt_row gt_center" headers="stat_2">611</td>
+<td class="gt_row gt_center" headers="stat_3">311</td>
+<td class="gt_row gt_center" headers="stat_4">635</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y41</td>
+<td class="gt_row gt_center" headers="n">5,968</td>
+<td class="gt_row gt_center" headers="stat_1">-6 (6)</td>
+<td class="gt_row gt_center" headers="stat_2">0 (7)</td>
+<td class="gt_row gt_center" headers="stat_3">-3 (5)</td>
+<td class="gt_row gt_center" headers="stat_4">-5 (4)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">1,042</td>
+<td class="gt_row gt_center" headers="stat_2">234</td>
+<td class="gt_row gt_center" headers="stat_3">678</td>
+<td class="gt_row gt_center" headers="stat_4">78</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y42</td>
+<td class="gt_row gt_center" headers="n">5,978</td>
+<td class="gt_row gt_center" headers="stat_1">-6 (13)</td>
+<td class="gt_row gt_center" headers="stat_2">25 (16)</td>
+<td class="gt_row gt_center" headers="stat_3">0 (19)</td>
+<td class="gt_row gt_center" headers="stat_4">-8 (11)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">489</td>
+<td class="gt_row gt_center" headers="stat_2">590</td>
+<td class="gt_row gt_center" headers="stat_3">296</td>
+<td class="gt_row gt_center" headers="stat_4">647</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y43</td>
+<td class="gt_row gt_center" headers="n">5,987</td>
+<td class="gt_row gt_center" headers="stat_1">-4 (13)</td>
+<td class="gt_row gt_center" headers="stat_2">36 (20)</td>
+<td class="gt_row gt_center" headers="stat_3">2 (20)</td>
+<td class="gt_row gt_center" headers="stat_4">-8 (9)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">461</td>
+<td class="gt_row gt_center" headers="stat_2">606</td>
+<td class="gt_row gt_center" headers="stat_3">329</td>
+<td class="gt_row gt_center" headers="stat_4">617</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y44</td>
+<td class="gt_row gt_center" headers="n">5,977</td>
+<td class="gt_row gt_center" headers="stat_1">-4 (11)</td>
+<td class="gt_row gt_center" headers="stat_2">39 (26)</td>
+<td class="gt_row gt_center" headers="stat_3">36 (10)</td>
+<td class="gt_row gt_center" headers="stat_4">-6 (9)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">104</td>
+<td class="gt_row gt_center" headers="stat_2">204</td>
+<td class="gt_row gt_center" headers="stat_3">1,084</td>
+<td class="gt_row gt_center" headers="stat_4">631</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y45</td>
+<td class="gt_row gt_center" headers="n">5,914</td>
+<td class="gt_row gt_center" headers="stat_1">-1 (12)</td>
+<td class="gt_row gt_center" headers="stat_2">47 (28)</td>
+<td class="gt_row gt_center" headers="stat_3">5 (18)</td>
+<td class="gt_row gt_center" headers="stat_4">-2 (9)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">508</td>
+<td class="gt_row gt_center" headers="stat_2">628</td>
+<td class="gt_row gt_center" headers="stat_3">314</td>
+<td class="gt_row gt_center" headers="stat_4">636</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y51</td>
+<td class="gt_row gt_center" headers="n">5,923</td>
+<td class="gt_row gt_center" headers="stat_1">-3.9 (4.5)</td>
+<td class="gt_row gt_center" headers="stat_2">1.8 (6.0)</td>
+<td class="gt_row gt_center" headers="stat_3">-0.3 (4.4)</td>
+<td class="gt_row gt_center" headers="stat_4">-2.8 (3.1)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">1,040</td>
+<td class="gt_row gt_center" headers="stat_2">252</td>
+<td class="gt_row gt_center" headers="stat_3">707</td>
+<td class="gt_row gt_center" headers="stat_4">78</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y52</td>
+<td class="gt_row gt_center" headers="n">5,966</td>
+<td class="gt_row gt_center" headers="stat_1">-3 (11)</td>
+<td class="gt_row gt_center" headers="stat_2">23 (14)</td>
+<td class="gt_row gt_center" headers="stat_3">1 (16)</td>
+<td class="gt_row gt_center" headers="stat_4">-6 (8)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">495</td>
+<td class="gt_row gt_center" headers="stat_2">584</td>
+<td class="gt_row gt_center" headers="stat_3">303</td>
+<td class="gt_row gt_center" headers="stat_4">652</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y53</td>
+<td class="gt_row gt_center" headers="n">6,024</td>
+<td class="gt_row gt_center" headers="stat_1">-1 (11)</td>
+<td class="gt_row gt_center" headers="stat_2">33 (17)</td>
+<td class="gt_row gt_center" headers="stat_3">4 (17)</td>
+<td class="gt_row gt_center" headers="stat_4">-5 (8)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">464</td>
+<td class="gt_row gt_center" headers="stat_2">579</td>
+<td class="gt_row gt_center" headers="stat_3">315</td>
+<td class="gt_row gt_center" headers="stat_4">618</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y54</td>
+<td class="gt_row gt_center" headers="n">5,953</td>
+<td class="gt_row gt_center" headers="stat_1">-1 (9)</td>
+<td class="gt_row gt_center" headers="stat_2">35 (22)</td>
+<td class="gt_row gt_center" headers="stat_3">32 (9)</td>
+<td class="gt_row gt_center" headers="stat_4">-3 (8)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">102</td>
+<td class="gt_row gt_center" headers="stat_2">203</td>
+<td class="gt_row gt_center" headers="stat_3">1,114</td>
+<td class="gt_row gt_center" headers="stat_4">628</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Y55</td>
+<td class="gt_row gt_center" headers="n">5,950</td>
+<td class="gt_row gt_center" headers="stat_1">1 (11)</td>
+<td class="gt_row gt_center" headers="stat_2">42 (24)</td>
+<td class="gt_row gt_center" headers="stat_3">6 (15)</td>
+<td class="gt_row gt_center" headers="stat_4">0 (7)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="n"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_1">498</td>
+<td class="gt_row gt_center" headers="stat_2">618</td>
+<td class="gt_row gt_center" headers="stat_3">300</td>
+<td class="gt_row gt_center" headers="stat_4">634</td>
+</tr>
+</tbody><tfoot class="gt_footnotes">
+<tr class="odd">
+<td colspan="6" class="gt_footnote"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> Mean (SD); n / N (%)</td>
+</tr>
+</tfoot>
+
+</table>
+
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">paste</span>(<span class="st">"Clustering quality (silhouette):"</span>, <span class="fu">round</span>(cluster_result<span class="sc">$</span>silhouette, <span class="dv">3</span>)))</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Clustering quality (silhouette): 0.135</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">run_cissvae</span>(</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_missing,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">index_col =</span> <span class="st">"index"</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">clusters =</span> cluster_result<span class="sc">$</span>clusters,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">5</span>, <span class="do">## short run for demo purposes</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">return_history =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">device =</span> <span class="st">"cpu"</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Cluster dataset:</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  ClusterDataset(n_samples=8000, n_features=30, n_clusters=4)</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   • Original missing: 61800 / 240000 (25.75%)</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   • Validation held-out: 17762 (9.97% of non-missing)</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   • .data shape:     (8000, 30)</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   • .masks shape:    (8000, 30)</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   • .val_data shape: (8000, 30)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="using-pre-computed-missingness-proportion-matrix" class="level3">
+<h3 class="anchored" data-anchor-id="using-pre-computed-missingness-proportion-matrix">Using Pre-computed Missingness Proportion Matrix</h3>
+<p>For advanced control over the clustering process, you can provide a pre-computed missingness proportion matrix directly to <code>run_cissvae()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Standardize df_missing column names to feature_timepoint format</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(df_missing) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">'index'</span>, <span class="st">'Age'</span>, <span class="st">'Salary'</span>, <span class="st">'ZipCode10001'</span>, <span class="st">'ZipCode20002'</span>, <span class="st">'ZipCode30003'</span>, <span class="st">'Y1_1'</span>, <span class="st">'Y1_2'</span>, <span class="st">'Y1_3'</span>, <span class="st">'Y1_4'</span>, <span class="st">'Y1_5'</span>, <span class="st">'Y2_1'</span>, <span class="st">'Y2_2'</span>, <span class="st">'Y2_3'</span>, <span class="st">'Y2_4'</span>, <span class="st">'Y2_5'</span>, <span class="st">'Y3_1'</span>, <span class="st">'Y3_2'</span>, <span class="st">'Y3_3'</span>, <span class="st">'Y3_4'</span>, <span class="st">'Y3_5'</span>, <span class="st">'Y4_1'</span>, <span class="st">'Y4_2'</span>, <span class="st">'Y4_3'</span>, <span class="st">'Y4_4'</span>, <span class="st">'Y4_5'</span>, <span class="st">'Y5_1'</span>, <span class="st">'Y5_2'</span>, <span class="st">'Y5_3'</span>, <span class="st">'Y5_4'</span>, <span class="st">'Y5_5'</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Create and examine missingness proportion matrix</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>prop_matrix <span class="ot">&lt;-</span> <span class="fu">create_missingness_prop_matrix</span>(df_missing, </span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="at">index_col =</span> <span class="st">"index"</span>, </span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="at">cols_ignore =</span> <span class="fu">c</span>(<span class="st">'Age'</span>, <span class="st">'Salary'</span>, <span class="st">'ZipCode10001'</span>, <span class="st">'ZipCode20002'</span>, <span class="st">'ZipCode30003'</span>),</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="at">repeat_feature_names =</span> <span class="fu">c</span>(<span class="st">"Y1"</span>, <span class="st">"Y2"</span>, <span class="st">"Y3"</span>, <span class="st">"Y4"</span>, <span class="st">"Y5"</span>))</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Missingness proportion matrix dimensions:"</span>)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "Missingness proportion matrix dimensions:"</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">dim</span>(prop_matrix))</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 8000    5</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Sample of proportion matrix:"</span>)</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "Sample of proportion matrix:"</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">head</span>(prop_matrix[, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]))</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Y1  Y2  Y3  Y4  Y5</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 0.4 0.4 0.2 0.4 0.2</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 0.4 0.2 0.2 0.2 0.2</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 0.4 0.2 0.2 0.4 0.2</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 0.4 0.2 0.4 0.4 0.2</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 0.4 0.4 0.2 0.2 0.4</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 0.2 0.2 0.4 0.2 0.4</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Use proportion matrix with scaling for better clustering</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>advanced_result <span class="ot">&lt;-</span> <span class="fu">run_cissvae</span>(</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_missing,</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">index_col =</span> <span class="st">"index"</span>,</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">clusters =</span> <span class="cn">NULL</span>,  <span class="co"># Let function cluster using prop_matrix</span></span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">columns_ignore =</span> <span class="fu">c</span>(<span class="st">'Age'</span>, <span class="st">'Salary'</span>, <span class="st">'ZipCode10001'</span>, <span class="st">'ZipCode20002'</span>, <span class="st">'ZipCode30003'</span>), </span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">missingness_proportion_matrix =</span> prop_matrix,</span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">scale_features =</span> <span class="cn">TRUE</span>,  <span class="co"># Standardize features before clustering</span></span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_clusters =</span> <span class="dv">4</span>,</span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">leiden_resolution =</span> <span class="fl">0.1</span>,  </span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">5</span>,</span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">return_history =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">return_silhouettes =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">device =</span> <span class="st">"cpu"</span>,</span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Cluster dataset:</span></span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  ClusterDataset(n_samples=8000, n_features=30, n_clusters=4)</span></span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   • Original missing: 61800 / 200000 (30.90%)</span></span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   • Validation held-out: 13786 (9.98% of non-missing)</span></span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   • .data shape:     (8000, 30)</span></span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   • .masks shape:    (8000, 30)</span></span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   • .val_data shape: (8000, 30)</span></span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Clustering quality:"</span>)</span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "Clustering quality:"</span></span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"Silhouette score:"</span>, <span class="fu">round</span>(advanced_result<span class="sc">$</span>silhouette_width, <span class="dv">3</span>)))</span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "Silhouette score: 0.656"</span></span>
+<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot training history</span></span>
+<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(advanced_result<span class="sc">$</span>history)) {</span>
+<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(advanced_result<span class="sc">$</span>history<span class="sc">$</span>epoch, advanced_result<span class="sc">$</span>history<span class="sc">$</span>val_mse, </span>
+<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a>       <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">main =</span> <span class="st">"Validation MSE During Training"</span>, </span>
+<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">"Epoch"</span>, <span class="at">ylab =</span> <span class="st">"Validation MSE"</span>)</span>
+<span id="cb14-61"><a href="#cb14-61" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="advanced-hyperparameter-optimization-with-autotune" class="level2">
+<h2 class="anchored" data-anchor-id="advanced-hyperparameter-optimization-with-autotune">Advanced Hyperparameter Optimization with Autotune</h2>
+<section id="understanding-parameter-types" class="level3">
+<h3 class="anchored" data-anchor-id="understanding-parameter-types">Understanding Parameter Types</h3>
+<p>For hyperparameter optimization in <code>autotune_cissvae()</code>, parameters can be specified as:</p>
+<ul>
+<li><strong>Fixed value</strong>: <code>beta = 0.01</code> → parameter remains constant across trials</li>
+<li><strong>Categorical choice</strong>: <code>c(64, 128, 256)</code> → Optuna selects from the provided options</li>
+<li><strong>Integer range</strong>: <code>c(1, 4)</code> → Optuna suggests integers between 1 and 4 (inclusive)</li>
+<li><strong>Float range</strong>: <code>reticulate::tuple(1e-4, 1e-3)</code> → Optuna suggests floats in the specified range</li>
+</ul>
+<section id="layer-placement-strategies" class="level4">
+<h4 class="anchored" data-anchor-id="layer-placement-strategies">Layer Placement Strategies</h4>
+<p>The layer arrangement strategies control how shared and unshared layers are positioned:</p>
+<ul>
+<li><strong><code>"at_end"</code></strong>: Places shared layers at the end of the encoder or start of the decoder</li>
+<li><strong><code>"at_start"</code></strong>: Places shared layers at the start of the encoder or end of the decoder<br>
+</li>
+<li><strong><code>"alternating"</code></strong>: Distributes shared layers evenly throughout the architecture</li>
+<li><strong><code>"random"</code></strong>: Uses random placement of shared layers (with reproducible seed)</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reticulate)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rCISSVAE)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">use_virtualenv</span>(<span class="st">"./cissvae_environment"</span>, <span class="at">required =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(df_missing)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(clusters)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>aut <span class="ot">&lt;-</span> <span class="fu">autotune_cissvae</span>(</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_missing,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">index_col =</span> <span class="st">"index"</span>,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">clusters =</span> clusters<span class="sc">$</span>clusters,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">save_model_path =</span> <span class="cn">NULL</span>,</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">save_search_space_path =</span> <span class="cn">NULL</span>,</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_trials =</span> <span class="dv">3</span>, <span class="do">## Using low number of trials for demo</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">study_name =</span> <span class="st">"comprehensive_vae_autotune"</span>,</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">device_preference =</span> <span class="st">"cpu"</span>,</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">show_progress =</span> <span class="cn">FALSE</span>,  <span class="co"># Set true for Rich progress bars with training visualization</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">optuna_dashboard_db =</span> <span class="st">"sqlite:///optuna_study.db"</span>,  <span class="co"># Save results to database</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">load_if_exists =</span> <span class="cn">FALSE</span>, <span class="do">## Set true to load and continue study if it exists</span></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>, </span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Search strategy options</span></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">constant_layer_size =</span> <span class="cn">FALSE</span>,     <span class="co"># Allow different sizes per layer</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">evaluate_all_orders =</span> <span class="cn">FALSE</span>,     <span class="co"># Sample layer arrangements efficiently</span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_exhaustive_orders =</span> <span class="dv">100</span>,     <span class="co"># Limit for exhaustive search</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Hyperparameter search space</span></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">num_hidden_layers =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>),     <span class="co"># Try 2-5 hidden layers</span></span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">hidden_dims =</span> <span class="fu">c</span>(<span class="dv">64</span>, <span class="dv">512</span>),        <span class="co"># Layer sizes from 64 to 512</span></span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">latent_dim =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">100</span>),         <span class="co"># Latent dimension range</span></span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">latent_shared =</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>),</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_shared =</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>),</span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">lr =</span> <span class="fl">0.01</span>,  <span class="co"># Learning rate range</span></span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">decay_factor =</span> <span class="fl">0.99</span>,</span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta =</span> <span class="fl">0.01</span>,  <span class="co"># KL weight range</span></span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">num_epochs =</span> <span class="dv">500</span>,                <span class="co"># Fixed epochs for demo</span></span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> <span class="fu">c</span>(<span class="dv">1000</span>, <span class="dv">4000</span>),     <span class="co"># Batch size options</span></span>
+<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">num_shared_encode =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>),</span>
+<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a>  <span class="at">num_shared_decode =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>),</span>
+<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Layer placement strategies - try different arrangements</span></span>
+<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a>  <span class="at">encoder_shared_placement =</span> <span class="fu">c</span>(<span class="st">"at_end"</span>, <span class="st">"at_start"</span>, <span class="st">"alternating"</span>, <span class="st">"random"</span>),</span>
+<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a>  <span class="at">decoder_shared_placement =</span> <span class="fu">c</span>(<span class="st">"at_start"</span>, <span class="st">"at_end"</span>, <span class="st">"alternating"</span>, <span class="st">"random"</span>),</span>
+<span id="cb15-46"><a href="#cb15-46" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb15-47"><a href="#cb15-47" aria-hidden="true" tabindex="-1"></a>  <span class="at">refit_patience =</span> <span class="dv">2</span>,        <span class="co"># Early stopping patience</span></span>
+<span id="cb15-48"><a href="#cb15-48" aria-hidden="true" tabindex="-1"></a>  <span class="at">refit_loops =</span> <span class="dv">100</span>,                <span class="co"># Fixed refit loops</span></span>
+<span id="cb15-49"><a href="#cb15-49" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs_per_loop =</span> <span class="dv">100</span>,   <span class="co"># Epochs per refit loop</span></span>
+<span id="cb15-50"><a href="#cb15-50" aria-hidden="true" tabindex="-1"></a>  <span class="at">reset_lr_refit =</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>)</span>
+<span id="cb15-51"><a href="#cb15-51" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-52"><a href="#cb15-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-53"><a href="#cb15-53" aria-hidden="true" tabindex="-1"></a><span class="co"># Analyze results</span></span>
+<span id="cb15-54"><a href="#cb15-54" aria-hidden="true" tabindex="-1"></a>imputed <span class="ot">&lt;-</span> aut<span class="sc">$</span>imputed</span>
+<span id="cb15-55"><a href="#cb15-55" aria-hidden="true" tabindex="-1"></a>best_model <span class="ot">&lt;-</span> aut<span class="sc">$</span>model</span>
+<span id="cb15-56"><a href="#cb15-56" aria-hidden="true" tabindex="-1"></a>study <span class="ot">&lt;-</span> aut<span class="sc">$</span>study</span>
+<span id="cb15-57"><a href="#cb15-57" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> aut<span class="sc">$</span>results</span>
+<span id="cb15-58"><a href="#cb15-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-59"><a href="#cb15-59" aria-hidden="true" tabindex="-1"></a><span class="co"># View best hyperparameters</span></span>
+<span id="cb15-60"><a href="#cb15-60" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Best validation MSE:"</span>, study<span class="sc">$</span>best_value, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb15-61"><a href="#cb15-61" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Trial results:"</span>)</span>
+<span id="cb15-62"><a href="#cb15-62" aria-hidden="true" tabindex="-1"></a>results <span class="sc">%&gt;%</span> <span class="fu">kable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb15-63"><a href="#cb15-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">font_size=</span><span class="dv">12</span>)</span>
+<span id="cb15-64"><a href="#cb15-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-65"><a href="#cb15-65" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot model architecture</span></span>
+<span id="cb15-66"><a href="#cb15-66" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_vae_architecture</span>(best_model, <span class="at">title =</span> <span class="st">"Optimized CISSVAE Architecture"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<pre><code>#&gt; Starting Optuna optimization with 3 trials...
+#&gt; Optimization complete. Best trial: 0 (Total Imputation Error: 11.092969)
+#&gt; Training final model with best parameters...
+#&gt; Final model training complete.
+#&gt; Best validation MSE: 11.09297
+#&gt; [1] "Trial results:"</code></pre>
+<div class="cell-output-display">
+<table class="table caption-top table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">trial_number</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">imputation_error</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">num_hidden_layers</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">hidden_dim_0</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">hidden_dim_1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">latent_dim</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">latent_shared</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">output_shared</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">batch_size</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">num_shared_encode</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">num_shared_decode</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">encoder_shared_placement</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">decoder_shared_placement</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">layer_order_enc_used</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">layer_order_dec_used</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">hidden_dim_2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">hidden_dim_3</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">hidden_dim_4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">11.09297</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">1000</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">at_start</td>
+<td style="text-align: left;">at_end</td>
+<td style="text-align: left;">U,U</td>
+<td style="text-align: left;">U,U</td>
+<td style="text-align: right;">NaN</td>
+<td style="text-align: right;">NaN</td>
+<td style="text-align: right;">NaN</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">20.94202</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: right;">1000</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">random</td>
+<td style="text-align: left;">at_start</td>
+<td style="text-align: left;">U,U,U,U,U</td>
+<td style="text-align: left;">S,U,U,U,U</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">512</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">26.18179</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">1000</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">at_start</td>
+<td style="text-align: left;">at_start</td>
+<td style="text-align: left;">S,S,U,U,U</td>
+<td style="text-align: left;">S,U,U,U,U</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">64</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+<pre><code>#&gt; Plot saved to: autotune_vae_arch.png</code></pre>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="autotune_vae_arch.png" class="img-fluid figure-img"></p>
+<figcaption>Autotuned VAE Architecture</figcaption>
+</figure>
+</div>
+<p>For more information on using optuna dashboard, see the <a href="https://ciss-vae.github.io/rCISS-VAE/articles/optunadb.html">Optuna Dashboard tutorial</a></p>
+</section>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

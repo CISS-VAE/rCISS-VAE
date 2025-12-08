@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.0000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2.0000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,6 +50,12 @@
         <dd>Autotune CISS-VAE hyperparameters with Optuna</dd>
       </dl><dl><dt>
 
+          <code><a href="check_devices.html">check_devices()</a></code>
+
+        </dt>
+        <dd>Check PyTorch device availability</dd>
+      </dl><dl><dt>
+
           <code><a href="cluster_on_missing.html">cluster_on_missing()</a></code>
 
         </dt>
@@ -60,6 +66,12 @@
 
         </dt>
         <dd>Cluster Samples Based on Missingness Proportions</dd>
+      </dl><dl><dt>
+
+          <code><a href="cluster_summary.html">cluster_summary()</a></code>
+
+        </dt>
+        <dd>Cluster-wise summary table using a separate cluster vector (gtsummary + gt)</dd>
       </dl><dl><dt>
 
           <code><a href="clusters.html">clusters</a></code>
@@ -95,7 +107,7 @@
           <code><a href="dni.html">dni</a></code>
 
         </dt>
-        <dd>Example dni matrix for demo of do_not_impute_matrix</dd>
+        <dd>Example dni matrix for demo of imputable_matrix</dd>
       </dl><dl><dt>
 
           <code><a href="evaluate_imputation.html">evaluate_imputation()</a></code>
@@ -104,22 +116,16 @@
         <dd>Evaluate imputation accuracy (R wrapper)</dd>
       </dl><dl><dt>
 
-          <code><a href="extract_cissvae_arch.html">extract_cissvae_arch()</a></code>
-
-        </dt>
-        <dd>Extract CISSVAE architecture metadata</dd>
-      </dl><dl><dt>
-
           <code><a href="mock_surv.html">mock_surv</a></code>
 
         </dt>
-        <dd>Example survival data for demo of do_not_impute_matrix</dd>
+        <dd>Example survival data for demo of imputable_matrix</dd>
       </dl><dl><dt>
 
           <code><a href="performance_by_cluster.html">performance_by_cluster()</a></code>
 
         </dt>
-        <dd>Calculate performance metrics by cluster and subgroups</dd>
+        <dd>Compute per-cluster and per-group performance metrics (MSE, BCE)</dd>
       </dl><dl><dt>
 
           <code><a href="plot_vae_architecture.html">plot_vae_architecture()</a></code>
@@ -137,7 +143,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Yasin Khadem Charvadeh, Danielle Vaithilingam, Kenneth Seier, Katherine S. Panageas, Mithat Gönen, Yuan Chen.</p>
+  <p>Developed by Yasin Khadem Charvadeh, Kenneth Seier, Katherine S. Panageas, Danielle Vaithilingam, Mithat Gönen, Yuan Chen.</p>
 </div>
 
 <div class="pkgdown-footer-right">

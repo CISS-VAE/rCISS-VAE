@@ -1,6 +1,6 @@
 ---
 title: "Handling Binary and Categorical Variables"
-date: "2025-10-21"
+date: "`r format(Sys.Date(), '%Y-%m-%d')`"
 output: 
   rmarkdown::html_vignette:
     toc: true
@@ -16,11 +16,9 @@ vignette: >
 
 The CISS-VAE model can handle binary and categorical variables, but categorical variables must first be converted into binary dummy variables. 
 
-
 ```{r setup, echo=FALSE, include=FALSE}
 rm(list = ls())
 
-setwd("/home/nfs/vaithid1/CISS-VAE/rCISSVAE")
 library(rCISSVAE)
 library(tidyverse)
 library(ggplot2)
@@ -28,14 +26,7 @@ library(kableExtra)
 library(reticulate)
 
 set.seed(42)
-reticulate::use_virtualenv("../.venv", required = TRUE)
 
-if (py_module_available("ciss_vae")) {
-  ciss_vae <- import("ciss_vae")
-  print(ciss_vae$`__version__`)
-} else {
-  message("ciss_vae is not installed in the active Python environment.")
-}
 ```
 
 The [Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/) dataset has both continuous (bill_length, bill_depth, flipper_length, body_mass) and categorical (species, island, sex) values so it makes a good example for this. We can use the `dummy_cols()` function from the `fastDummies` package to create dummy variables for our categories. Set `ignore_na = TRUE` and `remove_selected_columns = TRUE` to avoid creating a new column for NA values and to remove the original categoricals once the dummies are created. 
@@ -96,7 +87,7 @@ head(penguin_dummies) %>% kable()
 Now that the dummy vars are created and there is missingness, we can create a `binary_feature_mask` and impute with `run_cissvae()`.
 
 
-```{r}
+```{r eval=FALSE}
 binary_feature_mask = c(rep(FALSE, 5), rep(TRUE, 5))
 
 glue::glue("Binary Feature Mask: {paste0(binary_feature_mask, collapse = ', ')}")
@@ -114,13 +105,17 @@ results = run_cissvae(
 )
 
 head(results$imputed_dataset)
-
-
 head(penguin_dummies)
 ```
 
-As we can see above, the imputed values for the binary variables are in terms of probability not a flat 0,1 so we have to convert those values. 
+```{r echo=FALSE}
+results = readRDS(system.file("extdata", "binary_res.rds", package = "rCISSVAE"))
 
+head(results$imputed_dataset)
+head(penguin_dummies)
+```
+
+As we can see above, the imputed values for the binary variables are in terms of **probability**, not a flat 0,1 so we have to convert those values to binary. The 'imputed_dataset' is returned as a data.frame, so we can use tidyverse mutate to convert the binary variables. 
 
 ```{r}
 results$imputed_dataset <- results$imputed_dataset %>%

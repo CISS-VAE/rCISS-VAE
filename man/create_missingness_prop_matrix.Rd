@@ -9,7 +9,8 @@ create_missingness_prop_matrix(
   index_col = NULL,
   cols_ignore = NULL,
   na_values = c(NA, NaN, Inf, -Inf),
-  repeat_feature_names = character(0)
+  repeat_feature_names = character(0),
+  loose = FALSE
 )
 }
 \arguments{

@@ -9,7 +9,7 @@ of missingness and returns cluster labels plus silhouette score."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.0000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2.0000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,9 +46,11 @@ of missingness and returns cluster labels plus silhouette score.</p>
 <span>  <span class="va">data</span>,</span>
 <span>  cols_ignore <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n_clusters <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  min_cluster_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  cluster_selection_epsilon <span class="op">=</span> <span class="fl">0.25</span></span>
+<span>  seed <span class="op">=</span> <span class="fl">42</span>,</span>
+<span>  k_neighbors <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  leiden_resolution <span class="op">=</span> <span class="fl">0.25</span>,</span>
+<span>  leiden_objective <span class="op">=</span> <span class="st">"CPM"</span>,</span>
+<span>  use_snn <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -66,20 +68,20 @@ of missingness and returns cluster labels plus silhouette score.</p>
 
 <dt id="arg-n-clusters">n_clusters<a class="anchor" aria-label="anchor" href="#arg-n-clusters"></a></dt>
 <dd><p>Integer; if provided, will run KMeans with this many clusters.
-If <code>NULL</code>, will use HDBSCAN.</p></dd>
+If <code>NULL</code>, will use Leiden.</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
-<dd><p>Integer; random seed for KMeans (or reproducibility in HDBSCAN).</p></dd>
+<dd><p>Integer; random seed for KMeans (or reproducibility in Leiden).</p></dd>
 
 
-<dt id="arg-min-cluster-size">min_cluster_size<a class="anchor" aria-label="anchor" href="#arg-min-cluster-size"></a></dt>
-<dd><p>Integer; minimum cluster size for HDBSCAN.
+<dt id="arg-k-neighbors">k_neighbors<a class="anchor" aria-label="anchor" href="#arg-k-neighbors"></a></dt>
+<dd><p>Integer; minimum cluster size for Leiden.
 If <code>NULL</code>, defaults to <code>nrow(data) %/% 25</code>.</p></dd>
 
 
-<dt id="arg-cluster-selection-epsilon">cluster_selection_epsilon<a class="anchor" aria-label="anchor" href="#arg-cluster-selection-epsilon"></a></dt>
-<dd><p>Numeric; epsilon parameter for HDBSCAN.</p></dd>
+<dt id="arg-leiden-resolution">leiden_resolution<a class="anchor" aria-label="anchor" href="#arg-leiden-resolution"></a></dt>
+<dd><p>Resolution for Leiden Clustering.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -93,7 +95,7 @@ If <code>NULL</code>, defaults to <code>nrow(data) %/% 25</code>.</p></dd>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Yasin Khadem Charvadeh, Danielle Vaithilingam, Kenneth Seier, Katherine S. Panageas, Mithat Gönen, Yuan Chen.</p>
+  <p>Developed by Yasin Khadem Charvadeh, Kenneth Seier, Katherine S. Panageas, Danielle Vaithilingam, Mithat Gönen, Yuan Chen.</p>
 </div>
 
 <div class="pkgdown-footer-right">

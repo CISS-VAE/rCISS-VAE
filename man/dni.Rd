@@ -3,11 +3,11 @@
 \docType{data}
 \name{dni}
 \alias{dni}
-\title{Example dni matrix for demo of do_not_impute_matrix}
+\title{Example dni matrix for demo of imputable_matrix}
 \format{
 A dataframe:
 \describe{
-\item{do_not_impute_matrix}{A mock do_not_impute_matrix dataframe}
+\item{imputable_matrix}{A mock imputable_matrix dataframe}
 }
 }
 \source{
@@ -17,7 +17,7 @@ Imported from \code{data_raw/dni.csv}
 dni
 }
 \description{
-A sample do_not_impute_matrix (dataframe)
+A sample imputable_matrix (dataframe).
 }
 \examples{
 data(dni)

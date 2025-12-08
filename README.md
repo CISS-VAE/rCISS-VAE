@@ -1,10 +1,10 @@
-# rCISS-VAE - WORK IN PROGRESS!
+# rCISS-VAE 
 
-This is the R implementation of the Clustering-Informed Shared-Structure Variational Autoencoder (CISS-VAE) for imputation. The Python implementation can be found [here](https://github.com/CISS-VAE/CISS-VAE-python) and is available for installation on PyPI.
+This is the R implementation of the Clustering-Informed Shared-Structure Variational Autoencoder (CISS-VAE) for imputation. The Python implementation can be found [here](https://github.com/CISS-VAE/CISS-VAE-python) and is available for installation on [PyPI](https://pypi.org/project/CISS-VAE/).
 
-CISS-VAE is a flexible deep learning model for missing data imputation that accommodates all three types of missing data mechanisms: Missing Completely At Random (MCAR), Missing At Random (MAR), and Missing Not At Random (MNAR). While it is particularly well-suited to MNAR scenarios where missingness patterns carry informative signals, CISS-VAE also functions effectively under MAR assumptions.
+CISS-VAE is a flexible deep learning model for missing data imputation that accommodates all three types of missing data mechanisms: Missing Completely At Random (MCAR), Missing At Random (MAR), and Missing Not At Random (MNAR). While it is particularly well-suited to MNAR scenarios where missingness patterns carry informative signals, CISS-VAE also functions effectively under MAR assumptions. For more information, please check out our [publication](https://doi.org/10.1002/sim.70335)!
 
-![**Example CISS-VAE for Imputation Workflow**](vignettes/CISSVAEModelDiagram.png)
+![**Example CISS-VAE for Imputation Workflow**](man/figures/CISSVAEModelDiagram.png)
 <br>
 <details style="background: #deeff7ff; border: #2A373D; color: black; border-radius: 10px"><summary><span style="color: #2A373D"><b>Click Here for More Information</b></span></summary>
  <div style="padding: 10px 10px 10px 10px">
@@ -15,7 +15,6 @@ Additionally, CISS-VAE incorporates an iterative learning procedure, with a vali
 </details>  
 
 ## Installation 
-
 
 Install devtools or remotes if not already installed: 
 
@@ -110,6 +109,23 @@ dat = run_cissvae(
 plot_vae_architecture(model = dat$model)
 ```
 
-![**Architecture of Above Model**](vignettes/test_plot_arch.png)
+![**Architecture of Above Model**](man/figures/test_plot_arch.png){alt="Architecture diagram produced by plot_vae_architecture"}
 
 For a full tutorial, see [vignette](https://ciss-vae.github.io/rCISS-VAE/articles/vignette.html).
+
+
+## Citation
+If you use our package in your research, please consider citing <a href="https://doi.org/10.1002/sim.70335">our recent publication!</a>
+
+>Y. Khadem Charvadeh, K. Seier, K. S. Panageas, D. Vaithilingam, M.Gönen, and Y. Chen, “Clustering-Informed Shared-Structure Variational Autoencoder for Missing Data Imputation in Large-Scale Healthcare Data,” Statistics in Medicine 44, no. 28-30 (2025): e70335, https://doi.org/10.1002/sim.70335.
+
+
+### Authors
+
+>- Yasin Khadem Charvadeh
+>- Kenneth Seier  
+>- Katherine S. Panageas  
+>- Danielle Vaithilingam 
+>- Mithat Gönen  
+>- <b>Yuan Chen <i>(corresponding author)</i></b> — cheny19@mskcc.org  
+

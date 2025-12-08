@@ -1,6 +1,6 @@
 ---
 title: "Manual Virtual Environment Setup Tutorial"
-date: "2025-08-14"
+date: "`r format(Sys.Date(), '%Y-%m-%d')`"
 output: 
   rmarkdown::html_vignette:
     toc: true
@@ -40,7 +40,7 @@ Before starting, ensure you have:
 install.packages("reticulate")
 ```
 
-You can check your Python version by running:
+You can check your Python version by running the following from your terminal:
 
 ```bash
 python --version
@@ -151,7 +151,8 @@ reticulate::virtualenv_install(
     "optuna",
     "rich",
     "matplotlib",
-    "hdbscan"
+    "leiden-alg",
+    "python-igraph"
   )
 )
 

@@ -11,7 +11,7 @@ the default location) or at a custom filesystem path, or create it
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.0000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2.0000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,12 +75,24 @@ version is found on the system.</p></dd>
 
 </dl></div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">create_cissvae_env</span><span class="op">(</span></span></span>
+<span class="r-in"><span>envname <span class="op">=</span> <span class="st">"cissvae_environment"</span>,</span></span>
+<span class="r-in"><span>install_python <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>python_version <span class="op">=</span> <span class="st">"3.10"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Downloading uv...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Done!</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in if (!grepl("*", glob, fixed = TRUE)) {    suffix &lt;- if (is_windows())         c("/python*.exe", "/*/python*.exe", "/*/*/python*.exe")    else {        c("/bin/python*", "/*/bin/python*", "/*/*/bin/python*")    }    append(glob) &lt;- paste0(normalizePath(glob, winslash = "/",         mustWork = FALSE), suffix)}:</span> argument is of length zero</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Yasin Khadem Charvadeh, Danielle Vaithilingam, Kenneth Seier, Katherine S. Panageas, Mithat Gönen, Yuan Chen.</p>
+  <p>Developed by Yasin Khadem Charvadeh, Kenneth Seier, Katherine S. Panageas, Danielle Vaithilingam, Mithat Gönen, Yuan Chen.</p>
 </div>
 
 <div class="pkgdown-footer-right">

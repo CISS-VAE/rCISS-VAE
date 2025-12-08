@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.0000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2.0000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,7 @@ data.</p>
 <div class="section level2">
 <h2 id="per-cluster-summary">Per-cluster Summary<a class="anchor" aria-label="anchor" href="#per-cluster-summary"></a>
 </h2>
-<p>The <code>cluster_summary()</code> function creates a data summary
+<p>The <code><a href="../reference/cluster_summary.html">cluster_summary()</a></code> function creates a data summary
 table stratified by missingness cluster. Use the <code>cont_style</code>
 param to set the style of continuous variable summaries (“mean_sd”,
 “median_iqr”, “both”).</p>
@@ -72,10 +72,10 @@ param to set the style of continuous variable summaries (“mean_sd”,
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## ── <span style="font-weight: bold;">Attaching core tidyverse packages</span> ──────────────────────── tidyverse 2.0.0 ──</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">dplyr    </span> 1.1.4     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">readr    </span> 2.1.5</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">forcats  </span> 1.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">stringr  </span> 1.6.0</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">ggplot2  </span> 4.0.1     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tibble   </span> 3.3.0</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">lubridate</span> 1.9.3     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tidyr    </span> 1.3.1</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">purrr    </span> 1.2.0     </span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">forcats  </span> 1.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">stringr  </span> 1.5.1</span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">ggplot2  </span> 4.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tibble   </span> 3.3.0</span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">lubridate</span> 1.9.4     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tidyr    </span> 1.3.1</span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">purrr    </span> 1.1.0     </span></span>
 <span><span class="co">## ── <span style="font-weight: bold;">Conflicts</span> ────────────────────────────────────────── tidyverse_conflicts() ──</span></span>
 <span><span class="co">## <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">filter()</span> masks <span style="color: #0000BB;">stats</span>::filter()</span></span>
 <span><span class="co">## <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">lag()</span>    masks <span style="color: #0000BB;">stats</span>::lag()</span></span>
@@ -97,7 +97,7 @@ param to set the style of continuous variable summaries (“mean_sd”,
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clusters</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## Integer clusters must be passed in as a factor</span></span>
-<span><span class="fu">cluster_summary</span><span class="op">(</span>data <span class="op">=</span> <span class="va">df_missing</span>, <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">clusters</span><span class="op">$</span><span class="va">clusters</span><span class="op">)</span>, </span>
+<span><span class="fu"><a href="../reference/cluster_summary.html">cluster_summary</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">df_missing</span>, <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">clusters</span><span class="op">$</span><span class="va">clusters</span><span class="op">)</span>, </span>
 <span>include <span class="op">=</span> <span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">df_missing</span><span class="op">)</span>, <span class="st">"index"</span><span class="op">)</span>, </span>
 <span>statistic <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://www.danieldsjoberg.com/gtsummary/reference/select_helpers.html" class="external-link">all_continuous</a></span><span class="op">(</span><span class="op">)</span> <span class="op">~</span> <span class="st">"{mean} ({sd})"</span>,</span>
@@ -1067,7 +1067,7 @@ N = 2,000</span><span class="gt_footnote_marks" style="white-space:nowrap;font-s
 <td headers="stat_4" class="gt_row gt_center">551</td>
 </tr>
 </tbody>
-<tfoot><tr class="gt_footnotes">
+<tfoot class="gt_footnotes"><tr>
 <td class="gt_footnote" colspan="6">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> <span class="gt_from_md">Mean (SD); n / N
 (%)</span>
@@ -1128,42 +1128,42 @@ part of the return object. Otherwise, use the ‘clusters’ parameter in
 <span>  <span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## $overall</span></span>
 <span><span class="co">##     metric     n</span></span>
-<span><span class="co">## 1 75.88655 13783</span></span>
+<span><span class="co">## 1 87.52106 13783</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $per_cluster</span></span>
 <span><span class="co">##   cluster mean_imputation_loss    n</span></span>
-<span><span class="co">## 1       0             61.89374 3408</span></span>
-<span><span class="co">## 2       1             71.27104 1787</span></span>
-<span><span class="co">## 3       2             76.00792 5000</span></span>
-<span><span class="co">## 4       3             91.30698 3588</span></span>
+<span><span class="co">## 1       0             50.22196 3408</span></span>
+<span><span class="co">## 2       1             62.15463 1787</span></span>
+<span><span class="co">## 3       2            146.68272 5000</span></span>
+<span><span class="co">## 4       3             53.13890 3588</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $per_feature_overall</span></span>
 <span><span class="co">##    feature       type mean_imputation_loss   n</span></span>
-<span><span class="co">## 1      Y11 continuous            43.183477 486</span></span>
-<span><span class="co">## 2      Y12 continuous            65.857519 486</span></span>
-<span><span class="co">## 3      Y13 continuous           108.514866 488</span></span>
-<span><span class="co">## 4      Y14 continuous           107.818234 486</span></span>
-<span><span class="co">## 5      Y15 continuous           179.960233 484</span></span>
-<span><span class="co">## 6      Y21 continuous            64.496535 485</span></span>
-<span><span class="co">## 7      Y22 continuous           113.820563 489</span></span>
-<span><span class="co">## 8      Y23 continuous           165.329652 489</span></span>
-<span><span class="co">## 9      Y24 continuous           205.020220 484</span></span>
-<span><span class="co">## 10     Y25 continuous           203.699684 488</span></span>
-<span><span class="co">## 11     Y31 continuous            50.011497 592</span></span>
-<span><span class="co">## 12     Y32 continuous            73.139316 593</span></span>
-<span><span class="co">## 13     Y33 continuous           117.241149 597</span></span>
-<span><span class="co">## 14     Y34 continuous           147.675417 593</span></span>
-<span><span class="co">## 15     Y35 continuous           125.437630 593</span></span>
-<span><span class="co">## 16     Y41 continuous             6.789067 596</span></span>
-<span><span class="co">## 17     Y42 continuous            17.354022 596</span></span>
-<span><span class="co">## 18     Y43 continuous            25.440297 597</span></span>
-<span><span class="co">## 19     Y44 continuous            34.743547 597</span></span>
-<span><span class="co">## 20     Y45 continuous            39.970825 590</span></span>
-<span><span class="co">## 21     Y51 continuous             5.609562 591</span></span>
-<span><span class="co">## 22     Y52 continuous            12.871700 595</span></span>
-<span><span class="co">## 23     Y53 continuous            18.710681 601</span></span>
-<span><span class="co">## 24     Y54 continuous            25.557355 594</span></span>
-<span><span class="co">## 25     Y55 continuous            30.092431 593</span></span></code></pre>
+<span><span class="co">## 1      Y11 continuous            38.122084 486</span></span>
+<span><span class="co">## 2      Y12 continuous            78.098287 486</span></span>
+<span><span class="co">## 3      Y13 continuous           135.052938 488</span></span>
+<span><span class="co">## 4      Y14 continuous           170.977045 486</span></span>
+<span><span class="co">## 5      Y15 continuous           225.920158 484</span></span>
+<span><span class="co">## 6      Y21 continuous            56.331695 485</span></span>
+<span><span class="co">## 7      Y22 continuous           106.415160 489</span></span>
+<span><span class="co">## 8      Y23 continuous           153.014150 489</span></span>
+<span><span class="co">## 9      Y24 continuous           221.143330 484</span></span>
+<span><span class="co">## 10     Y25 continuous           263.322486 488</span></span>
+<span><span class="co">## 11     Y31 continuous            34.547226 592</span></span>
+<span><span class="co">## 12     Y32 continuous            80.638284 593</span></span>
+<span><span class="co">## 13     Y33 continuous           124.523814 597</span></span>
+<span><span class="co">## 14     Y34 continuous           163.868605 593</span></span>
+<span><span class="co">## 15     Y35 continuous           192.690129 593</span></span>
+<span><span class="co">## 16     Y41 continuous             6.178258 596</span></span>
+<span><span class="co">## 17     Y42 continuous            17.810601 596</span></span>
+<span><span class="co">## 18     Y43 continuous            25.157027 597</span></span>
+<span><span class="co">## 19     Y44 continuous            46.010148 597</span></span>
+<span><span class="co">## 20     Y45 continuous            50.226487 590</span></span>
+<span><span class="co">## 21     Y51 continuous             4.685499 591</span></span>
+<span><span class="co">## 22     Y52 continuous            14.288399 595</span></span>
+<span><span class="co">## 23     Y53 continuous            19.011965 601</span></span>
+<span><span class="co">## 24     Y54 continuous            28.738215 594</span></span>
+<span><span class="co">## 25     Y55 continuous            36.292319 593</span></span></code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -1172,7 +1172,7 @@ part of the return object. Otherwise, use the ‘clusters’ parameter in
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Yasin Khadem Charvadeh, Danielle Vaithilingam, Kenneth Seier, Katherine S. Panageas, Mithat Gönen, Yuan Chen.</p>
+  <p>Developed by Yasin Khadem Charvadeh, Kenneth Seier, Katherine S. Panageas, Danielle Vaithilingam, Mithat Gönen, Yuan Chen.</p>
 </div>
 
 <div class="pkgdown-footer-right">

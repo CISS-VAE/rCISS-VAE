@@ -1,5 +1,6 @@
 ---
 title: "Summary Functions"
+date: "`r format(Sys.Date(), '%Y-%m-%d')`"
 output: 
   rmarkdown::html_vignette:
     toc: true
@@ -18,9 +19,7 @@ There are two summary functions included with the rCISSVAE package that can help
 ## Per-cluster Summary
 
 The `cluster_summary()` function creates a data summary table stratified by missingness cluster. Use the `cont_style` param to set the style of continuous variable summaries ("mean_sd", "median_iqr", "both"). 
-```{r usevenv, echo=FALSE, include=FALSE}
-reticulate::use_virtualenv("/home/nfs/vaithid1/CISS-VAE/.venv", required = TRUE)
-```
+
 
 ```{r setup}
 library(tidyverse)
@@ -42,13 +41,13 @@ statistic = list(
 
 ```
 
-## By-cluster MSE function
+## By-cluster imputation loss function
 
-After running the model, you can get the per-cluster validation set MSE using the `performance_by_cluster()` function. Set 'return_validation_dataset = TRUE' in the `run_cissvae()` function to be able to use performance_by_cluster on the result object. If the validation dataset (val_data in result object) and imputed validation dataset (val_imputed in the result object) are not returned, the MSE cannot be calculated. 
+After running the model, you can get the per-cluster validation set imputation loss using the `performance_by_cluster()` function. Set 'return_validation_dataset = TRUE' in the `run_cissvae()` function to be able to use performance_by_cluster on the result object. If the validation dataset (val_data in result object) and imputed validation dataset (val_imputed in the result object) are not returned, the imputation loss cannot be calculated. 
 
 If the `run_cissvae()` function was used to generate clusters, set `return_clusters=TRUE` and the clusters will be part of the return object. Otherwise, use the 'clusters' parameter in `performance_by_cluster()` to input the clusters. 
 
-```{r}
+```{r eval=FALSE}
 result = run_cissvae(
   data = df_missing,
   index_col = "index",
@@ -69,7 +68,12 @@ result = run_cissvae(
 cat(paste("Check necessary returns:", paste0(names(result), collapse = ", ")))
 ```
 
-```{r}
+```{r checkres, echo=FALSE}
+result = readRDS(system.file("extdata", "demo_run.rds", package = "rCISSVAE"))
+cat(paste("Check necessary returns:", paste0(names(result), collapse = ", ")))
+```
+
+```{r perf_by_clus}
 performance_by_cluster(res = result, 
   group_col = NULL, 
   clusters = clusters$clusters,

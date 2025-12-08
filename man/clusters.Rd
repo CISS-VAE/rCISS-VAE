@@ -19,7 +19,7 @@ clusters
 }
 \description{
 A tibble assigning each observation in \code{df_missing}/\code{df_complete} to a cluster
-determined by its missingness pattern.  Useful for stratifying downstream analyses.
+determined by its missingness pattern.
 }
 \examples{
 data(clusters)

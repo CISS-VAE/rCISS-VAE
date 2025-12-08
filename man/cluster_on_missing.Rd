@@ -8,9 +8,11 @@ cluster_on_missing(
   data,
   cols_ignore = NULL,
   n_clusters = NULL,
-  seed = NULL,
-  min_cluster_size = NULL,
-  cluster_selection_epsilon = 0.25
+  seed = 42,
+  k_neighbors = NULL,
+  leiden_resolution = 0.25,
+  leiden_objective = "CPM",
+  use_snn = TRUE
 )
 }
 \arguments{
@@ -19,14 +21,14 @@ cluster_on_missing(
 \item{cols_ignore}{Character vector of column names to ignore when clustering.}
 
 \item{n_clusters}{Integer; if provided, will run KMeans with this many clusters.
-If \code{NULL}, will use HDBSCAN.}
+If \code{NULL}, will use Leiden.}
 
-\item{seed}{Integer; random seed for KMeans (or reproducibility in HDBSCAN).}
+\item{seed}{Integer; random seed for KMeans (or reproducibility in Leiden).}
 
-\item{min_cluster_size}{Integer; minimum cluster size for HDBSCAN.
+\item{k_neighbors}{Integer; minimum cluster size for Leiden.
 If \code{NULL}, defaults to \code{nrow(data) \%/\% 25}.}
 
-\item{cluster_selection_epsilon}{Numeric; epsilon parameter for HDBSCAN.}
+\item{leiden_resolution}{Resolution for Leiden Clustering.}
 }
 \value{
 A list with components:

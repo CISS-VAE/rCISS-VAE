@@ -11,11 +11,12 @@
 #' @param python_version Python version string (major.minor), used when installing Python.
 #' 
 #' @examples
+#' \dontrun{
 #' create_cissvae_env(
 #' envname = "cissvae_environment",
 #' install_python = FALSE,
 #' python_version = "3.10")
-#' 
+#' }
 #' @export
 create_cissvae_env <- function(
   envname        = "cissvae_environment",

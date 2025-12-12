@@ -9,8 +9,7 @@ output:
     fig_height: 5
     dpi: 600
 vignette: >
-  %\VignetteIndexEntry{Masking certain entries from imputation
-  model}
+  %\VignetteIndexEntry{'Masking certain entries from imputation model'}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -57,7 +56,7 @@ If we look at the entry for P007, which has a death event at year 3, we can see 
 
 When running the cissvae model with this dataset, it is important that the dataset and dni matrix have the same shape and column names. This allows us to take advantage of the `index_col` and `columns_ignore` arguments. We pass the dni matrix through the `imputable_matrix` argument. 
 
-```{r eval=False}
+```{r eval=FALSE}
 res <- run_cissvae(
   mock_surv,
   index_col = "patient_id",
@@ -71,6 +70,7 @@ res <- run_cissvae(
   k_neighbors = 5,
   return_silhouettes = FALSE
 )
+res$imputed_dataset[1:7,] %>% kableExtra::kable()
 
 ```
 
@@ -78,10 +78,5 @@ When we unpack the results and look at the imputed dataset, we can see that P007
 
 ```{r include=FALSE, echo=FALSE}
 res <- readRDS(system.file("extdata", "imputable.rds", package = "rCISSVAE"))
-```
-
-```{r}
-
-res$imputed_dataset[1:7,] %>% kableExtra::kable()
-
+res[1:7,] %>% kableExtra::kable()
 ```

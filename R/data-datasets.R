@@ -20,27 +20,9 @@
 #' summary(df_missing)
 "df_missing"
 
-#' Complete version of the sample dataset
-#'
-#' The same simulated biomarker measurements as in `df_missing`, but with **no** missing values—
-#' useful as a ground truth for evaluating imputation methods.
-#'
-#' @docType data
-#' @format A tibble with *8,000* rows and *30* variables containing full simulated data:
-#' \describe{
-#'   \item{index}{Integer. Row identifier imported from `data_raw/df_complete.csv`.}
-#'   \item{Age, Salary, ZipCode10001-ZipCode30003}{Demographic columns.}
-#'   \item{Y11, ..., Y55}{Simulated Biomarker columns}
-#' }
-#' @source Imported from `data_raw/df_complete.csv`, then renamed `...1` → `index`.  
-#' @examples
-#' data(df_complete)
-#' head(df_complete)
-"df_complete"
-
 #' Cluster assignments based on missingness patterns
 #'
-#' A tibble assigning each observation in `df_missing`/`df_complete` to a cluster
+#' A tibble assigning each observation in `df_missing` to a cluster
 #' determined by its missingness pattern. 
 #'
 #' @docType data

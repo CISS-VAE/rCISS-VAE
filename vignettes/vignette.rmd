@@ -415,10 +415,13 @@ print(head(prop_matrix[, 1:5]))
 ```{r showres4, echo=FALSE}
 advanced_result = readRDS(system.file("extdata", "missing_prop.rds", package = "rCISSVAE"))
 
-cat("Clustering quality:\n")
-cat(paste("Silhouette score:", round(advanced_result$silhouette_width, 3)), "\n")
+# ar$silhouette_width
+# [1] 0.6557173
 
-ggplot2::ggplot(data = advanced_result$training_history, aes(x = epoch, y = imputation_error)) + geom_point() + labs(y = "Imputation Loss", x = "Epoch") + 
+cat("Clustering quality:\n")
+cat(paste("Silhouette score:", round(0.6557173, 3)), "\n")
+
+ggplot2::ggplot(data = advanced_result, aes(x = epoch, y = imputation_error)) + geom_point() + labs(y = "Imputation Loss", x = "Epoch") + 
   theme_classic()
 
 ```
@@ -512,11 +515,9 @@ plot_vae_architecture(best_model, title = "Optimized CISSVAE Architecture")
 ```
 
 ```{r showres5, echo=FALSE}
-aut = readRDS(system.file("extdata", "autotune.rds", package = "rCISSVAE"))
-# Analyze results
-imputed <- aut$imputed
-best_model <- aut$model
-results <- aut$results
+results = readRDS(system.file("extdata", "autotune.rds", package = "rCISSVAE"))
+
+
 
 # View best hyperparameters
 print("Trial results:")

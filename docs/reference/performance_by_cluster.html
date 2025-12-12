@@ -116,15 +116,11 @@ For other numeric features, performance is mean squared error (MSE).</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ciss-vae.github.io/rCISS-VAE">rCISSVAE</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://haozhu233.github.io/kableExtra/" class="external-link">kableExtra</a></span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘kableExtra’</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> The following object is masked from ‘package:dplyr’:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     group_rows</span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ddsjoberg/gtsummary" class="external-link">gtsummary</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">df_missing</span><span class="op">)</span></span></span>
@@ -134,8 +130,7 @@ For other numeric features, performance is mean squared error (MSE).</p>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="va">df_missing</span>,</span></span>
 <span class="r-in"><span>  index_col <span class="op">=</span> <span class="st">"index"</span>,</span></span>
 <span class="r-in"><span>  val_proportion <span class="op">=</span> <span class="fl">0.1</span>, <span class="co">## pass a vector for different proportions by cluster</span></span></span>
-<span class="r-in"><span>  columns_ignore <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Age"</span>, <span class="st">"Salary"</span>, <span class="st">"ZipCode10001"</span>, <span class="st">"ZipCode20002"</span>, <span class="st">"ZipCode30003"</span><span class="op">)</span>, <span class="co">## If there are columns in addition to the index you want to ignore when selecting validation set, list them here. In this case, we ignore the 'demographic' columns because we do not want to remove data from them for validation purposes. </span></span></span>
-<span class="r-in"><span>  clusters <span class="op">=</span> <span class="va">clusters</span><span class="op">$</span><span class="va">clusters</span>, <span class="co">## we have precomputed cluster labels so we pass them here</span></span></span>
+<span class="r-in"><span>  columns_ignore <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Age"</span>, <span class="st">"Salary"</span>, <span class="st">"ZipCode10001"</span>, <span class="st">"ZipCode20002"</span>, <span class="st">"ZipCode30003"</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>  epochs <span class="op">=</span> <span class="fl">5</span>,</span></span>
 <span class="r-in"><span>  return_silhouettes <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>  return_history <span class="op">=</span> <span class="cn">TRUE</span>,  <span class="co"># Get detailed training history</span></span></span>
@@ -153,47 +148,10 @@ For other numeric features, performance is mean squared error (MSE).</p>
 <span class="r-in"><span>  feature_cols <span class="op">=</span> <span class="cn">NULL</span>, <span class="co">## default, all numeric columns excluding group_col &amp; cols_ignore</span></span></span>
 <span class="r-in"><span>  by_group <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>  by_cluster <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>  cols_ignore <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"index"</span>, <span class="st">"Age"</span>, <span class="st">"Salary"</span>, <span class="st">"ZipCode10001"</span>, <span class="st">"ZipCode20002"</span>, <span class="st">"ZipCode30003"</span><span class="op">)</span> <span class="co">## columns to not score</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $overall</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     metric     n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 63.16161 13783</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $per_cluster</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   cluster mean_imputation_loss    n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1       0             47.80707 3408</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2       1             52.92966 1787</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       2             95.31815 5000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4       3             38.03062 3588</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $per_feature_overall</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    feature       type mean_imputation_loss   n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1      Y11 continuous            36.591704 486</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2      Y12 continuous            46.755067 486</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3      Y13 continuous            94.654444 488</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4      Y14 continuous            98.587245 486</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5      Y15 continuous           162.425388 484</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6      Y21 continuous            58.314266 485</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7      Y22 continuous            76.707372 489</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8      Y23 continuous            94.390170 489</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9      Y24 continuous           141.621430 484</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10     Y25 continuous           189.928999 488</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11     Y31 continuous            33.438247 592</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12     Y32 continuous            61.453036 593</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13     Y33 continuous            98.153023 597</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14     Y34 continuous           128.054635 593</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15     Y35 continuous           132.032501 593</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16     Y41 continuous             5.810522 596</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17     Y42 continuous            14.824334 596</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18     Y43 continuous            23.896075 597</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19     Y44 continuous            32.645968 597</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20     Y45 continuous            36.669992 590</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21     Y51 continuous             4.242267 591</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22     Y52 continuous            11.562685 595</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23     Y53 continuous            16.359109 601</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24     Y54 continuous            19.838694 594</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25     Y55 continuous            27.645233 593</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span>  cols_ignore <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"index"</span>, <span class="st">"Age"</span>, <span class="st">"Salary"</span>, <span class="st">"ZipCode10001"</span>, <span class="st">"ZipCode20002"</span>, <span class="st">"ZipCode30003"</span><span class="op">)</span> </span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

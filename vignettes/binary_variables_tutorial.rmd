@@ -21,7 +21,6 @@ rm(list = ls())
 
 library(rCISSVAE)
 library(tidyverse)
-library(ggplot2)
 library(kableExtra)
 library(reticulate)
 
@@ -111,13 +110,13 @@ head(penguin_dummies)
 ```{r echo=FALSE}
 results = readRDS(system.file("extdata", "binary_res.rds", package = "rCISSVAE"))
 
-head(results$imputed_dataset)
+head(results)
 head(penguin_dummies)
 ```
 
 As we can see above, the imputed values for the binary variables are in terms of **probability**, not a flat 0,1 so we have to convert those values to binary. The 'imputed_dataset' is returned as a data.frame, so we can use tidyverse mutate to convert the binary variables. 
 
-```{r}
+```{r eval=FALSE}
 results$imputed_dataset <- results$imputed_dataset %>%
   mutate(across(
     .cols = matches("species|island|sex"),
@@ -129,6 +128,22 @@ results$imputed_dataset <- results$imputed_dataset %>%
   ))
 
 head(results$imputed_dataset)
+head(penguin_dummies)
+head(penguin_dummies_complete)
+```
+
+```{r echo=FALSE}
+results <- results %>%
+  mutate(across(
+    .cols = matches("species|island|sex"),
+    .fns = ~ case_when(
+      .x > 0.5 ~ 1,
+      .x <= 0.5 ~ 0,
+      TRUE ~ .x
+    )
+  ))
+
+head(results)
 head(penguin_dummies)
 head(penguin_dummies_complete)
 ```

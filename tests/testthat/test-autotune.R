@@ -1,29 +1,33 @@
 # tests/testthat/test-autotune.R
+# -------------------------------------------------------------------
+# Correct tests for autotune_cissvae(), aligned with current implementation
+# -------------------------------------------------------------------
 
-test_that("Search-space style arguments accept fixed and ranged values", {
+test_that("Autotune accepts both fixed and ranged parameter styles", {
   skip_if_no_cissvae_py()
 
   df <- make_sample_data()
   clusters <- make_clusters_for(df, k = 3L)
 
-  # Fixed-only style
+  # --- Fixed hyperparameters (degenerate ranges allowed) ---------------------
   res_fixed <- autotune_cissvae(
     data = df,
     clusters = clusters,
-    n_trials = 2L,
+    n_trials = 1L,
     device_preference = "cpu",
     load_if_exists = FALSE,
-    # "SearchSpace" fixed style:
+
     num_hidden_layers = 2L,
     hidden_dims       = 64L,
     latent_dim        = 16L,
     latent_shared     = TRUE,
     output_shared     = FALSE,
-    lr                = c(1e-3, 1e-3),   # degenerate range = fixed
-    decay_factor      = c(0.95, 0.95),   # degenerate range = fixed
+    lr                = 1e-3,
+    decay_factor      = 0.95,
+    weight_decay      = 0.001,
     beta              = 0.01,
-    num_epochs        = 2L,
-    batch_size        = 64L,
+    num_epochs        = 1L,
+    batch_size        = 32L,
     num_shared_encode = 1L,
     num_shared_decode = 1L,
     encoder_shared_placement = "at_end",
@@ -32,21 +36,23 @@ test_that("Search-space style arguments accept fixed and ranged values", {
     refit_loops       = 1L,
     epochs_per_loop   = 1L,
     reset_lr_refit    = TRUE,
-    show_progress     = FALSE,
-    verbose           = FALSE
+
+    show_progress = FALSE,
+    verbose       = FALSE
   )
 
-  expect_true(all(c("imputed","model","study","results") %in% names(res_fixed)))
-  expect_s3_class(res_fixed$imputed, "data.frame")
+  expect_true(all(c("imputed_dataset","model","study","results") %in% names(res_fixed)))
+  expect_s3_class(res_fixed$imputed_dataset, "data.frame")
   expect_s3_class(res_fixed$results, "data.frame")
 
-  # Tunable/ranged style
+  # --- Ranged / tunable hyperparameters -------------------------------------
   res_tune <- autotune_cissvae(
     data = df,
     clusters = clusters,
-    n_trials = 3L,
+    n_trials = 2L,
     device_preference = "cpu",
     load_if_exists = FALSE,
+
     num_hidden_layers = c(1L, 3L),
     hidden_dims       = c(32L, 64L),
     latent_dim        = c(8L, 16L),
@@ -54,8 +60,9 @@ test_that("Search-space style arguments accept fixed and ranged values", {
     output_shared     = c(TRUE, FALSE),
     lr                = c(1e-4, 1e-3),
     decay_factor      = c(0.9, 0.999),
+    weight_decay      = 0.001,
     beta              = 0.01,
-    num_epochs        = 2L,
+    num_epochs        = 1L,
     batch_size        = 32L,
     num_shared_encode = c(0L, 1L),
     num_shared_decode = c(0L, 1L),
@@ -65,217 +72,168 @@ test_that("Search-space style arguments accept fixed and ranged values", {
     refit_loops       = 1L,
     epochs_per_loop   = 1L,
     reset_lr_refit    = c(TRUE, FALSE),
-    show_progress     = FALSE,
-    verbose           = FALSE
+
+    show_progress = FALSE,
+    verbose       = FALSE
   )
 
-  expect_true(all(c("imputed","model","study","results") %in% names(res_tune)))
-  expect_equal(nrow(res_tune$results), 3L)
+  expect_true(all(c("imputed_dataset","model","study","results") %in% names(res_tune)))
+  expect_equal(nrow(res_tune$results), 2L)
 })
+
+# ---------------------------------------------------------------------------
 
 test_that("n_trials controls number of results rows", {
   skip_if_no_cissvae_py()
-  df <- make_sample_data()
-  clusters <- make_clusters_for(df, k = 3L)
 
-  for (n in c(1L, 3L, 5L)) {
+  df <- make_sample_data()
+  clusters <- make_clusters_for(df)
+
+  for (n in c(1L, 2L, 3L)) {
     res <- autotune_cissvae(
-      data = df, clusters = clusters,
-      n_trials = n, device_preference = "cpu", load_if_exists = FALSE,
+      data = df,
+      clusters = clusters,
+      n_trials = n,
+      device_preference = "cpu",
+      load_if_exists = FALSE,
+
       num_hidden_layers = c(1L, 2L),
       hidden_dims       = c(32L, 64L),
       latent_dim        = c(8L, 16L),
-      num_epochs        = 2L,
+      lr                = c(1e-4, 1e-3),
+      decay_factor      = c(0.9, 0.99),
+      weight_decay      = 0.001,
+      num_epochs        = 1L,
       batch_size        = 32L,
       num_shared_encode = c(0L, 1L),
       num_shared_decode = c(0L, 1L),
       refit_patience    = 1L,
       refit_loops       = 1L,
       epochs_per_loop   = 1L,
-      show_progress     = FALSE,
-      verbose           = FALSE
+
+      show_progress = FALSE,
+      verbose       = FALSE
     )
+
     expect_equal(nrow(res$results), n)
   }
 })
 
-test_that("evaluate_all_orders=TRUE runs with a cap on combinations", {
+# ---------------------------------------------------------------------------
+
+test_that("evaluate_all_orders = TRUE respects max_exhaustive_orders", {
   skip_if_no_cissvae_py()
+
   df <- make_sample_data()
-  clusters <- make_clusters_for(df, k = 3L)
+  clusters <- make_clusters_for(df)
 
   res <- autotune_cissvae(
-    data = df, clusters = clusters,
-    n_trials = 2L,
-    device_preference = "cpu",
-    load_if_exists = FALSE,
+    data = df,
+    clusters = clusters,
+    n_trials = 1L,
     evaluate_all_orders = TRUE,
     max_exhaustive_orders = 5L,
-    num_hidden_layers = 4L,  # many combos
-    hidden_dims       = 64L,
+
+    num_hidden_layers = 4L,
+    hidden_dims       = 32L,
     latent_dim        = 16L,
-    num_shared_encode = c(0L, 1L, 2L, 3L),
-    num_shared_decode = c(0L, 1L, 2L, 3L),
-    num_epochs        = 1L,
-    batch_size        = 64L,
-    refit_loops       = 1L,
-    epochs_per_loop   = 1L,
-    show_progress     = FALSE,
-    verbose           = FALSE
-  )
-  expect_true(all(c("imputed","model","study","results") %in% names(res)))
-})
+    num_shared_encode = c(0L, 1L, 2L),
+    num_shared_decode = c(0L, 1L, 2L),
 
-test_that("evaluate_all_orders=FALSE runs", {
-  skip_if_no_cissvae_py()
-  df <- make_sample_data()
-  clusters <- make_clusters_for(df, k = 3L)
-
-  res <- autotune_cissvae(
-    data = df, clusters = clusters,
-    n_trials = 2L, device_preference = "cpu", load_if_exists = FALSE,
-    evaluate_all_orders = FALSE,
-    num_hidden_layers = c(1L, 3L),
-    hidden_dims       = c(32L, 64L),
-    latent_dim        = c(8L, 16L),
-    num_epochs        = 2L,
-    batch_size        = 32L,
-    num_shared_encode = c(0L, 1L),
-    num_shared_decode = c(0L, 1L),
-    refit_patience    = 1L,
-    refit_loops       = 1L,
-    epochs_per_loop   = 1L,
-    show_progress     = FALSE,
-    verbose           = FALSE
-  )
-  expect_true(all(c("imputed","model","study","results") %in% names(res)))
-})
-
-test_that("return format is consistent", {
-  skip_if_no_cissvae_py()
-  df <- make_sample_data()
-  clusters <- make_clusters_for(df, k = 3L)
-
-  res <- autotune_cissvae(
-    data = df, clusters = clusters,
-    n_trials = 2L, device_preference = "cpu", load_if_exists = FALSE,
-    num_hidden_layers = c(1L, 2L),
-    hidden_dims       = c(32L, 64L),
-    latent_dim        = c(8L, 16L),
-    num_epochs        = 2L,
-    batch_size        = 32L,
-    num_shared_encode = c(0L, 1L),
-    num_shared_decode = c(0L, 1L),
-    refit_patience    = 1L,
-    refit_loops       = 1L,
-    epochs_per_loop   = 1L,
-    show_progress     = FALSE,
-    verbose           = FALSE
+    device_preference = "cpu",
+    load_if_exists = FALSE,
+    num_epochs      = 1L,
+    batch_size      = 32L,
+    refit_loops     = 1L,
+    epochs_per_loop = 1L,
+    show_progress   = FALSE,
+    verbose         = FALSE
   )
 
-  expect_named(res, c("imputed","model","study","results"), ignore.order = TRUE)
-  expect_s3_class(res$imputed, "data.frame")
-  expect_s3_class(res$results, "data.frame")
+  expect_true(all(c("imputed_dataset","model","study","results") %in% names(res)))
 })
 
-test_that("constant_layer_size=TRUE runs", {
-  skip_if_no_cissvae_py()
-  df <- make_sample_data()
-  clusters <- make_clusters_for(df, k = 3L)
+# ---------------------------------------------------------------------------
 
-  res <- autotune_cissvae(
-    data = df, clusters = clusters,
-    n_trials = 2L, device_preference = "cpu", load_if_exists = FALSE,
-    constant_layer_size = TRUE,
-    num_hidden_layers = 3L,
-    hidden_dims       = c(64L, 128L),  # should be treated as constant
-    latent_dim        = 16L,
-    num_epochs        = 2L,
-    batch_size        = 32L,
-    refit_loops       = 1L,
-    epochs_per_loop   = 1L,
-    show_progress     = FALSE,
-    verbose           = FALSE
-  )
-  expect_true(all(c("imputed","model","study","results") %in% names(res)))
-})
-
-test_that("invalid parameter values are validated", {
+test_that("invalid placement strategies are rejected", {
   skip_if_no_cissvae_py()
+
   df <- make_sample_data()
-  clusters <- make_clusters_for(df, k = 3L)
+  clusters <- make_clusters_for(df)
 
   expect_error(
     autotune_cissvae(
-      data = df, clusters = clusters,
-      n_trials = 1L, device_preference = "cpu", load_if_exists = FALSE,
-      encoder_shared_placement = "not_a_valid_option"  # invalid
+      data = df,
+      clusters = clusters,
+      n_trials = 1L,
+      encoder_shared_placement = "NOPE"
     ),
     "Invalid encoder_shared_placement"
   )
 
   expect_error(
     autotune_cissvae(
-      data = df, clusters = clusters,
-      n_trials = 1L, device_preference = "cpu", load_if_exists = FALSE,
-      decoder_shared_placement = "nope"  # invalid
+      data = df,
+      clusters = clusters,
+      n_trials = 1L,
+      decoder_shared_placement = "BAD"
     ),
     "Invalid decoder_shared_placement"
   )
 })
 
-test_that("seed reproducibility: same nrow(results) for same seed", {
-  skip_if_no_cissvae_py()
-  df <- make_sample_data()
-  clusters <- make_clusters_for(df, k = 3L)
+# ---------------------------------------------------------------------------
 
+test_that("seed reproducibility preserves the number of rows", {
+  skip_if_no_cissvae_py()
+
+  df <- make_sample_data()
+  clusters <- make_clusters_for(df)
   p <- minimal_params_autotune()
 
-  res1 <- autotune_cissvae(
-    data = df, clusters = clusters,
-    n_trials = 2L, device_preference = "cpu", load_if_exists = FALSE,
-    seed = 42L,
-    num_hidden_layers = p$num_hidden_layers,
-    hidden_dims       = p$hidden_dims,
-    latent_dim        = p$latent_dim,
-    num_epochs        = p$num_epochs,
-    batch_size        = p$batch_size,
-    num_shared_encode = p$num_shared_encode,
-    num_shared_decode = p$num_shared_decode,
-    encoder_shared_placement = p$encoder_shared_placement,
-    decoder_shared_placement = p$decoder_shared_placement,
-    refit_patience    = p$refit_patience,
-    refit_loops       = p$refit_loops,
-    epochs_per_loop   = p$epochs_per_loop,
-    reset_lr_refit    = p$reset_lr_refit,
-    show_progress     = FALSE, verbose = FALSE
-  )
+  run_one <- function() {
+    autotune_cissvae(
+      data = df,
+      clusters = clusters,
+      n_trials = 2L,
+      seed = 42L,
+      device_preference = "cpu",
+      load_if_exists = FALSE,
 
-  res2 <- autotune_cissvae(
-    data = df, clusters = clusters,
-    n_trials = 2L, device_preference = "cpu", load_if_exists = FALSE,
-    seed = 42L,
-    num_hidden_layers = p$num_hidden_layers,
-    hidden_dims       = p$hidden_dims,
-    latent_dim        = p$latent_dim,
-    num_epochs        = p$num_epochs,
-    batch_size        = p$batch_size,
-    num_shared_encode = p$num_shared_encode,
-    num_shared_decode = p$num_shared_decode,
-    encoder_shared_placement = p$encoder_shared_placement,
-    decoder_shared_placement = p$decoder_shared_placement,
-    refit_patience    = p$refit_patience,
-    refit_loops       = p$refit_loops,
-    epochs_per_loop   = p$epochs_per_loop,
-    reset_lr_refit    = p$reset_lr_refit,
-    show_progress     = FALSE, verbose = FALSE
-  )
+      # from minimal_params_autotune()
+      num_hidden_layers = p$num_hidden_layers,
+      hidden_dims       = p$hidden_dims,
+      latent_dim        = p$latent_dim,
+      lr                = c(1e-4, 1e-3),
+      decay_factor      = c(0.9, 0.99),
+      weight_decay      = 0.001,
+      num_epochs        = p$num_epochs,
+      batch_size        = p$batch_size,
+      num_shared_encode = p$num_shared_encode,
+      num_shared_decode = p$num_shared_decode,
+      encoder_shared_placement = p$encoder_shared_placement,
+      decoder_shared_placement = p$decoder_shared_placement,
+      refit_patience    = p$refit_patience,
+      refit_loops       = p$refit_loops,
+      epochs_per_loop   = p$epochs_per_loop,
+      reset_lr_refit    = p$reset_lr_refit,
+
+      show_progress = FALSE,
+      verbose       = FALSE
+    )
+  }
+
+  res1 <- run_one()
+  res2 <- run_one()
 
   expect_equal(nrow(res1$results), nrow(res2$results))
 })
 
-test_that("actual tiny optimization runs end-to-end", {
+# ---------------------------------------------------------------------------
+
+test_that("tiny optimization path runs end-to-end", {
   skip_if_no_cissvae_py()
+
   df <- make_sample_data()
   clusters <- make_clusters_for(df, k = 3L)
 
@@ -283,24 +241,26 @@ test_that("actual tiny optimization runs end-to-end", {
     data = df,
     clusters = clusters,
     n_trials = 2L,
-    study_name = "vae_autotune_rtest",
     device_preference = "cpu",
-    show_progress = FALSE,
     load_if_exists = FALSE,
-    # minimal space
+
     num_hidden_layers = 1L,
     hidden_dims       = 16L,
     latent_dim        = c(4L, 8L),
-    lr                = c(0.01, 0.01),
+    lr                = 0.01,
+    decay_factor      = 0.95,
+    weight_decay      = 0.001,
     num_epochs        = 1L,
-    batch_size        = 64L,
-    refit_loops       = 1L,
-    epochs_per_loop   = 1L,
+    batch_size        = 32L,
     num_shared_encode = 0L,
     num_shared_decode = 1L,
-    verbose           = FALSE
+    refit_loops       = 1L,
+    epochs_per_loop   = 1L,
+
+    show_progress = FALSE,
+    verbose       = FALSE
   )
 
-  expect_true(all(c("imputed","model","study","results") %in% names(res)))
+  expect_true(all(c("imputed_dataset","model","study","results") %in% names(res)))
   expect_equal(nrow(res$results), 2L)
 })

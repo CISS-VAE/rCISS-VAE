@@ -81,20 +81,18 @@ results <- aut$results
 
 # View best hyperparameters
 print("Trial results:")
-results %>% kable() %>%
+results |> kable() |>
   kable_styling(font_size=12)
 
 ```
 
 ```{r showres, echo=FALSE}
-aut = readRDS(system.file("extdata", "autotune.rds", package = "rCISSVAE"))
+library(tidyverse)
+results = readRDS(system.file("extdata", "autotune.rds", package = "rCISSVAE"))
 
-imputed <- aut$imputed
-best_model <- aut$model
-results <- aut$results
 
 print("Trial results:")
-results %>% kableExtra::kable() %>%
+results |> kableExtra::kable() |>
   kableExtra::kable_styling(font_size=12)
 
 ```

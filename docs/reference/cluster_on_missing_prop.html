@@ -84,18 +84,20 @@ entries are missingness proportions in <code>[0,1]</code>. Can be created with <
 <dd><p>Numeric; Leiden cluster selection threshold (default: <code>0.25</code>).</p></dd>
 
 
+<dt id="arg-use-snn">use_snn<a class="anchor" aria-label="anchor" href="#arg-use-snn"></a></dt>
+<dd><p>use snn</p></dd>
+
+
+<dt id="arg-leiden-objective">leiden_objective<a class="anchor" aria-label="anchor" href="#arg-leiden-objective"></a></dt>
+<dd><p>objective</p></dd>
+
+
 <dt id="arg-metric">metric<a class="anchor" aria-label="anchor" href="#arg-metric"></a></dt>
 <dd><p>Character; distance metric <code>"euclidean"</code> or <code>"cosine"</code> (default: <code>"euclidean"</code>).</p></dd>
 
 
 <dt id="arg-scale-features">scale_features<a class="anchor" aria-label="anchor" href="#arg-scale-features"></a></dt>
 <dd><p>Logical; whether to standardize <strong>feature columns</strong> before clustering samples (default: <code>FALSE</code>).</p></dd>
-
-
-<dt id="arg-handle-noise">handle_noise<a class="anchor" aria-label="anchor" href="#arg-handle-noise"></a></dt>
-<dd><p>Character; how to handle Leiden noise points (<code>-1</code>):
-<code>"keep"</code> (each noise sample gets its own new cluster ID), <code>"separate"</code> (all noise samples share one new ID),
-or <code>"merge"</code> (noise samples assigned to largest existing cluster) (default: <code>"keep"</code>).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -119,7 +121,7 @@ or <code>"merge"</code> (noise samples assigned to largest existing cluster) (de
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">clusters_positive</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt; table of extent 0 &gt;</span>
 <span class="r-in"><span><span class="va">res</span><span class="op">$</span><span class="va">silhouette_score</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.8375278</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

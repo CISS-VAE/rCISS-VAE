@@ -29,6 +29,10 @@ If \code{NULL}, will use Leiden.}
 If \code{NULL}, defaults to \code{nrow(data) \%/\% 25}.}
 
 \item{leiden_resolution}{Resolution for Leiden Clustering.}
+
+\item{leiden_objective}{objective}
+
+\item{use_snn}{use snn}
 }
 \value{
 A list with components:

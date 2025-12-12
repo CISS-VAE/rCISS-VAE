@@ -27,9 +27,10 @@ the default location) or at a custom filesystem path, or create it
 (and install CISSVAE into it).
 }
 \examples{
+\dontrun{
 create_cissvae_env(
 envname = "cissvae_environment",
 install_python = FALSE,
 python_version = "3.10")
-
+}
 }

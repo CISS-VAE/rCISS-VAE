@@ -1,11 +1,12 @@
-# rCISSVAE/R/autotune_fun.R
-library(reticulate)
-library(dplyr)
-library(purrr)
 #' Autotune CISS-VAE hyperparameters with Optuna
-#' 
-#' Performs hyperparameter optimization for CISS-VAE using Optuna with support for both tunable and fixed parameters. 
-#' 
+#'
+#' @importFrom purrr keep
+#'
+
+#'
+#' @description Performs hyperparameter optimization for CISS-VAE using Optuna with support
+#' for both tunable and fixed parameters.
+
 #' @param data Data frame or matrix containing the input data
 #' @param index_col String name of index column to preserve (optional)
 #' @param clusters Integer vector specifying cluster assignments for each row.
@@ -40,6 +41,14 @@ library(purrr)
 #' @param refit_loops Integer: maximum number of refit loops
 #' @param epochs_per_loop Integer: epochs per refit loop
 #' @param reset_lr_refit Logical vector: whether to reset LR before refit
+#' @param val_proportion Proportion of non-missing data to hold out for validation.
+#' @param replacement_value Numeric value used to replace missing entries before model input.
+#' @param columns_ignore Character vector of column names to exclude from imputation scoring.
+#' @param imputable_matrix Logical matrix indicating entries allowed to be imputed.
+#' @param binary_feature_mask Logical vector marking which columns are binary.
+#' @param weight_decay Weight decay (L2 penalty) used in Adam optimizer.
+#' @param debug Logical; if TRUE, additional metadata is returned for debugging.
+
 #' 
 #' @return List containing imputed data, best model, study object, and results dataframe
 #' 
@@ -52,7 +61,51 @@ library(purrr)
 #'   \item Use `optuna-dashboard` [(see vignette)](https://ciss-vae.github.io/rCISS-VAE/articles/optunadb.html) to examine hyperparameter importance  
 #' }
 #' 
-#' @example inst/examples/autotune_ex.R
+#' @examples
+#' \dontrun{
+#' library(tidyverse)
+#'library(reticulate)
+#'library(rCISSVAE)
+#'reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
+#'
+#'data(df_missing)
+#'data(clusters)
+#'
+#'aut <- autotune_cissvae(
+#'  data = df_missing,
+#'  index_col = "index",
+#'  clusters = clusters$clusters,
+#'  n_trials = 3, ## Using low number of trials for demo
+#'  study_name = "comprehensive_vae_autotune",
+#'  device_preference = "cpu",
+#'  seed = 42, 
+#'  
+#'  ## Hyperparameter search space
+#'  num_hidden_layers = c(2, 5),     # Try 2-5 hidden layers
+#'  hidden_dims = c(64, 512),        # Layer sizes from 64 to 512
+#'  latent_dim = c(10, 100),         # Latent dimension range
+#'  latent_shared = c(TRUE, FALSE),
+#'  output_shared = c(TRUE, FALSE),
+#'  lr = 0.01,  # Learning rate range
+#'  decay_factor = 0.99,
+#'  beta = 0.01,  # KL weight range
+#'  num_epochs = 5,                # Limited epochs for demo
+#'  batch_size = 4000,     # Batch size options
+#'  num_shared_encode = c(0, 1, 2, 3),
+#'  num_shared_decode = c(0, 1, 2, 3),
+#'  
+#'  # Layer placement strategies - try different arrangements
+#'  encoder_shared_placement = c("at_end", "at_start", "alternating", "random"),
+#'  decoder_shared_placement = c("at_start", "at_end", "alternating", "random"),
+#'  
+#'  refit_patience = 2,        # Early stopping patience
+#'  refit_loops = 10,                # Fixed refit loops, limited for demo
+#'  epochs_per_loop = 5,   # Epochs per refit loop, limited for demo
+#'  reset_lr_refit = c(TRUE, FALSE)
+#')
+#'
+#'plot_vae_architecture(aut$model, title = "Optimized CISSVAE Architecture")
+#' }
 #' @export
 autotune_cissvae <- function(
   data,
@@ -100,8 +153,10 @@ autotune_cissvae <- function(
   ## defaults to returning helpful things
   debug = FALSE
 ) {
-  
-  # ── 1) Coerce to integers ────────────────────────────────────────────────
+
+  requireNamespace('purrr')
+
+  # -- 1) Coerce to integers ------------------------------------------------
   n_trials          <- as.integer(n_trials)
   seed              <- as.integer(seed)
   max_exhaustive_orders <- as.integer(max_exhaustive_orders)
@@ -116,7 +171,7 @@ autotune_cissvae <- function(
   refit_loops       <- as.integer(refit_loops)
   epochs_per_loop   <- as.integer(epochs_per_loop)
   
-  # ── 2) Validate shared layer placement strategies ───────────────────────
+  # -- 2) Validate shared layer placement strategies -----------------------
   valid_placements <- c("at_end", "at_start", "alternating", "random")
   if (!all(encoder_shared_placement %in% valid_placements)) {
     stop("Invalid encoder_shared_placement values. Must be one of: ", paste(valid_placements, collapse = ", "))
@@ -125,7 +180,7 @@ autotune_cissvae <- function(
     stop("Invalid decoder_shared_placement values. Must be one of: ", paste(valid_placements, collapse = ", "))
   }
   
-  # ── 3) Handle index_col ─────────────────────────────────────────────────
+  # -- 3) Handle index_col -------------------------------------------------
   if (!is.null(index_col)) {
     if (!index_col %in% colnames(data)) stop("`index_col` not found in data.")
     index_vals <- data[[index_col]]
@@ -133,14 +188,14 @@ autotune_cissvae <- function(
     imputable_matrix = imputable_matrix[, setdiff(colnames(imputable_matrix), index_col), drop = FALSE]
   } else index_vals <- NULL
 
-  # ── 3.1) Ensure data and mask columns match EXACTLY (after index removal) ──
+  # -- 3.1) Ensure data and mask columns match EXACTLY (after index removal) --
 if (!is.null(imputable_matrix)) {
   if (!identical(colnames(data), colnames(imputable_matrix))) {
     stop("`data` and `imputable_matrix` columns must match exactly (same names & order) after removing index_col.")
   }
 }
 
-# ── 3.2) Quick coverage diagnostics on FEATURE columns only ──
+# -- 3.2) Quick coverage diagnostics on FEATURE columns only --
 feat_cols <- if (is.null(columns_ignore)) colnames(data) else setdiff(colnames(data), columns_ignore)
 
 if (!is.null(imputable_matrix)) {
@@ -152,7 +207,7 @@ if (!is.null(imputable_matrix)) {
   zero_rows <- which(rowSums(valid) == 0)
 
   if (length(zero_cols)) {
-    stop("These feature columns have zero valid cells (observed ∧ imputable): ",
+    stop("These feature columns have zero valid cells: ",
          paste(zero_cols, collapse = ", "),
          "\nDrop them or adjust the mask before running autotune.")
   }
@@ -163,42 +218,42 @@ if (!is.null(imputable_matrix)) {
 }
 
 
-  # ── 4) Prepare matrix & Python imports ──────────────────────────────────
+  # -- 4) Prepare matrix & Python imports ----------------------------------
   mat <- if (is.data.frame(data)) as.matrix(data) else data
-  auto_mod <- import("ciss_vae.training.autotune", convert = FALSE)
+  auto_mod <- reticulate::import("ciss_vae.training.autotune", convert = FALSE)
   SS       <- auto_mod$SearchSpace
   autotune <- auto_mod$autotune
-  np       <- import("numpy", convert = FALSE)
-  pd       <- import("pandas", convert = FALSE)
-  CD_mod   <- import("ciss_vae.classes.cluster_dataset", convert = FALSE)$ClusterDataset
+  np       <- reticulate::import("numpy", convert = FALSE)
+  pd       <- reticulate::import("pandas", convert = FALSE)
+  CD_mod   <- reticulate::import("ciss_vae.classes.cluster_dataset", convert = FALSE)$ClusterDataset
   
-  # ── 5) Build Python SearchSpace ─────────────────────────────────────────
+  # -- 5) Build Python SearchSpace -----------------------------------------
   ss_py <- SS(
-    num_hidden_layers = r_to_py(num_hidden_layers),
-    hidden_dims       = r_to_py(hidden_dims),
-    latent_dim        = r_to_py(latent_dim),
-    latent_shared     = r_to_py(latent_shared),
-    output_shared     = r_to_py(output_shared),
-    lr                = r_to_py(lr),
-    decay_factor      = r_to_py(decay_factor),
+    num_hidden_layers = reticulate::r_to_py(num_hidden_layers),
+    hidden_dims       = reticulate::r_to_py(hidden_dims),
+    latent_dim        = reticulate::r_to_py(latent_dim),
+    latent_shared     = reticulate::r_to_py(latent_shared),
+    output_shared     = reticulate::r_to_py(output_shared),
+    lr                = reticulate::r_to_py(lr),
+    decay_factor      = reticulate::r_to_py(decay_factor),
     beta              = beta,
-    weight_decay = r_to_py(weight_decay),
+    weight_decay = reticulate::r_to_py(weight_decay),
     num_epochs        = num_epochs,
     batch_size        = batch_size,
-    num_shared_encode = r_to_py(num_shared_encode),
-    num_shared_decode = r_to_py(num_shared_decode),
+    num_shared_encode = reticulate::r_to_py(num_shared_encode),
+    num_shared_decode = reticulate::r_to_py(num_shared_decode),
     # NEW: Add placement strategy parameters
-    encoder_shared_placement = r_to_py(encoder_shared_placement),
-    decoder_shared_placement = r_to_py(decoder_shared_placement),
+    encoder_shared_placement = reticulate::r_to_py(encoder_shared_placement),
+    decoder_shared_placement = reticulate::r_to_py(decoder_shared_placement),
     refit_patience    = refit_patience,
     refit_loops       = refit_loops,
     epochs_per_loop   = epochs_per_loop,
-    reset_lr_refit    = r_to_py(reset_lr_refit)
+    reset_lr_refit    = reticulate::r_to_py(reset_lr_refit)
   )
   
   if (verbose) print("Built search space")
   
-  # ── 6) Build ClusterDataset ──────────────────────────────────────────────
+  # -- 6) Build ClusterDataset ----------------------------------------------
   ## Building the ClusterDataset is the point at which it will be necessary for the NAs to be good. 
   if (missing(clusters)) stop("`clusters` is required for autotune.")
   
@@ -213,7 +268,7 @@ if (!is.null(imputable_matrix)) {
   clusters_py <- np$array(as.integer(clusters), dtype = "int64")
 
   # columns_ignore as a Python list (safer when convert = FALSE)
-  cols_ignore_py <- if (is.null(columns_ignore)) NULL else r_to_py(as.character(columns_ignore))
+  cols_ignore_py <- if (is.null(columns_ignore)) NULL else reticulate::r_to_py(as.character(columns_ignore))
 
   if (!is.null(imputable_matrix)) {
       dni_py <- pd$DataFrame(imputable_matrix)
@@ -227,7 +282,7 @@ if (!is.null(imputable_matrix)) {
   
   if (verbose) print("Built cluster dataset")
   
-  # ── 7) Assemble autotune args & run ─────────────────────────────────────
+  # -- 7) Assemble autotune args & run -------------------------------------
   args_py <- list(
     search_space           = ss_py,
     train_dataset          = train_ds_py,
@@ -245,18 +300,18 @@ if (!is.null(imputable_matrix)) {
     constant_layer_size    = constant_layer_size,
     evaluate_all_orders    = evaluate_all_orders,
     max_exhaustive_orders  = max_exhaustive_orders
-  ) %>% keep(~ !is.null(.x))
+  ) |> keep(~ !is.null(.x))
   
   out_py      <- do.call(autotune, args_py)
   if (verbose) print("Ran autotune")
   
-  out_list <- py_to_r(out_py)    # now an R list of length 4
+  out_list <-reticulate::py_to_r(out_py)    # now an R list of length 4
   best_imp_py <- out_list[[1]]
   best_mod_py <- out_list[[2]]
   study_py    <- out_list[[3]]
   results_py  <- out_list[[4]]
   
-  # ── 8) Convert back to R ─────────────────────────────────────────────────
+  # -- 8) Convert back to R -------------------------------------------------
   imp_df <- as.data.frame(best_imp_py, stringsAsFactors = FALSE)
   if (ncol(imp_df) == ncol(mat)) {
     colnames(imp_df) <- colnames(mat)

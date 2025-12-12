@@ -31,7 +31,7 @@
 #'   Default `NULL`.
 #' @param k_neighbors Integer. Number of nearest neighbors for Leiden clustering. Defaults to 15.
 #' @param leiden_resolution Float. Resolution parameter for Leiden clustering. Defaults to 0.5. 
-#' @param leiden_objective Character. Objective function for Leiden clustering. One of {"CPM", "RB", "Modularity"}
+#' @param leiden_objective Character. Objective function for Leiden clustering. One of ("CPM", "RB", "Modularity")
 #' @param seed Integer. Random seed for reproducible results. Default `42`.
 #' @param missingness_proportion_matrix Optional pre-computed missingness proportion
 #'   matrix for biomarker-based clustering. If provided, clustering will be based on
@@ -83,10 +83,39 @@
 #'   containing loss values and metrics over epochs. Default `FALSE`.
 #' @param return_dataset Logical. If `TRUE`, returns the ClusterDataset object used
 #'   during training (contains validation data, masks, etc.). Default `FALSE`.
+#' @param imputable_matrix Logical matrix indicating entries allowed to be imputed.
+#' @param binary_feature_mask Logical vector marking which columns are binary.
+#' @param weight_decay Weight decay (L2 penalty) used in Adam optimizer.
+#' @param debug Logical; if TRUE, additional metadata is returned for debugging.
+#' @param return_validation_dataset Logical. If `TRUE` returns validation dataset 
+#' @param return_clusters Logical. If TRUE returns cluster vector
 #' 
-#' @example inst/examples/runcissvae_ex.R
-#' 
+#' @examples
+#' \dontrun{
+#' library(reticulate)
+#'library(rCISSVAE)
 #'
+#'data(df_missing)
+#'data(clusters)
+#'
+#'dat = run_cissvae(
+#'  data = df_missing,
+#'  index_col = "index",
+#'  val_proportion = 0.1, ## pass a vector for different proportions by cluster
+#'  columns_ignore = c("Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"), 
+#'  clusters = clusters$clusters, ## we have precomputed cluster labels so we pass them here
+#'  epochs = 5,
+#'  return_silhouettes = FALSE,
+#'  return_history = TRUE,  # Get detailed training history
+#'  verbose = FALSE,
+#'  return_model = TRUE, ## Allows for plotting model schematic
+#'  device = "cpu",  # Explicit device selection
+#'  layer_order_enc = c("unshared", "shared", "unshared"),
+#'  layer_order_dec = c("shared", "unshared", "shared")
+#')
+#' }
+#' 
+
 #' @details
 #' The CISS-VAE method works in two main phases:
 #' 

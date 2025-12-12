@@ -51,7 +51,7 @@
 
       <h1>Masking certain entries from imputation model</h1>
             
-            <h4 data-toc-skip class="date">2025-08-14</h4>
+            <h4 data-toc-skip class="date">2025-12-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CISS-VAE/rCISS-VAE/blob/HEAD/vignettes/do_not_impute_matrix.rmd" class="external-link"><code>vignettes/do_not_impute_matrix.rmd</code></a></small>
       <div class="d-none name"><code>do_not_impute_matrix.rmd</code></div>
@@ -59,21 +59,20 @@
 
     
     
-<p>There are some cases in which we want to tell CISSVAE not to impute
-certain missing data entries. For example, we would not want to impute
-patient biomarker values for collection dates past date of death.</p>
+<p>There are some cases in which we want to tell the CISSVAE model not
+to impute certain missing data entries. For example, we may not want to
+impute patient biomarker values for collection dates past date of
+death.</p>
 <p>We can use the <code>imputable_matrix</code> argument in the
 <code><a href="../reference/run_cissvae.html">run_cissvae()</a></code> function to mask these values. The binary
 <code>imputable_matrix</code> should have the same dimensions as the
-input dataframe with each cell containing 0 (impute if missing) or 1 (do
-not impute, even if missing).</p>
+input dataframe, with each cell containing 1 (impute if missing) or 0
+(do not impute, even if missing).</p>
 <p>Let’s use a simple survival dataset as an example. The mock survival
-dataset and its dni matrix can be loaded using the data function.</p>
+dataset and its imputable_matrix (dni) can be loaded using the data
+function.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ciss-vae.github.io/rCISS-VAE">rCISSVAE</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ddsjoberg/gtsummary" class="external-link">gtsummary</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">dni</span>, <span class="va">mock_surv</span><span class="op">)</span></span>
 <span></span>
@@ -396,9 +395,9 @@ dataset and its dni matrix can be loaded using the data function.</p>
 </tr>
 </tbody>
 </table>
-<p>If we look at the entry for P007, which has a death event at year 3,
-we can see that the biomarker entries after month 36 (aka year 3) are
-marked as non-imputable.</p>
+<div class="section level3">
+<h3 id="understanding-the-imputable-matrix">Understanding the ‘Imputable’ matrix<a class="anchor" aria-label="anchor" href="#understanding-the-imputable-matrix"></a>
+</h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mock_surv</span><span class="op">[</span><span class="fl">7</span>,<span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <table style="width:100%;" class="table">
@@ -635,6 +634,9 @@ marked as non-imputable.</p>
 <td align="right">0</td>
 </tr></tbody>
 </table>
+<p>If we look at the entry for P007, which has a death event at year 3,
+we can see that the biomarker entries after month 36 (aka year 3) are
+marked as non-imputable.</p>
 <p>When running the cissvae model with this dataset, it is important
 that the dataset and dni matrix have the same shape and column names.
 This allows us to take advantage of the <code>index_col</code> and
@@ -653,374 +655,13 @@ the <code>imputable_matrix</code> argument.</p>
 <span>  leiden_resolution <span class="op">=</span> <span class="fl">0.01</span>,</span>
 <span>  k_neighbors <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  return_silhouettes <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Cluster dataset:</span></span>
-<span><span class="co">##  ClusterDataset(n_samples=200, n_features=35, n_clusters=54)</span></span>
-<span><span class="co">##   • Original missing: 2543 / 6600 (38.53%)</span></span>
-<span><span class="co">##   • Validation held-out: 1662 (40.97% of non-missing)</span></span>
-<span><span class="co">##   • .data shape:     (200, 35)</span></span>
-<span><span class="co">##   • .masks shape:    (200, 35)</span></span>
-<span><span class="co">##   • .val_data shape: (200, 35)</span></span>
-<span><span class="co">##   • Non-imputable entries: 393</span></span></code></pre>
+<span><span class="op">)</span></span>
+<span><span class="va">res</span><span class="op">$</span><span class="va">imputed_dataset</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">7</span>,<span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>When we unpack the results and look at the imputed dataset, we can
 see that P007 still has NAs for biomarkers past 36 months.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">res</span><span class="op">$</span><span class="va">imputed_dataset</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">7</span>,<span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="0%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-</colgroup>
-<thead><tr class="header">
-<th align="left"></th>
-<th align="left">patient_id</th>
-<th align="right">death_event</th>
-<th align="right">death_year</th>
-<th align="right">biomarker1_m00</th>
-<th align="right">biomarker1_m06</th>
-<th align="right">biomarker1_m12</th>
-<th align="right">biomarker1_m18</th>
-<th align="right">biomarker1_m24</th>
-<th align="right">biomarker1_m30</th>
-<th align="right">biomarker1_m36</th>
-<th align="right">biomarker1_m42</th>
-<th align="right">biomarker1_m48</th>
-<th align="right">biomarker1_m54</th>
-<th align="right">biomarker1_m60</th>
-<th align="right">biomarker2_m00</th>
-<th align="right">biomarker2_m06</th>
-<th align="right">biomarker2_m12</th>
-<th align="right">biomarker2_m18</th>
-<th align="right">biomarker2_m24</th>
-<th align="right">biomarker2_m30</th>
-<th align="right">biomarker2_m36</th>
-<th align="right">biomarker2_m42</th>
-<th align="right">biomarker2_m48</th>
-<th align="right">biomarker2_m54</th>
-<th align="right">biomarker2_m60</th>
-<th align="right">biomarker3_m00</th>
-<th align="right">biomarker3_m06</th>
-<th align="right">biomarker3_m12</th>
-<th align="right">biomarker3_m18</th>
-<th align="right">biomarker3_m24</th>
-<th align="right">biomarker3_m30</th>
-<th align="right">biomarker3_m36</th>
-<th align="right">biomarker3_m42</th>
-<th align="right">biomarker3_m48</th>
-<th align="right">biomarker3_m54</th>
-<th align="right">biomarker3_m60</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">0</td>
-<td align="left">P001</td>
-<td align="right">0</td>
-<td align="right">4.776894</td>
-<td align="right">0.0329673</td>
-<td align="right">-0.0729603</td>
-<td align="right">0.3055585</td>
-<td align="right">0.2332004</td>
-<td align="right">0.4633308</td>
-<td align="right">0.6482251</td>
-<td align="right">0.8551518</td>
-<td align="right">0.6735983</td>
-<td align="right">0.9601134</td>
-<td align="right">1.324799</td>
-<td align="right">1.2400494</td>
-<td align="right">-0.2833088</td>
-<td align="right">-0.3357351</td>
-<td align="right">-0.5241007</td>
-<td align="right">-0.2146070</td>
-<td align="right">-0.4261048</td>
-<td align="right">-0.5503877</td>
-<td align="right">-0.4850004</td>
-<td align="right">-0.3808300</td>
-<td align="right">-0.8269995</td>
-<td align="right">-1.1647223</td>
-<td align="right">-0.7693558</td>
-<td align="right">-0.3397078</td>
-<td align="right">-0.3213299</td>
-<td align="right">-0.1733751</td>
-<td align="right">-0.2029932</td>
-<td align="right">-0.3556389</td>
-<td align="right">-0.1301366</td>
-<td align="right">-0.1629667</td>
-<td align="right">-0.1260693</td>
-<td align="right">-0.0539427</td>
-<td align="right">-0.1521347</td>
-<td align="right">0.0153199</td>
-</tr>
-<tr class="even">
-<td align="left">1</td>
-<td align="left">P002</td>
-<td align="right">0</td>
-<td align="right">5.329163</td>
-<td align="right">0.2979481</td>
-<td align="right">0.2019848</td>
-<td align="right">0.5120515</td>
-<td align="right">0.3917370</td>
-<td align="right">0.4851941</td>
-<td align="right">0.6344468</td>
-<td align="right">0.7677521</td>
-<td align="right">0.9657426</td>
-<td align="right">1.3371121</td>
-<td align="right">1.507349</td>
-<td align="right">1.6876800</td>
-<td align="right">-0.2642064</td>
-<td align="right">-0.2109939</td>
-<td align="right">-0.0600900</td>
-<td align="right">-0.1298160</td>
-<td align="right">-0.3187706</td>
-<td align="right">-0.2239344</td>
-<td align="right">-0.0821354</td>
-<td align="right">-0.3803490</td>
-<td align="right">-0.3139518</td>
-<td align="right">0.3821771</td>
-<td align="right">-0.7239360</td>
-<td align="right">-0.1965453</td>
-<td align="right">0.0070623</td>
-<td align="right">-0.3007039</td>
-<td align="right">-0.0402449</td>
-<td align="right">0.0721114</td>
-<td align="right">0.0654842</td>
-<td align="right">-0.1261376</td>
-<td align="right">-0.0235730</td>
-<td align="right">-0.1593525</td>
-<td align="right">-0.0288646</td>
-<td align="right">-0.0898675</td>
-</tr>
-<tr class="odd">
-<td align="left">2</td>
-<td align="left">P003</td>
-<td align="right">0</td>
-<td align="right">2.810034</td>
-<td align="right">-0.2819375</td>
-<td align="right">-0.3478628</td>
-<td align="right">-0.2809101</td>
-<td align="right">-0.3463161</td>
-<td align="right">-0.1221673</td>
-<td align="right">0.1957781</td>
-<td align="right">0.1373876</td>
-<td align="right">0.1664135</td>
-<td align="right">0.1874206</td>
-<td align="right">1.155541</td>
-<td align="right">0.6016288</td>
-<td align="right">0.0175643</td>
-<td align="right">0.0151971</td>
-<td align="right">-0.3381028</td>
-<td align="right">-0.9164180</td>
-<td align="right">-0.6699318</td>
-<td align="right">0.3786313</td>
-<td align="right">-1.1617521</td>
-<td align="right">-0.2871682</td>
-<td align="right">-1.3168921</td>
-<td align="right">-1.2316632</td>
-<td align="right">-1.4466560</td>
-<td align="right">0.0567814</td>
-<td align="right">0.0584894</td>
-<td align="right">0.4425502</td>
-<td align="right">-0.0236813</td>
-<td align="right">0.0841459</td>
-<td align="right">-0.6910132</td>
-<td align="right">0.0387965</td>
-<td align="right">0.1410949</td>
-<td align="right">-1.3610157</td>
-<td align="right">0.6063966</td>
-<td align="right">0.5767141</td>
-</tr>
-<tr class="even">
-<td align="left">3</td>
-<td align="left">P004</td>
-<td align="right">0</td>
-<td align="right">2.835940</td>
-<td align="right">0.0538936</td>
-<td align="right">1.4328521</td>
-<td align="right">0.3777936</td>
-<td align="right">0.8257963</td>
-<td align="right">0.4979936</td>
-<td align="right">0.9548627</td>
-<td align="right">1.1511669</td>
-<td align="right">0.8885234</td>
-<td align="right">1.2363808</td>
-<td align="right">1.376007</td>
-<td align="right">1.4586281</td>
-<td align="right">0.8077545</td>
-<td align="right">0.6799349</td>
-<td align="right">0.3304126</td>
-<td align="right">0.5036430</td>
-<td align="right">0.5477096</td>
-<td align="right">0.5697787</td>
-<td align="right">0.4387080</td>
-<td align="right">-0.0834018</td>
-<td align="right">0.7032660</td>
-<td align="right">-0.3879887</td>
-<td align="right">0.3902866</td>
-<td align="right">0.4530448</td>
-<td align="right">0.1931247</td>
-<td align="right">0.5290735</td>
-<td align="right">0.3123454</td>
-<td align="right">0.6130925</td>
-<td align="right">0.0988398</td>
-<td align="right">0.3152605</td>
-<td align="right">-0.0008705</td>
-<td align="right">-0.5473027</td>
-<td align="right">-0.2123734</td>
-<td align="right">-0.3376397</td>
-</tr>
-<tr class="odd">
-<td align="left">4</td>
-<td align="left">P005</td>
-<td align="right">0</td>
-<td align="right">2.821783</td>
-<td align="right">0.8207847</td>
-<td align="right">1.4844707</td>
-<td align="right">1.5075537</td>
-<td align="right">1.4269625</td>
-<td align="right">1.7042559</td>
-<td align="right">1.7166684</td>
-<td align="right">1.8634248</td>
-<td align="right">1.9726139</td>
-<td align="right">2.1577544</td>
-<td align="right">2.650625</td>
-<td align="right">2.5509279</td>
-<td align="right">1.0164934</td>
-<td align="right">0.0196025</td>
-<td align="right">0.9133255</td>
-<td align="right">0.5159682</td>
-<td align="right">-0.1186613</td>
-<td align="right">0.5745799</td>
-<td align="right">0.1219745</td>
-<td align="right">-0.0553872</td>
-<td align="right">-0.2674445</td>
-<td align="right">-0.4097872</td>
-<td align="right">-0.4382522</td>
-<td align="right">1.0913045</td>
-<td align="right">0.0593330</td>
-<td align="right">1.0314051</td>
-<td align="right">0.8340482</td>
-<td align="right">-0.6839802</td>
-<td align="right">0.7095674</td>
-<td align="right">0.0492240</td>
-<td align="right">0.8746146</td>
-<td align="right">0.5529082</td>
-<td align="right">0.9618712</td>
-<td align="right">0.1697414</td>
-</tr>
-<tr class="even">
-<td align="left">5</td>
-<td align="left">P006</td>
-<td align="right">0</td>
-<td align="right">2.822115</td>
-<td align="right">0.0798306</td>
-<td align="right">0.2458051</td>
-<td align="right">0.1493550</td>
-<td align="right">0.2171040</td>
-<td align="right">0.2917295</td>
-<td align="right">0.4103813</td>
-<td align="right">0.7858086</td>
-<td align="right">0.4664922</td>
-<td align="right">0.6859184</td>
-<td align="right">1.073819</td>
-<td align="right">0.8490065</td>
-<td align="right">-0.0967067</td>
-<td align="right">-0.0869093</td>
-<td align="right">-0.0088382</td>
-<td align="right">-0.2324610</td>
-<td align="right">-0.2122111</td>
-<td align="right">-0.1538908</td>
-<td align="right">-0.4459360</td>
-<td align="right">-0.3141975</td>
-<td align="right">-0.6617219</td>
-<td align="right">-0.5807806</td>
-<td align="right">-0.7427507</td>
-<td align="right">0.1298154</td>
-<td align="right">-0.2016869</td>
-<td align="right">-0.1289401</td>
-<td align="right">-0.2032740</td>
-<td align="right">-0.2017413</td>
-<td align="right">0.1135071</td>
-<td align="right">-0.0228946</td>
-<td align="right">-0.2137402</td>
-<td align="right">-0.5448710</td>
-<td align="right">0.0872763</td>
-<td align="right">0.1496102</td>
-</tr>
-<tr class="odd">
-<td align="left">6</td>
-<td align="left">P007</td>
-<td align="right">1</td>
-<td align="right">3.000000</td>
-<td align="right">-0.1646875</td>
-<td align="right">0.6226993</td>
-<td align="right">0.3190216</td>
-<td align="right">0.5829263</td>
-<td align="right">0.7385894</td>
-<td align="right">0.9623325</td>
-<td align="right">1.0725095</td>
-<td align="right">NaN</td>
-<td align="right">NaN</td>
-<td align="right">NaN</td>
-<td align="right">NaN</td>
-<td align="right">0.0623253</td>
-<td align="right">0.0624611</td>
-<td align="right">0.0732599</td>
-<td align="right">0.2839856</td>
-<td align="right">0.0027528</td>
-<td align="right">0.0585718</td>
-<td align="right">0.0656757</td>
-<td align="right">NaN</td>
-<td align="right">NaN</td>
-<td align="right">NaN</td>
-<td align="right">NaN</td>
-<td align="right">0.0546087</td>
-<td align="right">0.0302995</td>
-<td align="right">0.3764092</td>
-<td align="right">0.1709269</td>
-<td align="right">0.3963251</td>
-<td align="right">-0.1763422</td>
-<td align="right">0.2782471</td>
-<td align="right">NaN</td>
-<td align="right">NaN</td>
-<td align="right">NaN</td>
-<td align="right">NaN</td>
-</tr>
-</tbody>
-</table></main>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 

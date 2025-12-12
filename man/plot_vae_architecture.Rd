@@ -53,6 +53,13 @@ Creates a horizontal schematic diagram of the CISS-VAE architecture, showing
 shared and cluster-specific layers. This function wraps the Python
 \code{plot_vae_architecture} function from the ciss_vae package.
 }
+\section{Tips}{
+
+\itemize{
+\item If you get a TCL or TK error, run: \code{reticulate::py_run_string("import matplotlib; matplotlib.use('Agg')")} to change the matplotlib backend to use 'Agg' instead.
+}
+}
+
 \examples{
 \dontrun{
 # Train a model first

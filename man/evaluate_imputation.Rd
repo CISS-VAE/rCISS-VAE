@@ -14,12 +14,7 @@ evaluate_imputation(imputed_df, df_complete, df_missing)
 \item{df_missing}{A data.frame or tibble with NAs indicating the original missing entries}
 }
 \value{
-A list with components:
-\itemize{
-\item{\code{mse}}{Mean squared error at the originally missing positions}
-\item{\code{comparison}}{A data.frame with columns \code{row}, \code{col},
-\code{true}, \code{imputed}, and \code{squared_error}}
-}
+A list with components
 }
 \description{
 Compare imputed values to ground truth at originally missing positions,

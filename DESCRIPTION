@@ -16,18 +16,22 @@ Encoding: UTF-8
 Depends: R (>= 4.2.0)
 Imports: 
     reticulate,
-    methods,
-    ggplot2,
-    dplyr,
     purrr,
-    glue,
-    gtsummary
+    gtsummary,
+    rlang,
 Suggests: 
     testthat (>= 3.0.0),
     knitr,
-    quarto,
     rmarkdown,
-    tidyverse
+    tidyverse,
+    kableExtra,
+    MASS,
+    fastDummies,
+    palmerpenguins,
+    glue,
+    withr,
+    ggplot2,
+    qpdf
 URL: https://ciss-vae.github.io/rCISS-VAE
 BugReports: https://github.com/CISS-VAE/rCISS-VAE/issues
 Config/testthat/edition: 3

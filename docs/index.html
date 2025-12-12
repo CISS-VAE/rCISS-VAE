@@ -46,10 +46,10 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="rciss-vae---work-in-progress">rCISS-VAE - WORK IN PROGRESS!<a class="anchor" aria-label="anchor" href="#rciss-vae---work-in-progress"></a>
+<div class="page-header"><h1 id="rciss-vae">rCISS-VAE<a class="anchor" aria-label="anchor" href="#rciss-vae"></a>
 </h1></div>
-<p>This is the R implementation of the Clustering-Informed Shared-Structure Variational Autoencoder (CISS-VAE) for imputation. The Python implementation can be found <a href="https://github.com/CISS-VAE/CISS-VAE-python" class="external-link">here</a> and is available for installation on PyPI.</p>
-<p>CISS-VAE is a flexible deep learning model for missing data imputation that accommodates all three types of missing data mechanisms: Missing Completely At Random (MCAR), Missing At Random (MAR), and Missing Not At Random (MNAR). While it is particularly well-suited to MNAR scenarios where missingness patterns carry informative signals, CISS-VAE also functions effectively under MAR assumptions.</p>
+<p>This is the R implementation of the Clustering-Informed Shared-Structure Variational Autoencoder (CISS-VAE) for imputation. The Python implementation can be found <a href="https://github.com/CISS-VAE/CISS-VAE-python" class="external-link">here</a> and is available for installation on <a href="https://pypi.org/project/CISS-VAE/" class="external-link">PyPI</a>.</p>
+<p>CISS-VAE is a flexible deep learning model for missing data imputation that accommodates all three types of missing data mechanisms: Missing Completely At Random (MCAR), Missing At Random (MAR), and Missing Not At Random (MNAR). While it is particularly well-suited to MNAR scenarios where missingness patterns carry informative signals, CISS-VAE also functions effectively under MAR assumptions. For more information, please check out our <a href="https://doi.org/10.1002/sim.70335" class="external-link">publication</a>!</p>
 <img src="reference/figures/CISSVAEModelDiagram.png" alt="Example CISS-VAE for Imputation Workflow"><br><details style="background: #deeff7ff; border: #2A373D; color: black; border-radius: 10px"><summary><span style="color: #2A373D"><b>Click Here for More Information</b></span>
 </summary><div style="padding: 10px 10px 10px 10px">
 <p>A key feature of CISS-VAE is the use of unsupervised clustering to capture distinct patterns of missingness. Alongside cluster-specific representations, the method leverages shared encoder and decoder layers. This allows for knowledge transfer across clusters and enhances parameter stability, which is especially important when some clusters have small sample sizes. In situations where the data do not naturally partition into meaningful clusters, the model defaults to a pooled representation, preventing unnecessary complications from cluster-specific components. <br><br></p>
@@ -111,6 +111,33 @@ Additionally, CISS-VAE incorporates an iterative learning procedure, with a vali
 <img src="reference/figures/test_plot_arch.png" alt="Architecture diagram produced by plot_vae_architecture"><div class="figcaption"><strong>Architecture of Above Model</strong></div>
 </div>
 <p>For a full tutorial, see <a href="https://ciss-vae.github.io/rCISS-VAE/articles/vignette.html">vignette</a>.</p>
+</div>
+<div class="section level2">
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+</h2>
+<p>If you use our package in your research, please consider citing <a href="https://doi.org/10.1002/sim.70335" class="external-link">our recent publication!</a></p>
+<blockquote>
+<p>Y. Khadem Charvadeh, K. Seier, K. S. Panageas, D. Vaithilingam, M.Gönen, and Y. Chen, “Clustering-Informed Shared-Structure Variational Autoencoder for Missing Data Imputation in Large-Scale Healthcare Data,” Statistics in Medicine 44, no. 28-30 (2025): e70335, <a href="https://doi.org/10.1002/sim.70335" class="external-link uri">https://doi.org/10.1002/sim.70335</a>.</p>
+</blockquote>
+<div class="section level3">
+<h3 id="authors">Authors<a class="anchor" aria-label="anchor" href="#authors"></a>
+</h3>
+<blockquote>
+<ul>
+<li>Yasin Khadem Charvadeh</li>
+<li>Kenneth Seier<br>
+</li>
+<li>Katherine S. Panageas<br>
+</li>
+<li>Danielle Vaithilingam</li>
+<li>Mithat Gönen<br>
+</li>
+<li>
+<b>Yuan Chen <i>(corresponding author)</i></b> — <a href="mailto:cheny19@mskcc.org" class="email">cheny19@mskcc.org</a>
+</li>
+</ul>
+</blockquote>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

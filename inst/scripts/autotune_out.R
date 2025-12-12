@@ -53,7 +53,7 @@ best_model <- aut$model
 study <- aut$study
 results <- aut$results
 
-saveRDS(aut, file = "inst/extdata/autotune.rds")
+saveRDS(aut$results, file = "inst/extdata/autotune.rds")
 
 # cat("Best validation MSE:", study$best_value, "\n")
 # print("Trial results:")

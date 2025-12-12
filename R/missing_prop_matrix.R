@@ -15,6 +15,7 @@
 #' @param repeat_feature_names Character vector of "base" feature names that have repeated timepoints.
 #'   Repeat measurements must be in the form \code{<feature>_<timepoint>} where \code{<feature>}
 #'   is alphanumeric (and may include dots) and \code{<timepoint>} is an integer (e.g., \code{"CRP_1"}).
+#' @param loose Logical. If True, will match any column starting with feature from repeat_feature_names
 #'
 #' @return A numeric matrix of dimension \code{nrow(data)} by \code{n_features}, where rows are
 #'   samples and columns are features (base names). Entries are per-sample missingness proportions in `[0, 1]`.

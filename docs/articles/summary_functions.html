@@ -51,6 +51,7 @@
 
       <h1>Summary Functions</h1>
             
+            <h4 data-toc-skip class="date">2025-12-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CISS-VAE/rCISS-VAE/blob/HEAD/vignettes/summary_functions.rmd" class="external-link"><code>vignettes/summary_functions.rmd</code></a></small>
       <div class="d-none name"><code>summary_functions.rmd</code></div>
@@ -72,10 +73,10 @@ param to set the style of continuous variable summaries (“mean_sd”,
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## ── <span style="font-weight: bold;">Attaching core tidyverse packages</span> ──────────────────────── tidyverse 2.0.0 ──</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">dplyr    </span> 1.1.4     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">readr    </span> 2.1.5</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">forcats  </span> 1.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">stringr  </span> 1.5.1</span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">forcats  </span> 1.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">stringr  </span> 1.6.0</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">ggplot2  </span> 4.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tibble   </span> 3.3.0</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">lubridate</span> 1.9.4     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tidyr    </span> 1.3.1</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">purrr    </span> 1.1.0     </span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">purrr    </span> 1.2.0     </span></span>
 <span><span class="co">## ── <span style="font-weight: bold;">Conflicts</span> ────────────────────────────────────────── tidyverse_conflicts() ──</span></span>
 <span><span class="co">## <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">filter()</span> masks <span style="color: #0000BB;">stats</span>::filter()</span></span>
 <span><span class="co">## <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">lag()</span>    masks <span style="color: #0000BB;">stats</span>::lag()</span></span>
@@ -1067,7 +1068,7 @@ N = 2,000</span><span class="gt_footnote_marks" style="white-space:nowrap;font-s
 <td headers="stat_4" class="gt_row gt_center">551</td>
 </tr>
 </tbody>
-<tfoot class="gt_footnotes"><tr>
+<tfoot><tr class="gt_footnotes">
 <td class="gt_footnote" colspan="6">
 <span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> <span class="gt_from_md">Mean (SD); n / N
 (%)</span>
@@ -1077,15 +1078,16 @@ N = 2,000</span><span class="gt_footnote_marks" style="white-space:nowrap;font-s
 </div>
 </div>
 <div class="section level2">
-<h2 id="by-cluster-mse-function">By-cluster MSE function<a class="anchor" aria-label="anchor" href="#by-cluster-mse-function"></a>
+<h2 id="by-cluster-imputation-loss-function">By-cluster imputation loss function<a class="anchor" aria-label="anchor" href="#by-cluster-imputation-loss-function"></a>
 </h2>
 <p>After running the model, you can get the per-cluster validation set
-MSE using the <code><a href="../reference/performance_by_cluster.html">performance_by_cluster()</a></code> function. Set
-‘return_validation_dataset = TRUE’ in the <code><a href="../reference/run_cissvae.html">run_cissvae()</a></code>
-function to be able to use performance_by_cluster on the result object.
-If the validation dataset (val_data in result object) and imputed
-validation dataset (val_imputed in the result object) are not returned,
-the MSE cannot be calculated.</p>
+imputation loss using the <code><a href="../reference/performance_by_cluster.html">performance_by_cluster()</a></code>
+function. Set ‘return_validation_dataset = TRUE’ in the
+<code><a href="../reference/run_cissvae.html">run_cissvae()</a></code> function to be able to use
+performance_by_cluster on the result object. If the validation dataset
+(val_data in result object) and imputed validation dataset (val_imputed
+in the result object) are not returned, the imputation loss cannot be
+calculated.</p>
 <p>If the <code><a href="../reference/run_cissvae.html">run_cissvae()</a></code> function was used to generate
 clusters, set <code>return_clusters=TRUE</code> and the clusters will be
 part of the return object. Otherwise, use the ‘clusters’ parameter in
@@ -1106,18 +1108,11 @@ part of the return object. Otherwise, use the ‘clusters’ parameter in
 <span>  layer_order_enc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"unshared"</span>, <span class="st">"shared"</span>, <span class="st">"unshared"</span><span class="op">)</span>,</span>
 <span>  layer_order_dec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shared"</span>, <span class="st">"unshared"</span>, <span class="st">"shared"</span><span class="op">)</span>,</span>
 <span>  return_validation_dataset <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Cluster dataset:</span></span>
-<span><span class="co">##  ClusterDataset(n_samples=8000, n_features=30, n_clusters=4)</span></span>
-<span><span class="co">##   • Original missing: 61800 / 200000 (30.90%)</span></span>
-<span><span class="co">##   • Validation held-out: 13783 (9.97% of non-missing)</span></span>
-<span><span class="co">##   • .data shape:     (8000, 30)</span></span>
-<span><span class="co">##   • .masks shape:    (8000, 30)</span></span>
-<span><span class="co">##   • .val_data shape: (8000, 30)</span></span></code></pre>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Check necessary returns:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">", "</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Check necessary returns:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">", "</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Check necessary returns: imputed_dataset, raw_data, model, cluster_dataset, training_history, val_data, val_imputed</span></span></code></pre>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/performance_by_cluster.html">performance_by_cluster</a></span><span class="op">(</span>res <span class="op">=</span> <span class="va">result</span>, </span>
 <span>  group_col <span class="op">=</span> <span class="cn">NULL</span>, </span>
 <span>  clusters <span class="op">=</span> <span class="va">clusters</span><span class="op">$</span><span class="va">clusters</span>,</span>
@@ -1128,42 +1123,42 @@ part of the return object. Otherwise, use the ‘clusters’ parameter in
 <span>  <span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## $overall</span></span>
 <span><span class="co">##     metric     n</span></span>
-<span><span class="co">## 1 87.52106 13783</span></span>
+<span><span class="co">## 1 39.66814 13783</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $per_cluster</span></span>
 <span><span class="co">##   cluster mean_imputation_loss    n</span></span>
-<span><span class="co">## 1       0             50.22196 3408</span></span>
-<span><span class="co">## 2       1             62.15463 1787</span></span>
-<span><span class="co">## 3       2            146.68272 5000</span></span>
-<span><span class="co">## 4       3             53.13890 3588</span></span>
+<span><span class="co">## 1       0             40.25305 3408</span></span>
+<span><span class="co">## 2       1             57.15289 1787</span></span>
+<span><span class="co">## 3       2             41.15224 5000</span></span>
+<span><span class="co">## 4       3             28.33618 3588</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $per_feature_overall</span></span>
 <span><span class="co">##    feature       type mean_imputation_loss   n</span></span>
-<span><span class="co">## 1      Y11 continuous            38.122084 486</span></span>
-<span><span class="co">## 2      Y12 continuous            78.098287 486</span></span>
-<span><span class="co">## 3      Y13 continuous           135.052938 488</span></span>
-<span><span class="co">## 4      Y14 continuous           170.977045 486</span></span>
-<span><span class="co">## 5      Y15 continuous           225.920158 484</span></span>
-<span><span class="co">## 6      Y21 continuous            56.331695 485</span></span>
-<span><span class="co">## 7      Y22 continuous           106.415160 489</span></span>
-<span><span class="co">## 8      Y23 continuous           153.014150 489</span></span>
-<span><span class="co">## 9      Y24 continuous           221.143330 484</span></span>
-<span><span class="co">## 10     Y25 continuous           263.322486 488</span></span>
-<span><span class="co">## 11     Y31 continuous            34.547226 592</span></span>
-<span><span class="co">## 12     Y32 continuous            80.638284 593</span></span>
-<span><span class="co">## 13     Y33 continuous           124.523814 597</span></span>
-<span><span class="co">## 14     Y34 continuous           163.868605 593</span></span>
-<span><span class="co">## 15     Y35 continuous           192.690129 593</span></span>
-<span><span class="co">## 16     Y41 continuous             6.178258 596</span></span>
-<span><span class="co">## 17     Y42 continuous            17.810601 596</span></span>
-<span><span class="co">## 18     Y43 continuous            25.157027 597</span></span>
-<span><span class="co">## 19     Y44 continuous            46.010148 597</span></span>
-<span><span class="co">## 20     Y45 continuous            50.226487 590</span></span>
-<span><span class="co">## 21     Y51 continuous             4.685499 591</span></span>
-<span><span class="co">## 22     Y52 continuous            14.288399 595</span></span>
-<span><span class="co">## 23     Y53 continuous            19.011965 601</span></span>
-<span><span class="co">## 24     Y54 continuous            28.738215 594</span></span>
-<span><span class="co">## 25     Y55 continuous            36.292319 593</span></span></code></pre>
+<span><span class="co">## 1      Y11 continuous            36.982645 486</span></span>
+<span><span class="co">## 2      Y12 continuous            41.675944 486</span></span>
+<span><span class="co">## 3      Y13 continuous            59.875396 488</span></span>
+<span><span class="co">## 4      Y14 continuous            54.437914 486</span></span>
+<span><span class="co">## 5      Y15 continuous            89.918744 484</span></span>
+<span><span class="co">## 6      Y21 continuous            57.400484 485</span></span>
+<span><span class="co">## 7      Y22 continuous            67.460644 489</span></span>
+<span><span class="co">## 8      Y23 continuous            54.646223 489</span></span>
+<span><span class="co">## 9      Y24 continuous            98.177313 484</span></span>
+<span><span class="co">## 10     Y25 continuous            87.095364 488</span></span>
+<span><span class="co">## 11     Y31 continuous            33.382156 592</span></span>
+<span><span class="co">## 12     Y32 continuous            39.641209 593</span></span>
+<span><span class="co">## 13     Y33 continuous            66.543566 597</span></span>
+<span><span class="co">## 14     Y34 continuous            61.260754 593</span></span>
+<span><span class="co">## 15     Y35 continuous            77.375750 593</span></span>
+<span><span class="co">## 16     Y41 continuous             5.554665 596</span></span>
+<span><span class="co">## 17     Y42 continuous             8.644850 596</span></span>
+<span><span class="co">## 18     Y43 continuous            11.782283 597</span></span>
+<span><span class="co">## 19     Y44 continuous            15.638653 597</span></span>
+<span><span class="co">## 20     Y45 continuous            21.023589 590</span></span>
+<span><span class="co">## 21     Y51 continuous             4.249571 591</span></span>
+<span><span class="co">## 22     Y52 continuous             8.012297 595</span></span>
+<span><span class="co">## 23     Y53 continuous             9.592526 601</span></span>
+<span><span class="co">## 24     Y54 continuous            12.209226 594</span></span>
+<span><span class="co">## 25     Y55 continuous            15.194974 593</span></span></code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

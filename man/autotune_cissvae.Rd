@@ -53,6 +53,16 @@ autotune_cissvae(
 
 \item{index_col}{String name of index column to preserve (optional)}
 
+\item{val_proportion}{Proportion of non-missing data to hold out for validation.}
+
+\item{replacement_value}{Numeric value used to replace missing entries before model input.}
+
+\item{columns_ignore}{Character vector of column names to exclude from imputation scoring.}
+
+\item{imputable_matrix}{Logical matrix indicating entries allowed to be imputed.}
+
+\item{binary_feature_mask}{Logical vector marking which columns are binary.}
+
 \item{clusters}{Integer vector specifying cluster assignments for each row.}
 
 \item{save_model_path}{Optional path to save the best model's state_dict}
@@ -95,6 +105,8 @@ autotune_cissvae(
 
 \item{decay_factor}{Numeric(2) vector: (min, max) LR decay factor range}
 
+\item{weight_decay}{Weight decay (L2 penalty) used in Adam optimizer.}
+
 \item{beta}{Numeric: KL divergence weight (fixed or range)}
 
 \item{num_epochs}{Integer: number of initial training epochs (fixed or range)}
@@ -116,12 +128,15 @@ autotune_cissvae(
 \item{epochs_per_loop}{Integer: epochs per refit loop}
 
 \item{reset_lr_refit}{Logical vector: whether to reset LR before refit}
+
+\item{debug}{Logical; if TRUE, additional metadata is returned for debugging.}
 }
 \value{
 List containing imputed data, best model, study object, and results dataframe
 }
 \description{
-Performs hyperparameter optimization for CISS-VAE using Optuna with support for both tunable and fixed parameters.
+Performs hyperparameter optimization for CISS-VAE using Optuna with support
+for both tunable and fixed parameters.
 }
 \section{Tips}{
 
@@ -135,6 +150,7 @@ Performs hyperparameter optimization for CISS-VAE using Optuna with support for 
 }
 
 \examples{
+\dontrun{
 library(tidyverse)
 library(reticulate)
 library(rCISSVAE)
@@ -144,37 +160,38 @@ data(df_missing)
 data(clusters)
 
 aut <- autotune_cissvae(
-  data = df_missing,
-  index_col = "index",
-  clusters = clusters$clusters,
-  n_trials = 3, ## Using low number of trials for demo
-  study_name = "comprehensive_vae_autotune",
-  device_preference = "cpu",
-  seed = 42, 
-  
-  ## Hyperparameter search space
-  num_hidden_layers = c(2, 5),     # Try 2-5 hidden layers
-  hidden_dims = c(64, 512),        # Layer sizes from 64 to 512
-  latent_dim = c(10, 100),         # Latent dimension range
-  latent_shared = c(TRUE, FALSE),
-  output_shared = c(TRUE, FALSE),
-  lr = 0.01,  # Learning rate range
-  decay_factor = 0.99,
-  beta = 0.01,  # KL weight range
-  num_epochs = 5,                # Limited epochs for demo
-  batch_size = 4000,     # Batch size options
-  num_shared_encode = c(0, 1, 2, 3),
-  num_shared_decode = c(0, 1, 2, 3),
-  
-  # Layer placement strategies - try different arrangements
-  encoder_shared_placement = c("at_end", "at_start", "alternating", "random"),
-  decoder_shared_placement = c("at_start", "at_end", "alternating", "random"),
-  
-  refit_patience = 2,        # Early stopping patience
-  refit_loops = 10,                # Fixed refit loops, limited for demo
-  epochs_per_loop = 5,   # Epochs per refit loop, limited for demo
-  reset_lr_refit = c(TRUE, FALSE)
+ data = df_missing,
+ index_col = "index",
+ clusters = clusters$clusters,
+ n_trials = 3, ## Using low number of trials for demo
+ study_name = "comprehensive_vae_autotune",
+ device_preference = "cpu",
+ seed = 42, 
+ 
+ ## Hyperparameter search space
+ num_hidden_layers = c(2, 5),     # Try 2-5 hidden layers
+ hidden_dims = c(64, 512),        # Layer sizes from 64 to 512
+ latent_dim = c(10, 100),         # Latent dimension range
+ latent_shared = c(TRUE, FALSE),
+ output_shared = c(TRUE, FALSE),
+ lr = 0.01,  # Learning rate range
+ decay_factor = 0.99,
+ beta = 0.01,  # KL weight range
+ num_epochs = 5,                # Limited epochs for demo
+ batch_size = 4000,     # Batch size options
+ num_shared_encode = c(0, 1, 2, 3),
+ num_shared_decode = c(0, 1, 2, 3),
+ 
+ # Layer placement strategies - try different arrangements
+ encoder_shared_placement = c("at_end", "at_start", "alternating", "random"),
+ decoder_shared_placement = c("at_start", "at_end", "alternating", "random"),
+ 
+ refit_patience = 2,        # Early stopping patience
+ refit_loops = 10,                # Fixed refit loops, limited for demo
+ epochs_per_loop = 5,   # Epochs per refit loop, limited for demo
+ reset_lr_refit = c(TRUE, FALSE)
 )
 
 plot_vae_architecture(aut$model, title = "Optimized CISSVAE Architecture")
+}
 }

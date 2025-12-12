@@ -18,7 +18,7 @@ Imported from \code{data_raw/clusters.csv}, then renamed \code{...1} → \code{i
 clusters
 }
 \description{
-A tibble assigning each observation in \code{df_missing}/\code{df_complete} to a cluster
+A tibble assigning each observation in \code{df_missing} to a cluster
 determined by its missingness pattern.
 }
 \examples{

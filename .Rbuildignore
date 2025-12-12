@@ -1,7 +1,15 @@
 ^rCISSVAE\.Rproj$
 ^\.Rproj\.user$
-^ign_.*[.]R$
+^ign_.*\.R$
 ^\.venv(/|$)
-.readthedocs.yaml
+^\.readthedocs\.yaml$
 ^docs/
 ^codecov\.yml$
+^\.github/
+^_pkgdown\.yml$
+^data_raw/
+\.sqlite3$
+\.db$
+\.txt$
+\.csv$
+\.png$

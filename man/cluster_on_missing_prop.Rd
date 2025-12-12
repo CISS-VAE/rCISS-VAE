@@ -29,13 +29,13 @@ entries are missingness proportions in \verb{[0,1]}. Can be created with \code{c
 
 \item{leiden_resolution}{Numeric; Leiden cluster selection threshold (default: \code{0.25}).}
 
+\item{use_snn}{use snn}
+
+\item{leiden_objective}{objective}
+
 \item{metric}{Character; distance metric \code{"euclidean"} or \code{"cosine"} (default: \code{"euclidean"}).}
 
 \item{scale_features}{Logical; whether to standardize \strong{feature columns} before clustering samples (default: \code{FALSE}).}
-
-\item{handle_noise}{Character; how to handle Leiden noise points (\code{-1}):
-\code{"keep"} (each noise sample gets its own new cluster ID), \code{"separate"} (all noise samples share one new ID),
-or \code{"merge"} (noise samples assigned to largest existing cluster) (default: \code{"keep"}).}
 }
 \value{
 A list with:

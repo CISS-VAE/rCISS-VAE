@@ -7,12 +7,7 @@
 #' @param imputed_df A data.frame or tibble of imputed values (same dim as df_complete)
 #' @param df_complete A data.frame or tibble of the complete (ground-truth) values
 #' @param df_missing A data.frame or tibble with NAs indicating the original missing entries
-#' @return A list with components:
-#'   \itemize{
-#'     \item{\code{mse}}{Mean squared error at the originally missing positions}
-#'     \item{\code{comparison}}{A data.frame with columns \code{row}, \code{col},
-#'       \code{true}, \code{imputed}, and \code{squared_error}}
-#'   }
+#' @return A list with components 
 #' @export
 evaluate_imputation <- function(imputed_df, df_complete, df_missing) {
   if (!requireNamespace("reticulate", quietly = TRUE)) {
@@ -91,7 +86,7 @@ check_devices <- function(env_path = NULL){
   devs <- get_available_torch_devices()
 
   cat("Available Devices:\n")
-  cat(paste0("  • ", devs$pretty, collapse = "\n"), "\n\n")
+  cat(paste0("  * ", devs$pretty, collapse = "\n"), "\n\n")
   
   return(devs$usable)
 }

@@ -19,6 +19,12 @@
 #'
 #' @return If return_plot is TRUE, returns a Python matplotlib figure object that can be 
 #'   further manipulated. Otherwise returns NULL invisibly.
+#' 
+#' 
+#' @section Tips:
+#' \itemize{
+#'   \item If you get a TCL or TK error, run: `reticulate::py_run_string("import matplotlib; matplotlib.use('Agg')")` to change the matplotlib backend to use 'Agg' instead.
+#' }
 #'
 #' @export
 #'

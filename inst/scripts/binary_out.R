@@ -69,4 +69,4 @@ results = run_cissvae(
 
 # head(penguin_dummies)
 
-saveRDS(results, file = "inst/extdata/binary_res.rds")
+saveRDS(results$imputed_dataset, file = "inst/extdata/binary_res.rds")

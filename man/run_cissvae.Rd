@@ -66,6 +66,10 @@ Default \code{0.0}.}
 \item{columns_ignore}{Character or integer vector. Columns to exclude from validation set.
 Can specify by name or index. Default \code{NULL}.}
 
+\item{imputable_matrix}{Logical matrix indicating entries allowed to be imputed.}
+
+\item{binary_feature_mask}{Logical vector marking which columns are binary.}
+
 \item{print_dataset}{Logical. If \code{TRUE}, prints dataset summary information during
 processing. Default \code{TRUE}.}
 
@@ -90,7 +94,7 @@ proportion matrix clustering. Default \code{FALSE}.}
 
 \item{leiden_resolution}{Float. Resolution parameter for Leiden clustering. Defaults to 0.5.}
 
-\item{leiden_objective}{Character. Objective function for Leiden clustering. One of {"CPM", "RB", "Modularity"}}
+\item{leiden_objective}{Character. Objective function for Leiden clustering. One of ("CPM", "RB", "Modularity")}
 
 \item{hidden_dims}{Integer vector. Sizes of hidden layers in encoder/decoder.
 Length determines number of hidden layers. Default \code{c(150, 120, 60)}.}
@@ -120,6 +124,8 @@ training stability but require more memory. Default \code{4000}.}
 
 \item{decay_factor}{Numeric. Exponential decay factor for learning rate scheduling.
 Must be between 0 and 1. Default \code{0.999}.}
+
+\item{weight_decay}{Weight decay (L2 penalty) used in Adam optimizer.}
 
 \item{beta}{Numeric. Weight for KL divergence term in VAE loss function.
 Controls regularization strength. Default \code{0.001}.}
@@ -151,6 +157,8 @@ training. Default \code{FALSE}.}
 \item{return_model}{Logical. If \code{TRUE}, returns the trained Python VAE model object.
 Default \code{TRUE}.}
 
+\item{return_clusters}{Logical. If TRUE returns cluster vector}
+
 \item{return_silhouettes}{Logical. If \code{TRUE}, returns silhouette scores for
 cluster quality assessment. Default \code{FALSE}.}
 
@@ -159,6 +167,10 @@ containing loss values and metrics over epochs. Default \code{FALSE}.}
 
 \item{return_dataset}{Logical. If \code{TRUE}, returns the ClusterDataset object used
 during training (contains validation data, masks, etc.). Default \code{FALSE}.}
+
+\item{return_validation_dataset}{Logical. If \code{TRUE} returns validation dataset}
+
+\item{debug}{Logical; if TRUE, additional metadata is returned for debugging.}
 }
 \value{
 A list containing imputed data and optional additional outputs:
@@ -217,6 +229,7 @@ accessible via \code{reticulate}.
 }
 
 \examples{
+\dontrun{
 library(reticulate)
 library(rCISSVAE)
 
@@ -224,20 +237,22 @@ data(df_missing)
 data(clusters)
 
 dat = run_cissvae(
-  data = df_missing,
-  index_col = "index",
-  val_proportion = 0.1, ## pass a vector for different proportions by cluster
-  columns_ignore = c("Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"), ## If there are columns in addition to the index you want to ignore when selecting validation set, list them here. In this case, we ignore the 'demographic' columns because we do not want to remove data from them for validation purposes. 
-  clusters = clusters$clusters, ## we have precomputed cluster labels so we pass them here
-  epochs = 5,
-  return_silhouettes = FALSE,
-  return_history = TRUE,  # Get detailed training history
-  verbose = FALSE,
-  return_model = TRUE, ## Allows for plotting model schematic
-  device = "cpu",  # Explicit device selection
-  layer_order_enc = c("unshared", "shared", "unshared"),
-  layer_order_dec = c("shared", "unshared", "shared")
+ data = df_missing,
+ index_col = "index",
+ val_proportion = 0.1, ## pass a vector for different proportions by cluster
+ columns_ignore = c("Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"), 
+ clusters = clusters$clusters, ## we have precomputed cluster labels so we pass them here
+ epochs = 5,
+ return_silhouettes = FALSE,
+ return_history = TRUE,  # Get detailed training history
+ verbose = FALSE,
+ return_model = TRUE, ## Allows for plotting model schematic
+ device = "cpu",  # Explicit device selection
+ layer_order_enc = c("unshared", "shared", "unshared"),
+ layer_order_dec = c("shared", "unshared", "shared")
 )
+}
+
 \dontrun{
 # Basic usage with automatic clustering
 result <- run_cissvae(

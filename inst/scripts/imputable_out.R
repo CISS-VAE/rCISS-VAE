@@ -16,4 +16,4 @@ res <- run_cissvae(
   return_silhouettes = FALSE
 )
 
-saveRDS(res, file = "inst/extdata/imputable.rds")
+saveRDS(res$imputed_dataset, file = "inst/extdata/imputable.rds")

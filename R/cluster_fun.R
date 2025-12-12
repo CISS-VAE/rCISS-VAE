@@ -11,7 +11,8 @@
 #' @param k_neighbors Integer; minimum cluster size for Leiden.
 #'                           If `NULL`, defaults to `nrow(data) %/% 25`.
 #' @param leiden_resolution Resolution for Leiden Clustering.
-#'
+#' @param leiden_objective objective
+#' @param use_snn use snn
 #' @return A list with components:
 #'   * `clusters`   — integer vector of cluster labels  
 #'   * `silhouette` — numeric silhouette score, or `NA` if not computable  
@@ -95,9 +96,8 @@ cluster_on_missing <- function(
 #' @param leiden_resolution Numeric; Leiden cluster selection threshold (default: `0.25`).
 #' @param metric Character; distance metric `"euclidean"` or `"cosine"` (default: `"euclidean"`).
 #' @param scale_features Logical; whether to standardize **feature columns** before clustering samples (default: `FALSE`).
-#' @param handle_noise Character; how to handle Leiden noise points (`-1`):
-#'   `"keep"` (each noise sample gets its own new cluster ID), `"separate"` (all noise samples share one new ID),
-#'   or `"merge"` (noise samples assigned to largest existing cluster) (default: `"keep"`).
+#' @param leiden_objective objective
+#' @param use_snn use snn
 #'
 #' @return A list with:
 #' \itemize{

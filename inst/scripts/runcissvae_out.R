@@ -21,6 +21,8 @@ dat = run_cissvae(
   return_validation_dataset = TRUE
 )
 
+
+
 saveRDS(dat, file = "inst/extdata/demo_run.rds")
 
 
@@ -67,4 +69,4 @@ advanced_result <- run_cissvae(
   return_clusters = TRUE
 )
 
-saveRDS(advanced_result, file = "inst/extdata/missing_prop.rds")
+saveRDS(advanced_result$training_history, file = "inst/extdata/missing_prop.rds")

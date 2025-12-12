@@ -27,6 +27,8 @@ Defaults to \code{c(NA, NaN, Inf, -Inf)}.}
 \item{repeat_feature_names}{Character vector of "base" feature names that have repeated timepoints.
 Repeat measurements must be in the form \code{<feature>_<timepoint>} where \code{<feature>}
 is alphanumeric (and may include dots) and \code{<timepoint>} is an integer (e.g., \code{"CRP_1"}).}
+
+\item{loose}{Logical. If True, will match any column starting with feature from repeat_feature_names}
 }
 \value{
 A numeric matrix of dimension \code{nrow(data)} by \code{n_features}, where rows are

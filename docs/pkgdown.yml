@@ -8,7 +8,7 @@ articles:
   summary_functions: summary_functions.html
   vignette: vignette.html
   virtual_environment_tutorial: virtual_environment_tutorial.html
-last_built: 2025-12-15T15:41Z
+last_built: 2025-12-15T20:36Z
 urls:
   reference: https://ciss-vae.github.io/rCISS-VAE/reference
   article: https://ciss-vae.github.io/rCISS-VAE/articles

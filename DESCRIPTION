@@ -9,6 +9,7 @@ Authors@R:
         person(given = "Mithat", family = "Gönen", role = c("aut")),
         person(given = "Yuan", family = "Chen", email = "cheny19@mskcc.org", role = c("aut"))
         )
+Maintainer: Danielle Vaithilingam <vaithid1@mskcc.org>
 Description: Implements the Clustering-Informed Shared-Structure Variational 
     Autoencoder (CISS-VAE), a deep learning framework for missing data imputation. 
 License: MIT + file LICENSE

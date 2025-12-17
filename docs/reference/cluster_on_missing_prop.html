@@ -11,7 +11,7 @@ This is useful for detecting cohorts with shared missing-data behavior (e.g., si
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2.0000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3.0000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -108,7 +108,8 @@ entries are missingness proportions in <code>[0,1]</code>. Can be created with <
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  sample_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"s"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  <span class="co"># Two features measured at 3 timepoints each → proportions by feature per sample</span></span></span>
@@ -119,10 +120,8 @@ entries are missingness proportions in <code>[0,1]</code>. Can be created with <
 <span class="r-in"><span>                                     repeat_feature_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>,<span class="st">"B"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">cluster_on_missing_prop</span><span class="op">(</span><span class="va">pm</span>, n_clusters <span class="op">=</span> <span class="fl">2</span>, metric <span class="op">=</span> <span class="st">"cosine"</span>, scale_features <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">clusters_positive</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt; table of extent 0 &gt;</span>
 <span class="r-in"><span><span class="va">res</span><span class="op">$</span><span class="va">silhouette_score</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
-<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

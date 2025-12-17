@@ -2,6 +2,11 @@
 # -------------------------------------------------------------------
 # Correct tests for autotune_cissvae(), aligned with current implementation
 # -------------------------------------------------------------------
+testthat::skip_if_not(
+  reticulate::py_module_available("ciss_vae"),
+  message = "Skipping Python tests because 'ciss_vae' is not available"
+)
+
 
 test_that("Autotune accepts both fixed and ranged parameter styles", {
   skip_if_no_cissvae_py()

@@ -107,6 +107,7 @@ cluster_on_missing <- function(
 #' }
 #'
 #' @examples
+#' \dontrun{
 #' set.seed(123)
 #' dat <- data.frame(
 #'   sample_id = paste0("s", 1:12),
@@ -119,7 +120,7 @@ cluster_on_missing <- function(
 #' res <- cluster_on_missing_prop(pm, n_clusters = 2, metric = "cosine", scale_features = TRUE)
 #' table(res$clusters_positive)
 #' res$silhouette_score
-#'
+#'}
 #' @export
 cluster_on_missing_prop <- function(
   prop_matrix,

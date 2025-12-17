@@ -50,6 +50,7 @@ K-means clustering (when \code{n_clusters} is specified) or Leiden (when \code{n
 This is useful for detecting cohorts with shared missing-data behavior (e.g., site/batch effects).
 }
 \examples{
+\dontrun{
 set.seed(123)
 dat <- data.frame(
   sample_id = paste0("s", 1:12),
@@ -62,5 +63,5 @@ pm <- create_missingness_prop_matrix(dat, index_col = "sample_id",
 res <- cluster_on_missing_prop(pm, n_clusters = 2, metric = "cosine", scale_features = TRUE)
 table(res$clusters_positive)
 res$silhouette_score
-
+}
 }

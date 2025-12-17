@@ -2,6 +2,11 @@
 # -------------------------------------------------------------------
 # Tests aligned with CURRENT run_cissvae() implementation
 # -------------------------------------------------------------------
+testthat::skip_if_not(
+  reticulate::py_module_available("ciss_vae"),
+  message = "Skipping Python tests because 'ciss_vae' is not available"
+)
+
 
 skip_if_no_cissvae_py <- function() {
   if (!reticulate::py_module_available("ciss_vae")) {

@@ -337,14 +337,14 @@ result <- run_cissvae(
 
 ```{r showres2, echo=FALSE}
 library(gtsummary)
-cluster_result = readRDS(system.file("extdata", "cluster_on_missing.rds", package = "rCISSVAE"))
-cluster_summary(df_missing, factor(cluster_result$clusters), include = setdiff(names(df_missing), "index"), 
+
+cluster_summary(df_missing, factor(clusters$clusters), include = setdiff(names(df_missing), "index"), 
 statistic = list(
   all_continuous() ~ "{mean} ({sd})",
   all_categorical() ~ "{n} / {N}\n ({p}%)"), 
   missing = "always")  
 
-cat(paste("Clustering quality (silhouette):", round(cluster_result$silhouette, 3)))
+cat("Clustering quality (silhouette):  0.135")
 ```
 
 ### Using Pre-computed Missingness Proportion Matrix

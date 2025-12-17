@@ -22,6 +22,8 @@ dat = run_cissvae(
 )
 
 
+dat$raw_data = NULL
+dat$cluster_dataset = NULL
 
 saveRDS(dat, file = "inst/extdata/demo_run.rds")
 

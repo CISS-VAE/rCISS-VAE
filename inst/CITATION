@@ -1,0 +1,39 @@
+citHeader("To cite this package and its associated publication, please use:")
+
+citation <- function(package = "rCISSVAE", ...) {
+  list(
+    bibentry(
+      bibtype = "Article",
+      title   = "Clustering‐Informed Shared‐Structure Variational Autoencoder for Missing Data Imputation in Large‐Scale Healthcare Data",
+      author  = c(
+        person("Yasin", "Khadem Charvadeh"),
+        person("Kenneth", "Seier"),
+        person("Katherine S.", "Panageas"),
+        person("Danielle", "Vaithilingam"),
+        person("Mithat", "Gönen"),
+        person("Yuan", "Chen")
+      ),
+      journal = "Statistics in Medicine",
+      year    = "2025",
+      volume  = "44",
+      number  = "28-30",
+      pages   = "e70335",
+      doi     = "10.1002/sim.70335",
+      url     = "https://onlinelibrary.wiley.com/doi/10.1002/sim.70335"
+    ),
+    bibentry(
+      bibtype = "Manual",
+      title   = "rCISSVAE: Cluster-informed Shared-Structure Variational Autoencoder for Missing Data Imputation",
+      author  = c(
+        person("Yasin", "Khadem Charvadeh"),
+        person("Kenneth", "Seier"),
+        person("Katherine S.", "Panageas"),
+        person("Danielle", "Vaithilingam"),
+        person("Mithat", "Gönen"),
+        person("Yuan", "Chen")
+      ),
+      year    = "2025",
+      note    = "R package version 0.0.2.0000"
+    )
+  )
+}

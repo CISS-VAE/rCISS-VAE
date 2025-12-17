@@ -1,5 +1,5 @@
 Package: rCISSVAE
-Title: Clustering-Informed Shared-Structure Variational Autoencoder (CISS-VAE) for Imputation of Missing Data
+Title: Clustering-Informed Shared-Structure Variational Autoencoder (CISS-VAE) for Missing Data Imputation
 Version: 0.0.2.0000
 Authors@R: 
     c(  person(given = "Yasin", family = "Khadem Charvadeh", email = "khademy@mskcc.org", role = c("aut")),
@@ -10,8 +10,7 @@ Authors@R:
         person(given = "Yuan", family = "Chen", email = "cheny19@mskcc.org", role = c("aut"))
         )
 Maintainer: Danielle Vaithilingam <vaithid1@mskcc.org>
-Description: Implements the Clustering-Informed Shared-Structure Variational 
-    Autoencoder (CISS-VAE), a deep learning framework for missing data imputation. 
+Description: Implements the Clustering-Informed Shared-Structure Variational Autoencoder ('CISS-VAE'), a deep learning framework for missing data imputation introduced in Khadem Charvadeh et al. (2025) <doi:10.1002/sim.70335>. The model accommodates all three types of missing data mechanisms: Missing Completely At Random (MCAR), Missing At Random (MAR), and Missing Not At Random (MNAR). While it is particularly well-suited to MNAR scenarios, where missingness patterns carry informative signals, 'CISS-VAE' also functions effectively under MAR assumptions.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends: R (>= 4.2.0)
@@ -31,8 +30,7 @@ Suggests:
     palmerpenguins,
     glue,
     withr,
-    ggplot2,
-    qpdf
+    ggplot2
 URL: https://ciss-vae.github.io/rCISS-VAE
 BugReports: https://github.com/CISS-VAE/rCISS-VAE/issues
 Config/testthat/edition: 3

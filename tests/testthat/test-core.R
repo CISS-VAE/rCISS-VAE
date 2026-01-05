@@ -91,6 +91,27 @@ test_that("default returns contain imputed_dataset, raw_data, model", {
   expect_equal(length(res$clusters), nrow(df))
 })
 
+test_that("binary_feature_matrix works", {
+  skip_if_no_cissvae_py()
+  df = data.frame(index = c(1, 2, 3, 4, 5), A = c(5, 7, 5, NA, 1), B = c(NA, 1, 0, 1, NA))
+  binary_feature_mask = c(FALSE, FALSE, TRUE)
+  names(binary_feature_mask) = colnames(df)
+  res  = run_cissvae(
+    data = df,
+    index_col = "index",
+    binary_feature_mask = binary_feature_mask,
+    clusters = c(0, 0, 0, 1, 1),
+    seed = 42, 
+    hidden_dims = c(3, 2),
+    latent_dim = 3,
+    layer_order_enc = c("unshared", "shared"),
+    layer_order_dec = c("unshared", "shared"),
+    epochs = 2,
+    return_dataset = TRUE
+  )
+  expect_true(all(reticulate::py_to_r(res$cluster_dataset$binary_feature_mask) == c(FALSE, TRUE)))
+})
+
 test_that("single-return mode still includes raw_data (always returned)", {
   skip_if_no_cissvae_py()
   df <- make_sample_data()

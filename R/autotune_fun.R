@@ -186,6 +186,13 @@ autotune_cissvae <- function(
     index_vals <- data[[index_col]]
     data       <- data[, setdiff(colnames(data), index_col), drop = FALSE]
     imputable_matrix = imputable_matrix[, setdiff(colnames(imputable_matrix), index_col), drop = FALSE]
+    ## handle index col in binary_feature_mask
+    if(!is.null(binary_feature_mask) & !is.null(names(binary_feature_mask))){
+      binary_feature_mask =  binary_feature_mask[ setdiff(names(binary_feature_mask), index_col), drop = FALSE]
+      if(debug){
+        cat("Binary feature mask: ", paste0(names(binary_feature_mask), collapse = ", "))
+      }
+    }
   } else index_vals <- NULL
 
   # -- 3.1) Ensure data and mask columns match EXACTLY (after index removal) --
@@ -261,10 +268,10 @@ if (!is.null(imputable_matrix)) {
   data[is.na(data)] <- NaN
   data_py <- pd$DataFrame(data = data, dtype = "float64")
 
-  if(debug){
-    print("Python data thing")
-    print(data_py$head())
-  }
+  # if(debug){
+  #   print("Python data thing")
+  #   print(data_py$head())
+  # }
   clusters_py <- np$array(as.integer(clusters), dtype = "int64")
 
   # columns_ignore as a Python list (safer when convert = FALSE)
@@ -273,6 +280,12 @@ if (!is.null(imputable_matrix)) {
   if (!is.null(imputable_matrix)) {
       dni_py <- pd$DataFrame(imputable_matrix)
   } else dni_py <- NULL
+
+  if(debug){
+    if(!is.null(binary_feature_mask)){
+      print(reticulate::r_to_py(binary_feature_mask))
+    }
+  }
 
   train_ds_py <- CD_mod(data_py, clusters_py, val_proportion, replacement_value, cols_ignore_py, dni_py, reticulate::r_to_py(binary_feature_mask))
 

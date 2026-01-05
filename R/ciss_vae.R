@@ -328,6 +328,13 @@ run_cissvae <- function(
     if (index_col %in% colnames(imputable_matrix)) {
       imputable_matrix <- imputable_matrix[, setdiff(colnames(imputable_matrix), index_col), drop = FALSE]
     }
+    ## handle index col in binary_feature_mask
+    if(!is.null(binary_feature_mask) & !is.null(names(binary_feature_mask))){
+      binary_feature_mask =  binary_feature_mask[ setdiff(names(binary_feature_mask), index_col), drop = FALSE]
+      if(debug){
+        cat("Binary feature mask: ", paste0(names(binary_feature_mask), collapse = ", "))
+      }
+    }
   } else {
     index_vals <- NULL
   }

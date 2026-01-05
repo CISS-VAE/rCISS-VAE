@@ -73,3 +73,8 @@ vignettes/optuna_study.db
 *.db
 *.sqlite3
 vignettes/.nfs000000000119e5d200000196
+predicted_vals.csv
+
+se.csv
+
+valdata.csv

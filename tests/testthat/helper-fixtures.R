@@ -178,3 +178,53 @@ make_clusters_for <- function(df, k = 3L) {
   # fallback random
   sample.int(k, nrow(df), replace = TRUE) - 1L
 }
+
+
+make_sample_data_binary = function() {
+  set.seed(42)
+
+  library(dplyr)
+  library(MASS)
+
+  # Generate clustered data
+  Sigma <- diag(2) * 0.3
+  cl1 <- MASS::mvrnorm(50, mu = c(0, 0), Sigma)
+  cl2 <- MASS::mvrnorm(50, mu = c(3, 3), Sigma)
+
+  # Add noise features
+  noise <- matrix(rnorm(100 * 18, sd = 0.5), 100, 18)
+
+  # Combine into feature matrix
+  X <- cbind(rbind(cl1, cl2), noise)
+  colnames(X) <- paste0("feature_", seq_len(ncol(X)) - 1)
+
+  # Convert to data frame
+  df <- as.data.frame(X)
+
+  # Binary column 1: random Bernoulli
+  df$binary_1 <- rbinom(n = nrow(df), size = 1, prob = 0.5)
+
+  # Binary column 2: cluster-structure dependent
+  df$binary_2 <- ifelse(
+    df$feature_0^2 + df$feature_1^2 > 4,
+    1,
+    0
+  )
+
+  # Add index column (kept non-missing)
+  df$index <- seq_len(nrow(df))
+  # Introduce missing values (5%) to all columns EXCEPT index
+  mask <- matrix(
+    runif(nrow(df) * (ncol(df) - 1)) < 0.05,
+    nrow = nrow(df),
+    ncol = ncol(df) - 1
+  )
+
+  df[, -which(names(df) == "index")][mask] <- NA
+
+  # Convert binaries to factors if desired
+  df$binary_1 <- factor(df$binary_1, levels = c(0, 1))
+  df$binary_2 <- factor(df$binary_2, levels = c(0, 1))
+
+  return(df)
+}

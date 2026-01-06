@@ -146,6 +146,7 @@ for both tunable and fixed parameters.
 \item Adjust \code{batch_size} based on available memory (larger = faster but more memory).
 \item Use \code{verbose=TRUE} or \code{show_progress=TRUE} to monitor training progress
 \item Use \code{optuna-dashboard} \href{https://ciss-vae.github.io/rCISS-VAE/articles/optunadb.html}{(see vignette)} to examine hyperparameter importance
+\item If using binary features, set names(binary_feature_mask) = colnames(data) for correct index column handling
 }
 }
 

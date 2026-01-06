@@ -7,6 +7,104 @@ testthat::skip_if_not(
   message = "Skipping Python tests because 'ciss_vae' is not available"
 )
 
+# ----------- Fixtures ------------------
+
+make_sample_data_binary = function() {
+  set.seed(42)
+
+  library(MASS)
+
+  # Generate clustered data
+  Sigma <- diag(2) * 0.3
+  cl1 <- MASS::mvrnorm(50, mu = c(0, 0), Sigma)
+  cl2 <- MASS::mvrnorm(50, mu = c(3, 3), Sigma)
+
+  # Add noise features
+  noise <- matrix(rnorm(100 * 18, sd = 0.5), 100, 18)
+
+  # Combine into feature matrix
+  X <- cbind(rbind(cl1, cl2), noise)
+  colnames(X) <- paste0("feature_", seq_len(ncol(X)) - 1)
+
+  # Convert to data frame
+  df <- as.data.frame(X)
+
+  # Binary column 1: random Bernoulli
+  df$binary_1 <- rbinom(n = nrow(df), size = 1, prob = 0.5)
+
+  # Binary column 2: cluster-structure dependent
+  df$binary_2 <- ifelse(
+    df$feature_0^2 + df$feature_1^2 > 4,
+    1,
+    0
+  )
+
+  # Add index column (kept non-missing)
+  df$index <- seq_len(nrow(df))
+  # Introduce missing values (5%) to all columns EXCEPT index
+  mask <- matrix(
+    runif(nrow(df) * (ncol(df) - 1)) < 0.05,
+    nrow = nrow(df),
+    ncol = ncol(df) - 1
+  )
+
+  df[, -which(names(df) == "index")][mask] <- NA
+
+  # Convert binaries to factors if desired
+  df$binary_1 <- factor(df$binary_1, levels = c(0, 1))
+  df$binary_2 <- factor(df$binary_2, levels = c(0, 1))
+
+  return(df)
+}
+
+# ------------ TESTS ------------------
+
+test_that("Autotune handles binary feature matrix", {
+  skip_if_no_cissvae_py()
+
+  data = make_sample_data_binary()
+
+  ## make binary feature mask 
+  bfm = c(rep(FALSE, 20), TRUE, TRUE, FALSE)
+  names(bfm) = colnames(data)
+
+  clusters = make_clusters_for(data, k = 3L)
+  res_fixed <- autotune_cissvae(
+    data = data,
+    clusters = clusters,
+    n_trials = 1L,
+    device_preference = "cpu",
+    load_if_exists = FALSE,
+
+    num_hidden_layers = 2L,
+    hidden_dims       = 64L,
+    latent_dim        = 16L,
+    latent_shared     = TRUE,
+    output_shared     = FALSE,
+    lr                = 1e-3,
+    decay_factor      = 0.95,
+    weight_decay      = 0.001,
+    beta              = 0.01,
+    num_epochs        = 1L,
+    batch_size        = 32L,
+    num_shared_encode = 1L,
+    num_shared_decode = 1L,
+    encoder_shared_placement = c("at_end", "at_start"),
+    decoder_shared_placement = c("at_end", "at_start"),
+    refit_patience    = 1L,
+    refit_loops       = 1L,
+    epochs_per_loop   = 1L,
+    reset_lr_refit    = TRUE,
+
+    show_progress = FALSE,
+    verbose       = FALSE
+  )
+
+  expect_true(all(c("imputed_dataset","model","study","results") %in% names(res_fixed)))
+
+  expect_true(all(reticulate::py_to_r(res_fixed$cluster_dataset$binary_feature_mask) == c(rep(FALSE, 20), TRUE, TRUE)))
+})
+
 
 test_that("Autotune accepts both fixed and ranged parameter styles", {
   skip_if_no_cissvae_py()

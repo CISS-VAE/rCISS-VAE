@@ -59,6 +59,7 @@
 #'   \item Adjust `batch_size` based on available memory (larger = faster but more memory).
 #'   \item Use `verbose=TRUE` or `show_progress=TRUE` to monitor training progress
 #'   \item Use `optuna-dashboard` [(see vignette)](https://ciss-vae.github.io/rCISS-VAE/articles/optunadb.html) to examine hyperparameter importance  
+#' \item If using binary features, set names(binary_feature_mask) = colnames(data) for correct index column handling
 #' }
 #' 
 #' @examples
@@ -284,12 +285,24 @@ if (!is.null(imputable_matrix)) {
   if(debug){
     if(!is.null(binary_feature_mask)){
       print(reticulate::r_to_py(binary_feature_mask))
+      cat("Dim data_py = ", dim(data_py), "dim bfm = ", length(reticulate::r_to_py(binary_feature_mask)))
     }
   }
 
-  train_ds_py <- CD_mod(data_py, clusters_py, val_proportion, replacement_value, cols_ignore_py, dni_py, reticulate::r_to_py(binary_feature_mask))
+  ## correctly set up the cluster dataset
+  train_ds_py <- CD_mod(
+    data = data_py, 
+    cluster_labels = clusters_py, 
+    val_proportion = val_proportion, 
+    replacement_value = replacement_value, 
+    columns_ignore = cols_ignore_py, 
+    imputable = dni_py,
+    val_seed = seed,
+    binary_feature_mask =  reticulate::r_to_py(binary_feature_mask))
 
+  
   if(debug){
+    print("DEBUG: BINARY FEATURE MASK")
     print(train_ds_py$binary_feature_mask)
   }
   

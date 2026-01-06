@@ -30,6 +30,7 @@ make_sample_data <- function() {
   df
 }
 
+
 make_longitudinal_data <- function() {
   set.seed(123)
   n <- 100; t <- 5; tp <- 1:t

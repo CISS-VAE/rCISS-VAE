@@ -82,8 +82,7 @@ The input dataset should be a `matrix` or `data.frame` and missing values should
 
 
 
-```{r}  
-
+```{.r}  
 library(reticulate)
 library(rCISSVAE)
 

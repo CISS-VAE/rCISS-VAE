@@ -78,7 +78,7 @@ reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
 
 ## Quickstart
 
-The input dataset should be a `matrix` or `data.frame` and missing values should be represented with `NA` or `NaN`. Precomputed clusters should be passed as a numeric vector of length 'n' for an 'n x p' dataset. For more information on having `run_cissvae()` handle the clustering see (vignette)[https://ciss-vae.github.io/rCISS-VAE/articles/vignette.html#clustering-features-by-missingness-patterns].  
+The input dataset should be a `matrix` or `data.frame` and missing values should be represented with `NA` or `NaN`. Precomputed clusters should be passed as a numeric vector of length 'n' for an 'n x p' dataset. For more information on having `run_cissvae()` handle the clustering see the <a href="https://ciss-vae.github.io/rCISS-VAE/articles/vignette.html#clustering-features-by-missingness-patterns">'Clustering Features by Missingness Patterns' vignette</a>.    
 
 
 

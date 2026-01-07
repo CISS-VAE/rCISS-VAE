@@ -13,3 +13,10 @@
 \.txt$
 \.csv$
 \.png$
+
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.git$
+^\.github$
+README\.md$
+NEWS\.md$

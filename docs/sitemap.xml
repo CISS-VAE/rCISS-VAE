@@ -1,6 +1,5 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/404.html</loc></url>
-<url><loc>https://ciss-vae.github.io/rCISS-VAE/LICENSE-text.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/articles/binary_variables_tutorial.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/articles/do_not_impute_matrix.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/articles/index.html</loc></url>
@@ -10,13 +9,14 @@
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/articles/virtual_environment_tutorial.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/authors.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/index.html</loc></url>
+<url><loc>https://ciss-vae.github.io/rCISS-VAE/LICENSE-text.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/news/index.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/autotune_cissvae.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/check_devices.html</loc></url>
+<url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/clusters.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/cluster_on_missing.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/cluster_on_missing_prop.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/cluster_summary.html</loc></url>
-<url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/clusters.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/create_cissvae_env.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/create_missingness_prop_matrix.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/df_missing.html</loc></url>

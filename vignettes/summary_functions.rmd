@@ -18,7 +18,7 @@ There are two summary functions included with the rCISSVAE package that can help
 
 ## Per-cluster Summary
 
-The `cluster_summary()` function creates a data summary table stratified by missingness cluster. Use the `cont_style` param to set the style of continuous variable summaries ("mean_sd", "median_iqr", "both"). 
+The `cluster_summary()` function creates a data summary table stratified by missingness cluster. The function builds on `gtsummary::tbl_summary()`, so gtsummary-like statistics can be used for summarizing variables (<a href = "https://www.danieldsjoberg.com/gtsummary/reference/tbl_summary.html?q=statistic#statistic-argument"> see tbl_summary() documentation for details </a>).
 
 
 ```{r setup}

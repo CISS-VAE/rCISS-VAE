@@ -149,12 +149,12 @@
 #' This function requires the Python `ciss_vae` package to be installed and
 #' accessible via `reticulate`. 
 #'
-#' @section Performance Tips:
+#' @section Performance tips:
 #' \itemize{
-#'   \item If leiden clustering yields too many clusters, consider increasing `k_neighbors` or reducing `leiden_resolution``
-#'   \item Use GPU computation when available for faster training on large datasets. Use `rCISSVAE::check_devices()` to see what devices are available.
-#'   \item Adjust `batch_size` based on available memory (larger = faster but more memory)
-#'   \item Use `verbose=TRUE` to monitor training progress
+#'   \item If Leiden clustering yields too many clusters, consider increasing \code{k_neighbors} or reducing \code{leiden_resolution}.
+#'   \item Use GPU computation when available for faster training on large datasets. Use \code{check_devices()} to see what devices are available.
+#'   \item Adjust \code{batch_size} based on available memory (larger is faster but uses more memory).
+#'   \item Set \code{verbose = TRUE} to monitor training progress.
 #' }
 #'
 #' @export

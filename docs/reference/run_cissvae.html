@@ -21,7 +21,7 @@ patterns within and across different data subgroups."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3.0000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,7 +43,7 @@ patterns within and across different data subgroups."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Run the CISS-VAE pipeline for missing data imputation</h1>
-      <small class="dont-index">Source: <a href="https://github.com/CISS-VAE/rCISS-VAE/blob/HEAD/R/ciss_vae.R" class="external-link"><code>R/ciss_vae.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/CISS-VAE/rCISS-VAE/blob/HEAD/R/run_cissvae.R" class="external-link"><code>R/run_cissvae.R</code></a></small>
       <div class="d-none name"><code>run_cissvae.Rd</code></div>
     </div>
 
@@ -361,10 +361,13 @@ retrains on the updated dataset until convergence or maximum loops reached.</p><
 accessible via <code>reticulate</code>.</p>
     </div>
     <div class="section level2">
-    <h2 id="performance-tips">Performance Tips<a class="anchor" aria-label="anchor" href="#performance-tips"></a></h2>
+    <h2 id="performance-tips">Performance tips<a class="anchor" aria-label="anchor" href="#performance-tips"></a></h2>
 
 
-<ul><li><p>If leiden clustering yields too many clusters, consider increasing <code>k_neighbors</code> or reducing <code>leiden_resolution`` \item Use GPU computation when available for faster training on large datasets. Use </code>rCISSVAE::check_devices()<code>to see what devices are available. \item Adjust</code>batch_size<code>based on available memory (larger = faster but more memory) \item Use</code>verbose=TRUE` to monitor training progress</p></li>
+<ul><li><p>If Leiden clustering yields too many clusters, consider increasing <code>k_neighbors</code> or reducing <code>leiden_resolution</code>.</p></li>
+<li><p>Use GPU computation when available for faster training on large datasets. Use <code><a href="check_devices.html">check_devices()</a></code> to see what devices are available.</p></li>
+<li><p>Adjust <code>batch_size</code> based on available memory (larger is faster but uses more memory).</p></li>
+<li><p>Set <code>verbose = TRUE</code> to monitor training progress.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

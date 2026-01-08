@@ -111,7 +111,7 @@ cluster_on_missing <- function(
 #' set.seed(123)
 #' dat <- data.frame(
 #'   sample_id = paste0("s", 1:12),
-#'   # Two features measured at 3 timepoints each → proportions by feature per sample
+#'   # Two features measured at 3 timepoints each -> proportions by feature per sample
 #'   A_1 = c(NA, rnorm(11)), A_2 = c(NA, rnorm(11)), A_3 = rnorm(12),
 #'   B_1 = rnorm(12),        B_2 = c(rnorm(10), NA, NA), B_3 = rnorm(12)
 #' )

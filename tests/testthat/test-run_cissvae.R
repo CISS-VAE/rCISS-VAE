@@ -1,4 +1,4 @@
-# tests/testthat/test-core.R
+# tests/testthat/test-run_cissvae.R
 # -------------------------------------------------------------------
 # Tests aligned with CURRENT run_cissvae() implementation
 # -------------------------------------------------------------------

@@ -54,13 +54,14 @@
 #' 
 #' @section Tips:
 #' \itemize{
-#'   \item `rCISSVAE::cluster_on_missing()` or `rCISSVAE::cluster_on_missing_prop()` can be used to get cluster assignments.
-#'   \item Use GPU computation when available for faster training on large datasets. Use `rCISSVAE::check_devices()` to see what devices are available.
-#'   \item Adjust `batch_size` based on available memory (larger = faster but more memory).
-#'   \item Use `verbose=TRUE` or `show_progress=TRUE` to monitor training progress
-#'   \item Use `optuna-dashboard` [(see vignette)](https://ciss-vae.github.io/rCISS-VAE/articles/optunadb.html) to examine hyperparameter importance  
-#' \item If using binary features, set names(binary_feature_mask) = colnames(data) for correct index column handling
+#'   \item Use \code{cluster_on_missing()} or \code{cluster_on_missing_prop()} to obtain cluster assignments.
+#'   \item Use GPU computation when available for faster training on large datasets. Use \code{check_devices()} to see what devices are available.
+#'   \item Adjust \code{batch_size} based on available memory (larger is faster but uses more memory).
+#'   \item Set \code{verbose = TRUE} or \code{show_progress = TRUE} to monitor training progress.
+#'   \item Use the \code{optuna-dashboard} (see vignette \code{optunadb}) to examine hyperparameter importance.
+#'   \item If using binary features, set \code{names(binary_feature_mask) <- colnames(data)} for correct index/column handling.
 #' }
+#' 
 #' 
 #' @examples
 #' \dontrun{

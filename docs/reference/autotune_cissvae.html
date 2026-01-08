@@ -9,7 +9,7 @@ for both tunable and fixed parameters."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3.0000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,7 +31,7 @@ for both tunable and fixed parameters."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Autotune CISS-VAE hyperparameters with Optuna</h1>
-      <small class="dont-index">Source: <a href="https://github.com/CISS-VAE/rCISS-VAE/blob/HEAD/R/autotune_fun.R" class="external-link"><code>R/autotune_fun.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/CISS-VAE/rCISS-VAE/blob/HEAD/R/autotune_cissvae.R" class="external-link"><code>R/autotune_cissvae.R</code></a></small>
       <div class="d-none name"><code>autotune_cissvae.Rd</code></div>
     </div>
 
@@ -263,12 +263,12 @@ for both tunable and fixed parameters.</p>
     <h2 id="tips">Tips<a class="anchor" aria-label="anchor" href="#tips"></a></h2>
 
 
-<ul><li><p><code><a href="cluster_on_missing.html">rCISSVAE::cluster_on_missing()</a></code> or <code><a href="cluster_on_missing_prop.html">rCISSVAE::cluster_on_missing_prop()</a></code> can be used to get cluster assignments.</p></li>
-<li><p>Use GPU computation when available for faster training on large datasets. Use <code><a href="check_devices.html">rCISSVAE::check_devices()</a></code> to see what devices are available.</p></li>
-<li><p>Adjust <code>batch_size</code> based on available memory (larger = faster but more memory).</p></li>
-<li><p>Use <code>verbose=TRUE</code> or <code>show_progress=TRUE</code> to monitor training progress</p></li>
-<li><p>Use <code>optuna-dashboard</code> <a href="https://ciss-vae.github.io/rCISS-VAE/articles/optunadb.html">(see vignette)</a> to examine hyperparameter importance</p></li>
-<li><p>If using binary features, set names(binary_feature_mask) = colnames(data) for correct index column handling</p></li>
+<ul><li><p>Use <code><a href="cluster_on_missing.html">cluster_on_missing()</a></code> or <code><a href="cluster_on_missing_prop.html">cluster_on_missing_prop()</a></code> to obtain cluster assignments.</p></li>
+<li><p>Use GPU computation when available for faster training on large datasets. Use <code><a href="check_devices.html">check_devices()</a></code> to see what devices are available.</p></li>
+<li><p>Adjust <code>batch_size</code> based on available memory (larger is faster but uses more memory).</p></li>
+<li><p>Set <code>verbose = TRUE</code> or <code>show_progress = TRUE</code> to monitor training progress.</p></li>
+<li><p>Use the <code>optuna-dashboard</code> (see vignette <code>optunadb</code>) to examine hyperparameter importance.</p></li>
+<li><p>If using binary features, set <code>names(binary_feature_mask) &lt;- colnames(data)</code> for correct index/column handling.</p></li>
 </ul></div>
 
     <div class="section level2">

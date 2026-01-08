@@ -1,4 +1,4 @@
-# tests/testthat/test-autotune.R
+# tests/testthat/test-autotune_cissvae.R
 # -------------------------------------------------------------------
 # Correct tests for autotune_cissvae(), aligned with current implementation
 # -------------------------------------------------------------------

@@ -211,8 +211,10 @@
 #' result <- run_cissvae(
 #'   data = my_data,
 #'   hidden_dims = c(100, 80, 60),
-#'   layer_order_enc = c("unshared", "shared", "shared"),
-#'   layer_order_dec = c("shared", "shared", "unshared"),
+#'   layer_order_enc = c("unshared", 
+#' "shared", "shared"),
+#'   layer_order_dec = c("shared",
+#'  "shared", "unshared"),
 #'   latent_shared = TRUE
 #' )
 #' }

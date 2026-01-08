@@ -2,16 +2,14 @@
 #'
 #' @importFrom purrr keep
 #'
-
+#' @description Performs hyperparameter optimization for CISS-VAE using Optuna with
+#'   support for both tunable and fixed parameters.
 #'
-#' @description Performs hyperparameter optimization for CISS-VAE using Optuna with support
-#' for both tunable and fixed parameters.
-
 #' @param data Data frame or matrix containing the input data
 #' @param index_col String name of index column to preserve (optional)
 #' @param clusters Integer vector specifying cluster assignments for each row.
 #' @param save_model_path Optional path to save the best model's state_dict
-#' @param save_search_space_path Optional path to save search space configuration  
+#' @param save_search_space_path Optional path to save search space configuration
 #' @param n_trials Number of Optuna trials to run
 #' @param study_name Name identifier for the Optuna study
 #' @param device_preference Preferred device ("cuda", "mps", "cpu")
@@ -22,7 +20,7 @@
 #' @param verbose Whether to print detailed diagnostic information
 #' @param constant_layer_size Whether all hidden layers use same dimension
 #' @param evaluate_all_orders Whether to test all possible layer arrangements
-#' @param max_exhaustive_orders Max arrangements to test when evaluate_all_orders=TRUE
+#' @param max_exhaustive_orders Max arrangements to test when evaluate_all_orders = TRUE
 #' @param num_hidden_layers Numeric(2) vector: (min, max) for number of hidden layers
 #' @param hidden_dims Numeric vector: hidden layer dimensions to test
 #' @param latent_dim Numeric(2) vector: (min, max) for latent dimension
@@ -48,67 +46,76 @@
 #' @param binary_feature_mask Logical vector marking which columns are binary.
 #' @param weight_decay Weight decay (L2 penalty) used in Adam optimizer.
 #' @param debug Logical; if TRUE, additional metadata is returned for debugging.
-
-#' 
-#' @return List containing imputed data, best model, study object, and results dataframe
-#' 
+#'
+#' @return List with imputed data, best model, study object, and results dataframe
+#'
 #' @section Tips:
 #' \itemize{
-#'   \item Use \code{cluster_on_missing()} or \code{cluster_on_missing_prop()} to obtain cluster assignments.
-#'   \item Use GPU computation when available for faster training on large datasets. Use \code{check_devices()} to see what devices are available.
-#'   \item Adjust \code{batch_size} based on available memory (larger is faster but uses more memory).
-#'   \item Set \code{verbose = TRUE} or \code{show_progress = TRUE} to monitor training progress.
-#'   \item Use the \code{optuna-dashboard} (see vignette \code{optunadb}) to examine hyperparameter importance.
-#'   \item If using binary features, set \code{names(binary_feature_mask) <- colnames(data)} for correct index/column handling.
+#'   \item Use \code{cluster_on_missing()} or \code{cluster_on_missing_prop()} for cluster assignments.
+#'   \item Use GPU computation when available; call \code{check_devices()} to see available devices.
+#'   \item Adjust \code{batch_size} based on memory (larger is faster but uses more memory).
+#'   \item Set \code{verbose = TRUE} or \code{show_progress = TRUE} to monitor training.
+#'   \item Explore the \code{optuna-dashboard} (see vignette \code{optunadb}) for hyperparameter importance.
+#'   \item For binary features, set \code{names(binary_feature_mask) <- colnames(data)}.
 #' }
-#' 
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' library(tidyverse)
-#'library(reticulate)
-#'library(rCISSVAE)
-#'reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
+#' library(reticulate)
+#' library(rCISSVAE)
 #'
-#'data(df_missing)
-#'data(clusters)
+#' reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
 #'
-#'aut <- autotune_cissvae(
-#'  data = df_missing,
-#'  index_col = "index",
-#'  clusters = clusters$clusters,
-#'  n_trials = 3, ## Using low number of trials for demo
-#'  study_name = "comprehensive_vae_autotune",
-#'  device_preference = "cpu",
-#'  seed = 42, 
-#'  
-#'  ## Hyperparameter search space
-#'  num_hidden_layers = c(2, 5),     # Try 2-5 hidden layers
-#'  hidden_dims = c(64, 512),        # Layer sizes from 64 to 512
-#'  latent_dim = c(10, 100),         # Latent dimension range
-#'  latent_shared = c(TRUE, FALSE),
-#'  output_shared = c(TRUE, FALSE),
-#'  lr = 0.01,  # Learning rate range
-#'  decay_factor = 0.99,
-#'  beta = 0.01,  # KL weight range
-#'  num_epochs = 5,                # Limited epochs for demo
-#'  batch_size = 4000,     # Batch size options
-#'  num_shared_encode = c(0, 1, 2, 3),
-#'  num_shared_decode = c(0, 1, 2, 3),
-#'  
-#'  # Layer placement strategies - try different arrangements
-#'  encoder_shared_placement = c("at_end", "at_start", "alternating", "random"),
-#'  decoder_shared_placement = c("at_start", "at_end", "alternating", "random"),
-#'  
-#'  refit_patience = 2,        # Early stopping patience
-#'  refit_loops = 10,                # Fixed refit loops, limited for demo
-#'  epochs_per_loop = 5,   # Epochs per refit loop, limited for demo
-#'  reset_lr_refit = c(TRUE, FALSE)
-#')
+#' data(df_missing)
+#' data(clusters)
 #'
-#'plot_vae_architecture(aut$model, title = "Optimized CISSVAE Architecture")
+#' aut <- autotune_cissvae(
+#'   data = df_missing,
+#'   index_col = "index",
+#'   clusters = clusters$clusters,
+#'   n_trials = 3,
+#'   study_name = "comprehensive_vae_autotune",
+#'   device_preference = "cpu",
+#'   seed = 42,
+#'
+#'   ## Hyperparameter search space
+#'   num_hidden_layers = c(2, 5),
+#'   hidden_dims = c(64, 512),
+#'   latent_dim = c(10, 100),
+#'   latent_shared = c(TRUE, FALSE),
+#'   output_shared = c(TRUE, FALSE),
+#'   lr = c(0.01, 0.1),
+#'   decay_factor = c(0.99, 1.0),
+#'   beta = c(0.01, 0.1),
+#'   num_epochs = c(5, 20),
+#'   batch_size = c(1000, 4000),
+#'   num_shared_encode = c(0, 1, 2),
+#'   num_shared_decode = c(0, 1, 2),
+#'
+#'   ## Placement strategies
+#'   encoder_shared_placement = c(
+#'     "at_end", "at_start",
+#'     "alternating", "random"
+#'   ),
+#'   decoder_shared_placement = c(
+#'     "at_start", "at_end",
+#'     "alternating", "random"
+#'   ),
+#'
+#'   refit_patience = 2,
+#'   refit_loops = 10,
+#'   epochs_per_loop = 5,
+#'   reset_lr_refit = c(TRUE, FALSE)
+#' )
+#'
+#' plot_vae_architecture(aut$model,
+#'   title = "Optimized CISSVAE Architecture"
+#' )
 #' }
+#'
 #' @export
+
 autotune_cissvae <- function(
   data,
   index_col              = NULL,
@@ -176,23 +183,29 @@ autotune_cissvae <- function(
   # -- 2) Validate shared layer placement strategies -----------------------
   valid_placements <- c("at_end", "at_start", "alternating", "random")
   if (!all(encoder_shared_placement %in% valid_placements)) {
-    stop("Invalid encoder_shared_placement values. Must be one of: ", paste(valid_placements, collapse = ", "))
+    stop("Invalid encoder_shared_placement values. Must be one of: ", 
+    paste(valid_placements, collapse = ", "))
   }
   if (!all(decoder_shared_placement %in% valid_placements)) {
-    stop("Invalid decoder_shared_placement values. Must be one of: ", paste(valid_placements, collapse = ", "))
+    stop("Invalid decoder_shared_placement values. Must be one of: ", 
+    paste(valid_placements, collapse = ", "))
   }
   
   # -- 3) Handle index_col -------------------------------------------------
   if (!is.null(index_col)) {
     if (!index_col %in% colnames(data)) stop("`index_col` not found in data.")
     index_vals <- data[[index_col]]
-    data       <- data[, setdiff(colnames(data), index_col), drop = FALSE]
-    imputable_matrix = imputable_matrix[, setdiff(colnames(imputable_matrix), index_col), drop = FALSE]
+    data       <- data[, setdiff(colnames(data), 
+      index_col), drop = FALSE]
+    imputable_matrix = imputable_matrix[, setdiff(colnames(imputable_matrix), 
+      index_col), drop = FALSE]
     ## handle index col in binary_feature_mask
     if(!is.null(binary_feature_mask) & !is.null(names(binary_feature_mask))){
-      binary_feature_mask =  binary_feature_mask[ setdiff(names(binary_feature_mask), index_col), drop = FALSE]
+      binary_feature_mask =  binary_feature_mask[ setdiff(names(binary_feature_mask), 
+        index_col), drop = FALSE]
       if(debug){
-        cat("Binary feature mask: ", paste0(names(binary_feature_mask), collapse = ", "))
+        cat("Binary feature mask: ", 
+        paste0(names(binary_feature_mask), collapse = ", "))
       }
     }
   } else index_vals <- NULL
@@ -234,7 +247,8 @@ if (!is.null(imputable_matrix)) {
   autotune <- auto_mod$autotune
   np       <- reticulate::import("numpy", convert = FALSE)
   pd       <- reticulate::import("pandas", convert = FALSE)
-  CD_mod   <- reticulate::import("ciss_vae.classes.cluster_dataset", convert = FALSE)$ClusterDataset
+  CD_mod   <- reticulate::import("ciss_vae.classes.cluster_dataset", 
+  convert = FALSE)$ClusterDataset
   
   # -- 5) Build Python SearchSpace -----------------------------------------
   ss_py <- SS(

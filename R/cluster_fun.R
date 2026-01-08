@@ -83,44 +83,71 @@ cluster_on_missing <- function(
 
 #' Cluster Samples Based on Missingness Proportions
 #'
-#' Groups **samples** with similar patterns of missingness across features using either
-#' K-means clustering (when `n_clusters` is specified) or Leiden (when `n_clusters` is `NULL`).
-#' This is useful for detecting cohorts with shared missing-data behavior (e.g., site/batch effects).
+#' Groups **samples** with similar patterns of missingness across features using
+#' either K-means clustering (when `n_clusters` is specified) or Leiden
+#' (when `n_clusters` is `NULL`). This is useful for detecting cohorts with
+#' shared missing-data behavior (e.g., site/batch effects).
 #'
-#' @param prop_matrix Matrix or data frame where **rows are samples** and **columns are features**,
-#'   entries are missingness proportions in `[0,1]`. Can be created with `create_missingness_prop_matrix()`.
-#' @param n_clusters Integer; number of clusters for KMeans. If `NULL`, uses Leiden (default: `NULL`).
+#' @param prop_matrix Matrix or data frame where **rows are samples** and
+#'   **columns are features**, entries are missingness proportions in `[0,1]`.
+#'   Can be created with `create_missingness_prop_matrix()`.
+#' @param n_clusters Integer; number of clusters for KMeans. If `NULL`, uses
+#'   Leiden (default: `NULL`).
 #' @param seed Integer; random seed for KMeans reproducibility (default: `NULL`).
-#' @param k_neighbors Integer; Leiden minimum cluster size. If `NULL`, Python default is used
-#'   (typically a function of the number of samples) (default: `NULL`).
-#' @param leiden_resolution Numeric; Leiden cluster selection threshold (default: `0.25`).
-#' @param metric Character; distance metric `"euclidean"` or `"cosine"` (default: `"euclidean"`).
-#' @param scale_features Logical; whether to standardize **feature columns** before clustering samples (default: `FALSE`).
-#' @param leiden_objective objective
-#' @param use_snn use snn
+#' @param k_neighbors Integer; Leiden minimum cluster size. If `NULL`, Python
+#'   default is used (default: `NULL`).
+#' @param leiden_resolution Numeric; Leiden cluster selection threshold
+#'   (default: `0.25`).
+#' @param metric Character; distance metric. Options include:
+#'   \code{
+#'     "euclidean",
+#'     "cosine"
+#'   }
+#'   (default: `"euclidean"`).
+#' @param scale_features Logical; whether to standardize **feature columns**
+#'   before clustering samples (default: `FALSE`).
+#' @param leiden_objective Character; Leiden optimization objective (optional).
+#' @param use_snn Logical; whether to use shared nearest neighbors (optional).
 #'
 #' @return A list with:
 #' \itemize{
 #'   \item \code{clusters}: Integer vector of cluster assignments per **sample**.
-#'   \item \code{silhouette_score}: Numeric silhouette score, or \code{NULL} if not computable.
-
+#'   \item \code{silhouette_score}: Numeric silhouette score, or \code{NULL}
+#'     if not computable.
 #' }
 #'
 #' @examples
 #' \dontrun{
 #' set.seed(123)
+#'
 #' dat <- data.frame(
 #'   sample_id = paste0("s", 1:12),
-#'   # Two features measured at 3 timepoints each -> proportions by feature per sample
-#'   A_1 = c(NA, rnorm(11)), A_2 = c(NA, rnorm(11)), A_3 = rnorm(12),
-#'   B_1 = rnorm(12),        B_2 = c(rnorm(10), NA, NA), B_3 = rnorm(12)
+#'   # Two features measured at 3 timepoints each -> proportions by feature
+#'   A_1 = c(NA, rnorm(11)),
+#'   A_2 = c(NA, rnorm(11)),
+#'   A_3 = rnorm(12),
+#'   B_1 = rnorm(12),
+#'   B_2 = c(rnorm(10), NA, NA),
+#'   B_3 = rnorm(12)
 #' )
-#' pm <- create_missingness_prop_matrix(dat, index_col = "sample_id",
-#'                                      repeat_feature_names = c("A","B"))
-#' res <- cluster_on_missing_prop(pm, n_clusters = 2, metric = "cosine", scale_features = TRUE)
-#' table(res$clusters_positive)
+#'
+#' pm <- create_missingness_prop_matrix(
+#'   dat,
+#'   index_col = "sample_id",
+#'   repeat_feature_names = c("A", "B")
+#' )
+#'
+#' res <- cluster_on_missing_prop(
+#'   pm,
+#'   n_clusters = 2,
+#'   metric = "cosine",
+#'   scale_features = TRUE
+#' )
+#'
+#' table(res$clusters)
 #' res$silhouette_score
-#'}
+#' }
+#'
 #' @export
 cluster_on_missing_prop <- function(
   prop_matrix,

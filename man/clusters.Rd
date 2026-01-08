@@ -22,7 +22,9 @@ A tibble assigning each observation in \code{df_missing} to a cluster
 determined by its missingness pattern.
 }
 \examples{
+\dontrun{
 data(clusters)
 table(clusters$cluster)
+}
 }
 \keyword{datasets}

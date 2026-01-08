@@ -26,12 +26,16 @@ navbar:
 
 articles:
 - title: "Vignettes"
-  desc: "Package vignettes."  
+  desc: "Main package vignettes."  
   contents: 
     - vignette
     - binary_variables_tutorial
-    - virtual_environment_tutorial
     - do_not_impute_matrix
+
+- title: "Extras"
+  desc: "Vignettes for additional functionality"
+  contents: 
+    - virtual_environment_tutorial
     - summary_functions
     - optunadb
 

@@ -61,7 +61,8 @@ m <- create_missingness_prop_matrix(
 )
 
 dim(m)         # 4 x 3 (CRP, IL6, Albumin)
-m[ , "CRP"]    # per-sample proportion missing across CRP_1 and CRP_2
+# per-sample proportion missing across CRP_1 and CRP_2
+m[ , "CRP"]    
 attr(m, "feature_columns_map")
 
 }

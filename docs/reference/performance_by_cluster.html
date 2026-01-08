@@ -130,25 +130,31 @@ For other numeric features, performance is mean squared error (MSE).</p>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="va">df_missing</span>,</span></span>
 <span class="r-in"><span>  index_col <span class="op">=</span> <span class="st">"index"</span>,</span></span>
 <span class="r-in"><span>  val_proportion <span class="op">=</span> <span class="fl">0.1</span>, <span class="co">## pass a vector for different proportions by cluster</span></span></span>
-<span class="r-in"><span>  columns_ignore <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Age"</span>, <span class="st">"Salary"</span>, <span class="st">"ZipCode10001"</span>, <span class="st">"ZipCode20002"</span>, <span class="st">"ZipCode30003"</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>  columns_ignore <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Age"</span>, <span class="st">"Salary"</span>, </span></span>
+<span class="r-in"><span><span class="st">"ZipCode10001"</span>, <span class="st">"ZipCode20002"</span>, </span></span>
+<span class="r-in"><span><span class="st">"ZipCode30003"</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>  epochs <span class="op">=</span> <span class="fl">5</span>,</span></span>
 <span class="r-in"><span>  return_silhouettes <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>  return_history <span class="op">=</span> <span class="cn">TRUE</span>,  <span class="co"># Get detailed training history</span></span></span>
 <span class="r-in"><span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>  return_model <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co">## Allows for plotting model schematic</span></span></span>
 <span class="r-in"><span>  device <span class="op">=</span> <span class="st">"cpu"</span>,  <span class="co"># Explicit device selection</span></span></span>
-<span class="r-in"><span>  layer_order_enc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"unshared"</span>, <span class="st">"shared"</span>, <span class="st">"unshared"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  layer_order_dec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shared"</span>, <span class="st">"unshared"</span>, <span class="st">"shared"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  layer_order_enc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"unshared"</span>, </span></span>
+<span class="r-in"><span><span class="st">"shared"</span>, <span class="st">"unshared"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  layer_order_dec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shared"</span>, </span></span>
+<span class="r-in"><span><span class="st">"unshared"</span>, <span class="st">"shared"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  return_validation_dataset <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">performance_by_cluster</span><span class="op">(</span>res <span class="op">=</span> <span class="va">result</span>, </span></span>
 <span class="r-in"><span>  group_col <span class="op">=</span> <span class="cn">NULL</span>, </span></span>
 <span class="r-in"><span>  clusters <span class="op">=</span> <span class="va">clusters</span><span class="op">$</span><span class="va">clusters</span>,</span></span>
-<span class="r-in"><span>  feature_cols <span class="op">=</span> <span class="cn">NULL</span>, <span class="co">## default, all numeric columns excluding group_col &amp; cols_ignore</span></span></span>
+<span class="r-in"><span>  feature_cols <span class="op">=</span> <span class="cn">NULL</span>, </span></span>
+<span class="r-in"><span><span class="co">## default, all numeric columns excluding group_col &amp; cols_ignore</span></span></span>
 <span class="r-in"><span>  by_group <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>  by_cluster <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>  cols_ignore <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"index"</span>, <span class="st">"Age"</span>, <span class="st">"Salary"</span>, <span class="st">"ZipCode10001"</span>, <span class="st">"ZipCode20002"</span>, <span class="st">"ZipCode30003"</span><span class="op">)</span> </span></span>
+<span class="r-in"><span>  cols_ignore <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"index"</span>, <span class="st">"Age"</span>, <span class="st">"Salary"</span>, </span></span>
+<span class="r-in"><span><span class="st">"ZipCode10001"</span>, <span class="st">"ZipCode20002"</span>, <span class="st">"ZipCode30003"</span><span class="op">)</span> </span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>

@@ -89,7 +89,7 @@ autotune_cissvae(
 
 \item{evaluate_all_orders}{Whether to test all possible layer arrangements}
 
-\item{max_exhaustive_orders}{Max arrangements to test when evaluate_all_orders=TRUE}
+\item{max_exhaustive_orders}{Max arrangements to test when evaluate_all_orders = TRUE}
 
 \item{num_hidden_layers}{Numeric(2) vector: (min, max) for number of hidden layers}
 
@@ -132,21 +132,21 @@ autotune_cissvae(
 \item{debug}{Logical; if TRUE, additional metadata is returned for debugging.}
 }
 \value{
-List containing imputed data, best model, study object, and results dataframe
+List with imputed data, best model, study object, and results dataframe
 }
 \description{
-Performs hyperparameter optimization for CISS-VAE using Optuna with support
-for both tunable and fixed parameters.
+Performs hyperparameter optimization for CISS-VAE using Optuna with
+support for both tunable and fixed parameters.
 }
 \section{Tips}{
 
 \itemize{
-\item Use \code{cluster_on_missing()} or \code{cluster_on_missing_prop()} to obtain cluster assignments.
-\item Use GPU computation when available for faster training on large datasets. Use \code{check_devices()} to see what devices are available.
-\item Adjust \code{batch_size} based on available memory (larger is faster but uses more memory).
-\item Set \code{verbose = TRUE} or \code{show_progress = TRUE} to monitor training progress.
-\item Use the \code{optuna-dashboard} (see vignette \code{optunadb}) to examine hyperparameter importance.
-\item If using binary features, set \code{names(binary_feature_mask) <- colnames(data)} for correct index/column handling.
+\item Use \code{cluster_on_missing()} or \code{cluster_on_missing_prop()} for cluster assignments.
+\item Use GPU computation when available; call \code{check_devices()} to see available devices.
+\item Adjust \code{batch_size} based on memory (larger is faster but uses more memory).
+\item Set \code{verbose = TRUE} or \code{show_progress = TRUE} to monitor training.
+\item Explore the \code{optuna-dashboard} (see vignette \code{optunadb}) for hyperparameter importance.
+\item For binary features, set \code{names(binary_feature_mask) <- colnames(data)}.
 }
 }
 
@@ -155,44 +155,54 @@ for both tunable and fixed parameters.
 library(tidyverse)
 library(reticulate)
 library(rCISSVAE)
+
 reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
 
 data(df_missing)
 data(clusters)
 
 aut <- autotune_cissvae(
- data = df_missing,
- index_col = "index",
- clusters = clusters$clusters,
- n_trials = 3, ## Using low number of trials for demo
- study_name = "comprehensive_vae_autotune",
- device_preference = "cpu",
- seed = 42, 
- 
- ## Hyperparameter search space
- num_hidden_layers = c(2, 5),     # Try 2-5 hidden layers
- hidden_dims = c(64, 512),        # Layer sizes from 64 to 512
- latent_dim = c(10, 100),         # Latent dimension range
- latent_shared = c(TRUE, FALSE),
- output_shared = c(TRUE, FALSE),
- lr = 0.01,  # Learning rate range
- decay_factor = 0.99,
- beta = 0.01,  # KL weight range
- num_epochs = 5,                # Limited epochs for demo
- batch_size = 4000,     # Batch size options
- num_shared_encode = c(0, 1, 2, 3),
- num_shared_decode = c(0, 1, 2, 3),
- 
- # Layer placement strategies - try different arrangements
- encoder_shared_placement = c("at_end", "at_start", "alternating", "random"),
- decoder_shared_placement = c("at_start", "at_end", "alternating", "random"),
- 
- refit_patience = 2,        # Early stopping patience
- refit_loops = 10,                # Fixed refit loops, limited for demo
- epochs_per_loop = 5,   # Epochs per refit loop, limited for demo
- reset_lr_refit = c(TRUE, FALSE)
+  data = df_missing,
+  index_col = "index",
+  clusters = clusters$clusters,
+  n_trials = 3,
+  study_name = "comprehensive_vae_autotune",
+  device_preference = "cpu",
+  seed = 42,
+
+  ## Hyperparameter search space
+  num_hidden_layers = c(2, 5),
+  hidden_dims = c(64, 512),
+  latent_dim = c(10, 100),
+  latent_shared = c(TRUE, FALSE),
+  output_shared = c(TRUE, FALSE),
+  lr = c(0.01, 0.1),
+  decay_factor = c(0.99, 1.0),
+  beta = c(0.01, 0.1),
+  num_epochs = c(5, 20),
+  batch_size = c(1000, 4000),
+  num_shared_encode = c(0, 1, 2),
+  num_shared_decode = c(0, 1, 2),
+
+  ## Placement strategies
+  encoder_shared_placement = c(
+    "at_end", "at_start",
+    "alternating", "random"
+  ),
+  decoder_shared_placement = c(
+    "at_start", "at_end",
+    "alternating", "random"
+  ),
+
+  refit_patience = 2,
+  refit_loops = 10,
+  epochs_per_loop = 5,
+  reset_lr_refit = c(TRUE, FALSE)
 )
 
-plot_vae_architecture(aut$model, title = "Optimized CISSVAE Architecture")
+plot_vae_architecture(aut$model,
+  title = "Optimized CISSVAE Architecture"
+)
 }
+
 }

@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,7 @@
 
       <h1>Summary Functions</h1>
             
-            <h4 data-toc-skip class="date">2026-01-08</h4>
+            <h4 data-toc-skip class="date">2026-01-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CISS-VAE/rCISS-VAE/blob/HEAD/vignettes/summary_functions.rmd" class="external-link"><code>vignettes/summary_functions.rmd</code></a></small>
       <div class="d-none name"><code>summary_functions.rmd</code></div>
@@ -66,9 +66,11 @@ data.</p>
 <h2 id="per-cluster-summary">Per-cluster Summary<a class="anchor" aria-label="anchor" href="#per-cluster-summary"></a>
 </h2>
 <p>The <code><a href="../reference/cluster_summary.html">cluster_summary()</a></code> function creates a data summary
-table stratified by missingness cluster. Use the <code>cont_style</code>
-param to set the style of continuous variable summaries (“mean_sd”,
-“median_iqr”, “both”).</p>
+table stratified by missingness cluster. The function builds on
+<code><a href="https://www.danieldsjoberg.com/gtsummary/reference/tbl_summary.html" class="external-link">gtsummary::tbl_summary()</a></code>, so gtsummary-like statistics can
+be used for summarizing variables
+(<a href="https://www.danieldsjoberg.com/gtsummary/reference/tbl_summary.html?q=statistic#statistic-argument" class="external-link">
+see tbl_summary() documentation for details </a>).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## ── <span style="font-weight: bold;">Attaching core tidyverse packages</span> ──────────────────────── tidyverse 2.0.0 ──</span></span>
@@ -1078,6 +1080,21 @@ N = 2,000</span><span class="gt_footnote_marks" style="white-space:nowrap;font-s
 </div>
 </div>
 <div class="section level2">
+<h2 id="missingness-heatmap">Missingness Heatmap<a class="anchor" aria-label="anchor" href="#missingness-heatmap"></a>
+</h2>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/cluster_heatmap.html">cluster_heatmap</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">df_missing</span>, clusters <span class="op">=</span> <span class="va">clusters</span><span class="op">$</span><span class="va">clusters</span>, cols_ignore <span class="op">=</span> <span class="st">"index"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## `use_raster` is automatically set to TRUE for a matrix with more than</span></span>
+<span><span class="co">## 2000 columns You can control `use_raster` argument by explicitly</span></span>
+<span><span class="co">## setting TRUE/FALSE to it.</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Set `ht_opt$message = FALSE` to turn off this message.</span></span></code></pre>
+<pre><code><span><span class="co">## 'magick' package is suggested to install to give better rasterization.</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Set `ht_opt$message = FALSE` to turn off this message.</span></span></code></pre>
+<p><img src="summary_functions_files/figure-html/unnamed-chunk-1-1.png" alt="" width="700"></p>
+</div>
+<div class="section level2">
 <h2 id="by-cluster-imputation-loss-function">By-cluster imputation loss function<a class="anchor" aria-label="anchor" href="#by-cluster-imputation-loss-function"></a>
 </h2>
 <p>After running the model, you can get the per-cluster validation set
@@ -1092,7 +1109,7 @@ calculated.</p>
 clusters, set <code>return_clusters=TRUE</code> and the clusters will be
 part of the return object. Otherwise, use the ‘clusters’ parameter in
 <code><a href="../reference/performance_by_cluster.html">performance_by_cluster()</a></code> to input the clusters.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">=</span> <span class="fu"><a href="../reference/run_cissvae.html">run_cissvae</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">df_missing</span>,</span>
 <span>  index_col <span class="op">=</span> <span class="st">"index"</span>,</span>
@@ -1112,7 +1129,7 @@ part of the return object. Otherwise, use the ‘clusters’ parameter in
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Check necessary returns:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">", "</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Check necessary returns: imputed_dataset, model, training_history, val_data, val_imputed</span></span></code></pre>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/performance_by_cluster.html">performance_by_cluster</a></span><span class="op">(</span>res <span class="op">=</span> <span class="va">result</span>, </span>
 <span>  group_col <span class="op">=</span> <span class="cn">NULL</span>, </span>
 <span>  clusters <span class="op">=</span> <span class="va">clusters</span><span class="op">$</span><span class="va">clusters</span>,</span>

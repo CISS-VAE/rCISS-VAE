@@ -9,7 +9,7 @@ support for both tunable and fixed parameters."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -257,8 +257,32 @@ support for both tunable and fixed parameters.</p>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>List with imputed data, best model, study object, and results dataframe</p>
-    </div>
+    <p>A named list with the following components:</p><dl><dt>imputed_dataset</dt>
+<dd><p>A data frame containing the imputed values.</p></dd>
+
+<dt>model</dt>
+<dd><p>The fitted CISS-VAE model object</p></dd>
+
+<dt>cluster_dataset</dt>
+<dd><p>The ClusterDataset object used</p></dd>
+
+<dt>clusters</dt>
+<dd><p>The vector of cluster assignments</p></dd>
+
+<dt>study</dt>
+<dd><p>An optuna study object containing the trial results</p></dd>
+
+<dt>results</dt>
+<dd><p>A data frame of trial results</p></dd>
+
+<dt>val_data</dt>
+<dd><p>Validation dataset used</p></dd>
+
+<dt>val_imputed</dt>
+<dd><p>Imputed values of validation dataset</p></dd>
+
+
+</dl></div>
     <div class="section level2">
     <h2 id="tips">Tips<a class="anchor" aria-label="anchor" href="#tips"></a></h2>
 
@@ -273,16 +297,16 @@ support for both tunable and fixed parameters.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ciss-vae.github.io/rCISS-VAE/">rCISSVAE</a></span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co">## Configure Python environment</span></span></span>
+<span class="r-in"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_virtualenv</a></span><span class="op">(</span><span class="st">"cissvae_environment"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_virtualenv</a></span><span class="op">(</span><span class="st">"./cissvae_environment"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">df_missing</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clusters</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Run autotuning</span></span></span>
 <span class="r-in"><span><span class="va">aut</span> <span class="op">&lt;-</span> <span class="fu">autotune_cissvae</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="va">df_missing</span>,</span></span>
 <span class="r-in"><span>  index_col <span class="op">=</span> <span class="st">"index"</span>,</span></span>
@@ -322,11 +346,16 @@ support for both tunable and fixed parameters.</p>
 <span class="r-in"><span>  reset_lr_refit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="plot_vae_architecture.html">plot_vae_architecture</a></span><span class="op">(</span><span class="va">aut</span><span class="op">$</span><span class="va">model</span>,</span></span>
+<span class="r-in"><span><span class="co">## Visualize architecture</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="plot_vae_architecture.html">plot_vae_architecture</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">aut</span><span class="op">$</span><span class="va">model</span>,</span></span>
 <span class="r-in"><span>  title <span class="op">=</span> <span class="st">"Optimized CISSVAE Architecture"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
-<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in py_module_import(module, convert = convert) : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ModuleNotFoundError: No module named 'ciss_vae'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Run `reticulate::py_last_error()` for details.</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

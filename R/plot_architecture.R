@@ -26,31 +26,33 @@
 #'   \item If you get a TCL or TK error, run: `reticulate::py_run_string("import matplotlib; matplotlib.use('Agg')")` to change the matplotlib backend to use 'Agg' instead.
 #' }
 #'
-#' @export
 #'
 #' @examples
-#' \dontrun{
-#' # Train a model first
-#' result <- run_cissvae(my_data, return_model = TRUE)
-#' 
-#' # Basic plot
-#' plot_vae_architecture(result$model)
-#' 
-#' # Save plot to file
-#' plot_vae_architecture(
-#'   model = result$model,
-#'   title = "CISS-VAE Architecture",
-#'   save_path = "vae_architecture.png",
-#'   dpi = 300
-#' )
-#' 
-#' # Return plot object for further manipulation
-#' fig <- plot_vae_architecture(
-#'   model = result$model,
-#'   return_plot = TRUE,
-#'   display_plot = FALSE
-#' )
+#' \donttest{
+#' try({
+#'   # Train a model first
+#'   result <- run_cissvae(my_data, return_model = TRUE)
+#'
+#'   # Basic plot
+#'   plot_vae_architecture(result$model)
+#'
+#'   # Save plot to file
+#'   plot_vae_architecture(
+#'     model = result$model,
+#'     title = "CISS-VAE Architecture",
+#'     save_path = "vae_architecture.png",
+#'     dpi = 300
+#'   )
+#'
+#'   # Return plot object for further manipulation
+#'   fig <- plot_vae_architecture(
+#'     model = result$model,
+#'     return_plot = TRUE,
+#'     display_plot = FALSE
+#'   )
+#' })
 #' }
+#' @export
 plot_vae_architecture <- function(model,
   title = NULL,
   color_shared = "skyblue",
@@ -63,6 +65,7 @@ plot_vae_architecture <- function(model,
   dpi = 300,
   return_plot = FALSE,
   display_plot = TRUE) {
+  
 
 # Check if model is provided
 if (missing(model) || is.null(model)) {

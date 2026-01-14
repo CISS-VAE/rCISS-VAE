@@ -41,6 +41,12 @@ statistic = list(
 
 ```
 
+## Missingness Heatmap
+
+```{r}
+cluster_heatmap(data = df_missing, clusters = clusters$clusters, cols_ignore = "index")
+```
+
 ## By-cluster imputation loss function
 
 After running the model, you can get the per-cluster validation set imputation loss using the `performance_by_cluster()` function. Set 'return_validation_dataset = TRUE' in the `run_cissvae()` function to be able to use performance_by_cluster on the result object. If the validation dataset (val_data in result object) and imputed validation dataset (val_imputed in the result object) are not returned, the imputation loss cannot be calculated. 

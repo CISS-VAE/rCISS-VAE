@@ -36,48 +36,45 @@
 #' For other numeric features, performance is mean squared error (MSE).
 #'
 #' @examples
-#' \dontrun{
 #' library(tidyverse)
 #' library(reticulate)
 #' library(rCISSVAE)
 #' library(kableExtra)
 #' library(gtsummary)
 #' 
-#' data(df_missing)
-#' data(clusters)
+#' ## Make example results
+#' data_complete = data.frame(
+#' index = 1:10,
+#' x1 = rnorm(10),
+#' x2 = rnorm(10)*rnorm(10, mean = 50, sd=10)
+#'  )
 #' 
-#' result = run_cissvae(
-#'   data = df_missing,
-#'   index_col = "index",
-#'   val_proportion = 0.1, ## pass a vector for different proportions by cluster
-#'   columns_ignore = c("Age", "Salary", 
-#' "ZipCode10001", "ZipCode20002", 
-#' "ZipCode30003"), 
-#'   epochs = 5,
-#'   return_silhouettes = FALSE,
-#'   return_history = TRUE,  # Get detailed training history
-#'   verbose = FALSE,
-#'   return_model = TRUE, ## Allows for plotting model schematic
-#'   device = "cpu",  # Explicit device selection
-#'   layer_order_enc = c("unshared", 
-#' "shared", "unshared"),
-#'   layer_order_dec = c("shared", 
-#' "unshared", "shared"),
-#'   return_validation_dataset = TRUE
-#' )
+#' missing_mask = matrix(data = c(rep(FALSE, 10), 
+#' sample(c(TRUE, FALSE), 
+#' size = 20, replace = TRUE, 
+#' prob = c(0.7, 0.3))), nrow = 10)
 #' 
+#' ## Example validation dataset
+#' val_data = data_complete
+#' val_data[missing_mask] <- NA
+#' 
+#' ## Example 'imputed' validation dataset
+#' val_imputed = data.frame(index = 1:10, x1 = mean(data_complete$x1), x2 = mean(data_complete$x2))
+#' val_imputed[missing_mask] <- NA
+#' 
+#' ## Example result list
+#' result = list("val_data" = val_data, "val_imputed" = val_imputed)
+#' clusters = sample(c(0, 1), size = 10, replace = TRUE)
+#' 
+#' ## Run the function
 #' performance_by_cluster(res = result, 
 #'   group_col = NULL, 
-#'   clusters = clusters$clusters,
+#'   clusters = clusters,
 #'   feature_cols = NULL, 
-#' ## default, all numeric columns excluding group_col & cols_ignore
 #'   by_group = FALSE,
 #'   by_cluster = TRUE,
-#'   cols_ignore = c( "index", "Age", "Salary", 
-#' "ZipCode10001", "ZipCode20002", "ZipCode30003") 
+#'   cols_ignore = c("index") 
 #' )
-#' }
-#' 
 #' @export
 performance_by_cluster <- function(
   res,

@@ -132,7 +132,17 @@ autotune_cissvae(
 \item{debug}{Logical; if TRUE, additional metadata is returned for debugging.}
 }
 \value{
-List with imputed data, best model, study object, and results dataframe
+A named list with the following components:
+\describe{
+\item{imputed_dataset}{A data frame containing the imputed values.}
+\item{model}{The fitted CISS-VAE model object}
+\item{cluster_dataset}{The ClusterDataset object used}
+\item{clusters}{The vector of cluster assignments}
+\item{study}{An optuna study object containing the trial results}
+\item{results}{A data frame of trial results}
+\item{val_data}{Validation dataset used}
+\item{val_imputed}{Imputed values of validation dataset}
+}
 }
 \description{
 Performs hyperparameter optimization for CISS-VAE using Optuna with
@@ -151,16 +161,16 @@ support for both tunable and fixed parameters.
 }
 
 \examples{
-\dontrun{
-library(tidyverse)
-library(reticulate)
-library(rCISSVAE)
+\donttest{
+try({
+## Configure Python environment
+reticulate::use_virtualenv("cissvae_environment", required = TRUE)
 
-reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
 
 data(df_missing)
 data(clusters)
 
+## Run autotuning
 aut <- autotune_cissvae(
   data = df_missing,
   index_col = "index",
@@ -200,9 +210,11 @@ aut <- autotune_cissvae(
   reset_lr_refit = c(TRUE, FALSE)
 )
 
-plot_vae_architecture(aut$model,
+## Visualize architecture
+plot_vae_architecture(
+  aut$model,
   title = "Optimized CISSVAE Architecture"
 )
+})
 }
-
 }

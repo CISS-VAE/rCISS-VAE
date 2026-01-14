@@ -90,32 +90,6 @@
 #' @param return_validation_dataset Logical. If `TRUE` returns validation dataset 
 #' @param return_clusters Logical. If TRUE returns cluster vector
 #' 
-#' @examples
-#' \dontrun{
-#' library(reticulate)
-#'library(rCISSVAE)
-#'
-#'data(df_missing)
-#'data(clusters)
-#'
-#'dat = run_cissvae(
-#'  data = df_missing,
-#'  index_col = "index",
-#'  val_proportion = 0.1, ## pass a vector for different proportions by cluster
-#'  columns_ignore = c("Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"), 
-#'  clusters = clusters$clusters, ## we have precomputed cluster labels so we pass them here
-#'  epochs = 5,
-#'  return_silhouettes = FALSE,
-#'  return_history = TRUE,  # Get detailed training history
-#'  verbose = FALSE,
-#'  return_model = TRUE, ## Allows for plotting model schematic
-#'  device = "cpu",  # Explicit device selection
-#'  layer_order_enc = c("unshared", "shared", "unshared"),
-#'  layer_order_dec = c("shared", "unshared", "shared")
-#')
-#' }
-#' 
-
 #' @details
 #' The CISS-VAE method works in two main phases:
 #' 
@@ -131,18 +105,23 @@
 #'
 #' @return A list containing imputed data and optional additional outputs:
 #' \describe{
-#'   \item{imputed}{data.frame of imputed data with same dimensions as input.
+#'   \item{imputed_dataset}{data.frame of imputed data with same dimensions as input.
 #'     Missing values are filled with model predictions. If `index_col` was
 #'     provided, it is re-attached as the first column.}
 #'   \item{model}{(if `return_model=TRUE`) Python CISSVAE model object.
 #'     Can be used for further analysis or predictions.}
-#'   \item{dataset}{(if `return_dataset=TRUE`) Python ClusterDataset object
+#'   \item{cluster_dataset}{(if `return_dataset=TRUE`) Python ClusterDataset object
 #'     containing validation data, masks, normalization parameters, and cluster labels.
 #'     Can be used with performance_by_cluster() and other analysis functions.}
+#'  \item{clusters}{(if `return_clusters=TRUE`) Returns vector of cluster assignments}
 #'   \item{silhouettes}{(if `return_silhouettes=TRUE`) Numeric silhouette
 #'     score measuring cluster separation quality.}
-#'   \item{history}{(if `return_history=TRUE`) data.frame containing training
+#'   \item{training_history}{(if `return_history=TRUE`) data.frame containing training
 #'     history with columns for epoch, losses, and validation metrics.}
+#'   \item{val_data}{(if `return_validation_dataset=TRUE`) data.frame containing values held
+#'    aside for validation.}
+#'   \item{val_imputed}{(if `return_validation_dataset=TRUE`) data.frame containing imputed values of set held
+#'    aside for validation.}
 #' }
 #'
 #' @section Requirements:
@@ -156,72 +135,36 @@
 #'   \item Adjust \code{batch_size} based on available memory (larger is faster but uses more memory).
 #'   \item Set \code{verbose = TRUE} to monitor training progress.
 #' }
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' # Basic usage with automatic clustering
-#' result <- run_cissvae(
-#'   data = my_data_with_missing,
-#'   index_col = "sample_id"
-#' )
-#' imputed_data <- result$imputed
-#' 
-#' # Advanced usage with dataset for performance analysis
-#' result <- run_cissvae(
-#'   data = my_data,
-#'   clusters = my_cluster_labels,
-#'   hidden_dims = c(200, 150, 100),
-#'   latent_dim = 20,
-#'   epochs = 1000,
-#'   return_history = TRUE,
-#'   return_silhouettes = TRUE,
-#'   return_dataset = TRUE,
-#'   verbose = TRUE
-#' )
-#' 
-#' # Access different outputs
-#' imputed_data <- result$imputed
-#' training_history <- result$history
-#' cluster_quality <- result$silhouettes
-#' 
-#' # Use dataset for performance analysis
-#' perf <- performance_by_cluster(
-#'   original_data = my_data,
-#'   model = result$model,
-#'   dataset = result$dataset,
-#'   clusters = my_cluster_labels
-#' )
-#' 
-#' # Using pre-computed missingness matrix for clustering
-#' prop_matrix <- create_missingness_prop_matrix(
-#'   data = my_data, 
-#'   index_col = "sample_id"
-#' )
-#' result <- run_cissvae(
-#'   data = my_data,
-#'   index_col = "sample_id",
-#'   missingness_proportion_matrix = prop_matrix,
-#'   scale_features = TRUE,
-#'   return_dataset = TRUE
-#' )
-#' 
-#' # Custom layer sharing patterns
-#' result <- run_cissvae(
-#'   data = my_data,
-#'   hidden_dims = c(100, 80, 60),
-#'   layer_order_enc = c("unshared", 
-#' "shared", "shared"),
-#'   layer_order_dec = c("shared",
-#'  "shared", "unshared"),
-#'   latent_shared = TRUE
-#' )
-#' }
-#'
 #' @seealso
 #' \code{\link{create_missingness_prop_matrix}} for creating missingness proportion matrices
 #' \code{\link{performance_by_cluster}} for analyzing model performance using the returned dataset
+#' 
+#' @examples
+#' \donttest{
+#' library(rCISSVAE)
+#'
+#' data(df_missing)
+#' data(clusters)
+#'
+#' try({
+#' dat = run_cissvae(
+#'  data = df_missing,
+#'  index_col = "index",
+#'  val_proportion = 0.1, ## pass a vector for different proportions by cluster
+#'  columns_ignore = c("Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"), 
+#'  clusters = clusters$clusters, ## we have precomputed cluster labels so we pass them here
+#'  epochs = 5,
+#'  return_silhouettes = FALSE,
+#'  return_history = TRUE,  # Get detailed training history
+#'  verbose = FALSE,
+#'  return_model = TRUE, ## Allows for plotting model schematic
+#'  device = "cpu",  # Explicit device selection
+#'  layer_order_enc = c("unshared", "shared", "unshared"),
+#'  layer_order_dec = c("shared", "unshared", "shared")
+#')
+#' })
+#' }
+#' @export
 #' 
 run_cissvae <- function(
   data,
@@ -271,6 +214,21 @@ run_cissvae <- function(
   return_validation_dataset = FALSE,
   debug                  = FALSE
 ){
+
+      # Check if reticulate has initialized Python
+  if (is.null(reticulate::py_config()$python)) {
+      stop(
+        "Python is not initialized in this session. ",
+        "Please activate a reticulate Python environment before calling this function, ",
+        "for example by calling:\n",
+        "  reticulate::use_virtualenv(\"your/env/path\", required = TRUE)\n",
+        "or\n",
+        "  reticulate::use_condaenv(\"your_env_name\", required = TRUE)\n",
+        "and then re-run the function.",
+        call. = FALSE
+      )
+    } 
+  
   is_py_obj <- function(x) inherits(x, "python.builtin.object")
   ## step 0: if return_validation_dataset, set return_dataset = true. If run_cissvae does your clusters, return_clusters = true
   if(return_validation_dataset){

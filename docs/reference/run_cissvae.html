@@ -21,7 +21,7 @@ patterns within and across different data subgroups."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -320,7 +320,7 @@ during training (contains validation data, masks, etc.). Default <code>FALSE</co
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list containing imputed data and optional additional outputs:</p><dl><dt>imputed</dt>
+    <p>A list containing imputed data and optional additional outputs:</p><dl><dt>imputed_dataset</dt>
 <dd><p>data.frame of imputed data with same dimensions as input.
 Missing values are filled with model predictions. If <code>index_col</code> was
 provided, it is re-attached as the first column.</p></dd>
@@ -329,18 +329,29 @@ provided, it is re-attached as the first column.</p></dd>
 <dd><p>(if <code>return_model=TRUE</code>) Python CISSVAE model object.
 Can be used for further analysis or predictions.</p></dd>
 
-<dt>dataset</dt>
+<dt>cluster_dataset</dt>
 <dd><p>(if <code>return_dataset=TRUE</code>) Python ClusterDataset object
 containing validation data, masks, normalization parameters, and cluster labels.
 Can be used with performance_by_cluster() and other analysis functions.</p></dd>
+
+<dt>clusters</dt>
+<dd><p>(if <code>return_clusters=TRUE</code>) Returns vector of cluster assignments</p></dd>
 
 <dt>silhouettes</dt>
 <dd><p>(if <code>return_silhouettes=TRUE</code>) Numeric silhouette
 score measuring cluster separation quality.</p></dd>
 
-<dt>history</dt>
+<dt>training_history</dt>
 <dd><p>(if <code>return_history=TRUE</code>) data.frame containing training
 history with columns for epoch, losses, and validation metrics.</p></dd>
+
+<dt>val_data</dt>
+<dd><p>(if <code>return_validation_dataset=TRUE</code>) data.frame containing values held
+aside for validation.</p></dd>
+
+<dt>val_imputed</dt>
+<dd><p>(if <code>return_validation_dataset=TRUE</code>) data.frame containing imputed values of set held
+aside for validation.</p></dd>
 
 
 </dl></div>
@@ -377,13 +388,13 @@ accessible via <code>reticulate</code>.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a></span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ciss-vae.github.io/rCISS-VAE/">rCISSVAE</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">df_missing</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clusters</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="op">{</span></span></span>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">=</span> <span class="fu">run_cissvae</span><span class="op">(</span></span></span>
 <span class="r-in"><span> data <span class="op">=</span> <span class="va">df_missing</span>,</span></span>
 <span class="r-in"><span> index_col <span class="op">=</span> <span class="st">"index"</span>,</span></span>
@@ -399,67 +410,11 @@ accessible via <code>reticulate</code>.</p>
 <span class="r-in"><span> layer_order_enc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"unshared"</span>, <span class="st">"shared"</span>, <span class="st">"unshared"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span> layer_order_dec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shared"</span>, <span class="st">"unshared"</span>, <span class="st">"shared"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="co"># Basic usage with automatic clustering</span></span></span>
-<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">run_cissvae</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  data <span class="op">=</span> <span class="va">my_data_with_missing</span>,</span></span>
-<span class="r-in"><span>  index_col <span class="op">=</span> <span class="st">"sample_id"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">imputed_data</span> <span class="op">&lt;-</span> <span class="va">result</span><span class="op">$</span><span class="va">imputed</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Advanced usage with dataset for performance analysis</span></span></span>
-<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">run_cissvae</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  data <span class="op">=</span> <span class="va">my_data</span>,</span></span>
-<span class="r-in"><span>  clusters <span class="op">=</span> <span class="va">my_cluster_labels</span>,</span></span>
-<span class="r-in"><span>  hidden_dims <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">200</span>, <span class="fl">150</span>, <span class="fl">100</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  latent_dim <span class="op">=</span> <span class="fl">20</span>,</span></span>
-<span class="r-in"><span>  epochs <span class="op">=</span> <span class="fl">1000</span>,</span></span>
-<span class="r-in"><span>  return_history <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>  return_silhouettes <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>  return_dataset <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Access different outputs</span></span></span>
-<span class="r-in"><span><span class="va">imputed_data</span> <span class="op">&lt;-</span> <span class="va">result</span><span class="op">$</span><span class="va">imputed</span></span></span>
-<span class="r-in"><span><span class="va">training_history</span> <span class="op">&lt;-</span> <span class="va">result</span><span class="op">$</span><span class="va">history</span></span></span>
-<span class="r-in"><span><span class="va">cluster_quality</span> <span class="op">&lt;-</span> <span class="va">result</span><span class="op">$</span><span class="va">silhouettes</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Use dataset for performance analysis</span></span></span>
-<span class="r-in"><span><span class="va">perf</span> <span class="op">&lt;-</span> <span class="fu"><a href="performance_by_cluster.html">performance_by_cluster</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  original_data <span class="op">=</span> <span class="va">my_data</span>,</span></span>
-<span class="r-in"><span>  model <span class="op">=</span> <span class="va">result</span><span class="op">$</span><span class="va">model</span>,</span></span>
-<span class="r-in"><span>  dataset <span class="op">=</span> <span class="va">result</span><span class="op">$</span><span class="va">dataset</span>,</span></span>
-<span class="r-in"><span>  clusters <span class="op">=</span> <span class="va">my_cluster_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Using pre-computed missingness matrix for clustering</span></span></span>
-<span class="r-in"><span><span class="va">prop_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_missingness_prop_matrix.html">create_missingness_prop_matrix</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  data <span class="op">=</span> <span class="va">my_data</span>, </span></span>
-<span class="r-in"><span>  index_col <span class="op">=</span> <span class="st">"sample_id"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">run_cissvae</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  data <span class="op">=</span> <span class="va">my_data</span>,</span></span>
-<span class="r-in"><span>  index_col <span class="op">=</span> <span class="st">"sample_id"</span>,</span></span>
-<span class="r-in"><span>  missingness_proportion_matrix <span class="op">=</span> <span class="va">prop_matrix</span>,</span></span>
-<span class="r-in"><span>  scale_features <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>  return_dataset <span class="op">=</span> <span class="cn">TRUE</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Custom layer sharing patterns</span></span></span>
-<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">run_cissvae</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  data <span class="op">=</span> <span class="va">my_data</span>,</span></span>
-<span class="r-in"><span>  hidden_dims <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">80</span>, <span class="fl">60</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  layer_order_enc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"unshared"</span>, </span></span>
-<span class="r-in"><span><span class="st">"shared"</span>, <span class="st">"shared"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  layer_order_dec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shared"</span>,</span></span>
-<span class="r-in"><span> <span class="st">"shared"</span>, <span class="st">"unshared"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  latent_shared <span class="op">=</span> <span class="cn">TRUE</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
-<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in py_module_import(module, convert = convert) : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ModuleNotFoundError: No module named 'ciss_vae'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Run `reticulate::py_last_error()` for details.</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

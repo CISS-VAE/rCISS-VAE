@@ -46,8 +46,8 @@ All additional arguments (\code{...}) are passed directly to
 \code{all_continuous()} / \code{all_categorical()} selectors and custom statistics.
 }
 \examples{
-\dontrun{
-df <- tibble::tibble(
+if(requireNamespace("gtsummary")){
+df <- data.frame(
   age = rnorm(100, 60, 10),
   bmi = rnorm(100, 28, 5),
   sex = sample(c("F","M"), 100, TRUE)

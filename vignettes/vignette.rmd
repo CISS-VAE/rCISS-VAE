@@ -71,7 +71,7 @@ If you do not want to manually create the virtual environment, you can use the h
 
 ```{r eval=FALSE}
 create_cissvae_env(
-  envname = "cissvae_environment", ## name of environment
+  envname = "./cissvae_environment", ## name of environment
   path = NULL, ## add path to wherever you want virtual environment to be
   install_python = FALSE, ## set to TRUE if you want create_cisssvae_env to install python for you
   python_version = "3.10" ## set to whatever version you want >=3.10. Python 3.10 or 3.11 recommended

@@ -21,16 +21,20 @@ version is found on the system.}
 
 \item{python_version}{Python version string (major.minor), used when installing Python.}
 }
+\value{
+NULL. Does not return anything
+}
 \description{
 This function will either find an existing virtualenv by name (in
 the default location) or at a custom filesystem path, or create it
 (and install CISSVAE into it).
 }
 \examples{
-\dontrun{
+\donttest{
+try({
 create_cissvae_env(
 envname = "cissvae_environment",
 install_python = FALSE,
-python_version = "3.10")
-}
+python_version = "3.10")})}
+
 }

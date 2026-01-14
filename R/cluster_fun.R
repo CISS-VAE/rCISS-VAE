@@ -29,6 +29,20 @@ cluster_on_missing <- function(
 ) {
   # load reticulate
   requireNamespace("reticulate", quietly = TRUE)
+  
+  # Check if reticulate has initialized Python
+  if (is.null(reticulate::py_config()$python)) {
+      stop(
+        "Python is not initialized in this session. ",
+        "Please activate a reticulate Python environment before calling this function, ",
+        "for example by calling:\n",
+        "  reticulate::use_virtualenv(\"your/env/path\", required = TRUE)\n",
+        "or\n",
+        "  reticulate::use_condaenv(\"your_env_name\", required = TRUE)\n",
+        "and then re-run the function.",
+        call. = FALSE
+      )
+    } 
 
   # 1) import pandas and the helper function
   pd_mod      <- reticulate::import("pandas", convert = FALSE)
@@ -117,7 +131,6 @@ cluster_on_missing <- function(
 #' }
 #'
 #' @examples
-#' \dontrun{
 #' set.seed(123)
 #'
 #' dat <- data.frame(
@@ -137,6 +150,7 @@ cluster_on_missing <- function(
 #'   repeat_feature_names = c("A", "B")
 #' )
 #'
+#' try({
 #' res <- cluster_on_missing_prop(
 #'   pm,
 #'   n_clusters = 2,
@@ -146,7 +160,7 @@ cluster_on_missing <- function(
 #'
 #' table(res$clusters)
 #' res$silhouette_score
-#' }
+#' })
 #'
 #' @export
 cluster_on_missing_prop <- function(
@@ -164,6 +178,20 @@ cluster_on_missing_prop <- function(
   if (!requireNamespace("reticulate", quietly = TRUE)) {
     stop("Package 'reticulate' is required. Install it to use this function.")
   }
+
+    # Check if reticulate has initialized Python
+  if (is.null(reticulate::py_config()$python)) {
+      stop(
+        "Python is not initialized in this session. ",
+        "Please activate a reticulate Python environment before calling this function, ",
+        "for example by calling:\n",
+        "  reticulate::use_virtualenv(\"your/env/path\", required = TRUE)\n",
+        "or\n",
+        "  reticulate::use_condaenv(\"your_env_name\", required = TRUE)\n",
+        "and then re-run the function.",
+        call. = FALSE
+      )
+    } 
 
   # Locate Python function
   run_mod <- reticulate::import("ciss_vae.utils.clustering", convert = FALSE)

@@ -14,6 +14,7 @@
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/autotune_cissvae.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/check_devices.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/clusters.html</loc></url>
+<url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/cluster_heatmap.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/cluster_on_missing.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/cluster_on_missing_prop.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/cluster_summary.html</loc></url>
@@ -21,7 +22,6 @@
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/create_missingness_prop_matrix.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/df_missing.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/dni.html</loc></url>
-<url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/evaluate_imputation.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/index.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/mock_surv.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/performance_by_cluster.html</loc></url>

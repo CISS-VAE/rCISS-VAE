@@ -33,10 +33,8 @@
 #' }
 #' @source Imported from `data_raw/clusters.csv`, then renamed `...1` → `index`.  
 #' @examples
-#' \dontrun{
 #' data(clusters)
 #' table(clusters$cluster)
-#' }
 "clusters"
 
 

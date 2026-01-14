@@ -175,18 +175,23 @@ during training (contains validation data, masks, etc.). Default \code{FALSE}.}
 \value{
 A list containing imputed data and optional additional outputs:
 \describe{
-\item{imputed}{data.frame of imputed data with same dimensions as input.
+\item{imputed_dataset}{data.frame of imputed data with same dimensions as input.
 Missing values are filled with model predictions. If \code{index_col} was
 provided, it is re-attached as the first column.}
 \item{model}{(if \code{return_model=TRUE}) Python CISSVAE model object.
 Can be used for further analysis or predictions.}
-\item{dataset}{(if \code{return_dataset=TRUE}) Python ClusterDataset object
+\item{cluster_dataset}{(if \code{return_dataset=TRUE}) Python ClusterDataset object
 containing validation data, masks, normalization parameters, and cluster labels.
 Can be used with performance_by_cluster() and other analysis functions.}
+\item{clusters}{(if \code{return_clusters=TRUE}) Returns vector of cluster assignments}
 \item{silhouettes}{(if \code{return_silhouettes=TRUE}) Numeric silhouette
 score measuring cluster separation quality.}
-\item{history}{(if \code{return_history=TRUE}) data.frame containing training
+\item{training_history}{(if \code{return_history=TRUE}) data.frame containing training
 history with columns for epoch, losses, and validation metrics.}
+\item{val_data}{(if \code{return_validation_dataset=TRUE}) data.frame containing values held
+aside for validation.}
+\item{val_imputed}{(if \code{return_validation_dataset=TRUE}) data.frame containing imputed values of set held
+aside for validation.}
 }
 }
 \description{
@@ -232,13 +237,13 @@ accessible via \code{reticulate}.
 }
 
 \examples{
-\dontrun{
-library(reticulate)
+\donttest{
 library(rCISSVAE)
 
 data(df_missing)
 data(clusters)
 
+try({
 dat = run_cissvae(
  data = df_missing,
  index_col = "index",
@@ -254,67 +259,8 @@ dat = run_cissvae(
  layer_order_enc = c("unshared", "shared", "unshared"),
  layer_order_dec = c("shared", "unshared", "shared")
 )
+})
 }
-
-\dontrun{
-# Basic usage with automatic clustering
-result <- run_cissvae(
-  data = my_data_with_missing,
-  index_col = "sample_id"
-)
-imputed_data <- result$imputed
-
-# Advanced usage with dataset for performance analysis
-result <- run_cissvae(
-  data = my_data,
-  clusters = my_cluster_labels,
-  hidden_dims = c(200, 150, 100),
-  latent_dim = 20,
-  epochs = 1000,
-  return_history = TRUE,
-  return_silhouettes = TRUE,
-  return_dataset = TRUE,
-  verbose = TRUE
-)
-
-# Access different outputs
-imputed_data <- result$imputed
-training_history <- result$history
-cluster_quality <- result$silhouettes
-
-# Use dataset for performance analysis
-perf <- performance_by_cluster(
-  original_data = my_data,
-  model = result$model,
-  dataset = result$dataset,
-  clusters = my_cluster_labels
-)
-
-# Using pre-computed missingness matrix for clustering
-prop_matrix <- create_missingness_prop_matrix(
-  data = my_data, 
-  index_col = "sample_id"
-)
-result <- run_cissvae(
-  data = my_data,
-  index_col = "sample_id",
-  missingness_proportion_matrix = prop_matrix,
-  scale_features = TRUE,
-  return_dataset = TRUE
-)
-
-# Custom layer sharing patterns
-result <- run_cissvae(
-  data = my_data,
-  hidden_dims = c(100, 80, 60),
-  layer_order_enc = c("unshared", 
-"shared", "shared"),
-  layer_order_dec = c("shared",
- "shared", "unshared"),
-  latent_shared = TRUE
-)
-}
-
 }
 \seealso{
 \code{\link{create_missingness_prop_matrix}} for creating missingness proportion matrices

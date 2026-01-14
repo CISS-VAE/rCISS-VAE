@@ -61,7 +61,6 @@ either K-means clustering (when \code{n_clusters} is specified) or Leiden
 shared missing-data behavior (e.g., site/batch effects).
 }
 \examples{
-\dontrun{
 set.seed(123)
 
 dat <- data.frame(
@@ -81,6 +80,7 @@ pm <- create_missingness_prop_matrix(
   repeat_feature_names = c("A", "B")
 )
 
+try({
 res <- cluster_on_missing_prop(
   pm,
   n_clusters = 2,
@@ -90,6 +90,6 @@ res <- cluster_on_missing_prop(
 
 table(res$clusters)
 res$silhouette_score
-}
+})
 
 }

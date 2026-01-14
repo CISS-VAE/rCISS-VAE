@@ -47,7 +47,17 @@
 #' @param weight_decay Weight decay (L2 penalty) used in Adam optimizer.
 #' @param debug Logical; if TRUE, additional metadata is returned for debugging.
 #'
-#' @return List with imputed data, best model, study object, and results dataframe
+#' @return A named list with the following components:
+#' \describe{
+#' \item{imputed_dataset}{A data frame containing the imputed values.}
+#' \item{model}{The fitted CISS-VAE model object}
+#' \item{cluster_dataset}{The ClusterDataset object used}
+#' \item{clusters}{The vector of cluster assignments}
+#' \item{study}{An optuna study object containing the trial results}
+#' \item{results}{A data frame of trial results}
+#' \item{val_data}{Validation dataset used}
+#' \item{val_imputed}{Imputed values of validation dataset}
+#' }
 #'
 #' @section Tips:
 #' \itemize{
@@ -60,16 +70,16 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
-#' library(tidyverse)
-#' library(reticulate)
-#' library(rCISSVAE)
+#' \donttest{
+#' try({
+#' ## Configure Python environment
+#' reticulate::use_virtualenv("cissvae_environment", required = TRUE)
 #'
-#' reticulate::use_virtualenv("./cissvae_environment", required = TRUE)
 #'
 #' data(df_missing)
 #' data(clusters)
 #'
+#' ## Run autotuning
 #' aut <- autotune_cissvae(
 #'   data = df_missing,
 #'   index_col = "index",
@@ -109,11 +119,13 @@
 #'   reset_lr_refit = c(TRUE, FALSE)
 #' )
 #'
-#' plot_vae_architecture(aut$model,
+#' ## Visualize architecture
+#' plot_vae_architecture(
+#'   aut$model,
 #'   title = "Optimized CISSVAE Architecture"
 #' )
+#' })
 #' }
-#'
 #' @export
 
 autotune_cissvae <- function(
@@ -162,6 +174,24 @@ autotune_cissvae <- function(
   ## defaults to returning helpful things
   debug = FALSE
 ) {
+
+  if (!requireNamespace("reticulate", quietly = TRUE)) {
+    stop("Package 'reticulate' is required. Install it to use this function.")
+  }
+
+        # Check if reticulate has initialized Python
+  if (is.null(reticulate::py_config()$python)) {
+      stop(
+        "Python is not initialized in this session. ",
+        "Please activate a reticulate Python environment before calling this function, ",
+        "for example by calling:\n",
+        "  reticulate::use_virtualenv(\"your/env/path\", required = TRUE)\n",
+        "or\n",
+        "  reticulate::use_condaenv(\"your_env_name\", required = TRUE)\n",
+        "and then re-run the function.",
+        call. = FALSE
+      )
+    } 
 
   requireNamespace('purrr')
 

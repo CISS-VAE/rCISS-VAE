@@ -1,44 +1,14 @@
-#' Evaluate imputation accuracy (R wrapper)
-#'
-#' Compare imputed values to ground truth at originally missing positions,
-#' by calling the Python function `evaluate_imputation()` defined in the
-#' ciss_vae module.
-#'
-#' @param imputed_df A data.frame or tibble of imputed values (same dim as df_complete)
-#' @param df_complete A data.frame or tibble of the complete (ground-truth) values
-#' @param df_missing A data.frame or tibble with NAs indicating the original missing entries
-#' @return A list with components 
-#' @export
-evaluate_imputation <- function(imputed_df, df_complete, df_missing) {
-  if (!requireNamespace("reticulate", quietly = TRUE)) {
-    stop("Package 'reticulate' is required for evaluate_imputation()")
-  }
-
-  # Import pandas and your Python module
-  pd     <- reticulate::import("pandas", convert = FALSE)
-  cvae   <- reticulate::import("ciss_vae", convert = FALSE)
-
-  # Convert R data.frames/tibbles to pandas DataFrames
-  imp_py      <- pd$DataFrame(imputed_df)
-  complete_py <- pd$DataFrame(df_complete)
-  missing_py  <- pd$DataFrame(df_missing)
-
-  # Call the Python function directly
-  result <- cvae$evaluate_imputation(imp_py, complete_py, missing_py)
-
-  # Unpack and convert back to R
-  res      <- reticulate::py_to_r(result)
-
-  mse = res[1]
-  
-}
-
 #' Check PyTorch device availability
 #'
 #' This function prints the available devices (cpu, cuda, mps) detected by PyTorch. If your mps/cuda device is not shown, check your PyTorch installation. 
 #'
 #' @param env_path Path to virtual environment containing PyTorch and ciss-vae. Defaults to NULL.
 #' @return Vector of strings for available devices. 
+#' @examples
+#' \donttest{
+#' try(
+#' check_devices()
+#' )}
 #' @export
 check_devices <- function(env_path = NULL){
   

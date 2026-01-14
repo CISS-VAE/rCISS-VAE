@@ -15,3 +15,9 @@ Vector of strings for available devices.
 \description{
 This function prints the available devices (cpu, cuda, mps) detected by PyTorch. If your mps/cuda device is not shown, check your PyTorch installation.
 }
+\examples{
+\donttest{
+try(
+check_devices()
+)}
+}

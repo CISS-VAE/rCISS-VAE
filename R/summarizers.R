@@ -25,8 +25,8 @@
 #' @return A `gtsummary::tbl_summary` (default) or `gt::gt_tbl` if `return_as="gt"`.
 #'
 #' @examples
-#' \dontrun{
-#' df <- tibble::tibble(
+#' if(requireNamespace("gtsummary")){
+#' df <- data.frame(
 #'   age = rnorm(100, 60, 10),
 #'   bmi = rnorm(100, 28, 5),
 #'   sex = sample(c("F","M"), 100, TRUE)
@@ -117,4 +117,121 @@ cluster_summary <- function(
   } else {
     return(tbl)
   }
+}
+
+#' Cluster-wise Heatmap of Missing Data Patterns
+#'
+#' @description
+#' Visualize the pattern of missing values in a dataset, arranged by cluster. Each
+#' column in the heatmap represents one observation and each row a feature. Tiles
+#' indicate whether a value is missing (black) or present (white). Cluster labels
+#' are shown as a column annotation bar above the heatmap. The package
+#' \pkg{ComplexHeatmap} must be installed for this function to work.
+#'
+#' @param data A \code{data.frame} or tibble containing the dataset with possible
+#'   missing values. Rows represent observations and columns represent features.
+#' @param clusters A vector of cluster labels for each observation (row) in
+#'   \code{data}. Must have the same length as \code{nrow(data)}.
+#' @param cols_ignore Optional character vector of column names in \code{data} to
+#'   exclude from the heatmap (e.g., identifiers or non-feature columns).
+#' @param show_row_names Logical. If TRUE, displays feature names on plot
+#' @param missing_color Display color of missing values. Default black.
+#' @param observed_color Display color of observed values. Default white. 
+#' @param title Optional plot title. Defaults to "Missingness Heatmap by Cluster"
+#'
+#' @details
+#' This function constructs a binary missingness matrix where 1 indicates a
+#' missing value and 0 a present value. Columns (observations) are ordered by
+#' their cluster labels, and the function displays a heatmap of missingness
+#' patterns using \pkg{ComplexHeatmap}. Cluster membership is displayed as an
+#' annotation above the heatmap.
+#'
+#' @return A list of class \code{"ComplexHeatmap"} containing the heatmap
+#'   object. This can be used for further inspection or manual redraw.
+#'
+#' @examples
+#' if(requireNamespace("ComplexHeatmap")){
+#' # Simple example with small dataset
+#' df <- data.frame(
+#'   x1 = c(1, NA, 3),
+#'   x2 = c(NA, 2, 3),
+#'   x3 = c(1, 2, NA)
+#' )
+#' cl <- c("A", "B", "A")
+#' cluster_heatmap(df, cl)
+#'
+#' # Example excluding a column prior to plotting
+#' cluster_heatmap(df, cl, cols_ignore = "x2")
+#' }
+#' 
+#' @importFrom ComplexHeatmap HeatmapAnnotation anno_block Heatmap
+#' @export
+cluster_heatmap <- function(data, clusters, cols_ignore = NULL, show_row_names = TRUE,
+missing_color = "black", observed_color = "white", title = "Missingness Heatmap by Cluster") {
+
+  if (!requireNamespace("ComplexHeatmap", quietly = TRUE)) {
+    stop(
+      "The package 'ComplexHeatmap' is required but not installed. ",
+      "Please install it with BiocManager::install('ComplexHeatmap').",
+      call. = FALSE
+    )
+  }
+
+  if (!is.data.frame(data)) {
+    stop("`data` must be a data.frame or tibble.", call. = FALSE)
+  }
+  if (length(clusters) != nrow(data)) {
+    stop("Length of `clusters` must equal nrow(data).", call. = FALSE)
+  }
+
+  if (!is.null(cols_ignore) && length(cols_ignore) > 0) {
+    data <- dplyr::select(data, -dplyr::any_of(cols_ignore))
+  }
+
+  # Missingness matrix: features x observations
+  missing_mat <- is.na(data)
+  missing_mat <- 1L * missing_mat
+  missing_mat <- t(as.matrix(missing_mat))
+
+  rownames(missing_mat) <- colnames(data)
+  colnames(missing_mat) <- paste0("Obs_", seq_len(ncol(missing_mat)))
+
+  # Order by cluster
+  ord <- order(clusters)
+  missing_mat <- missing_mat[, ord, drop = FALSE]
+  clusters_ord <- clusters[ord]
+
+  # Define cluster slices
+  cluster_factor <- factor(clusters_ord, levels = unique(clusters_ord))
+  slice_lengths <- table(cluster_factor)
+
+  # Top annotation with centered cluster labels
+  top_anno <- ComplexHeatmap::HeatmapAnnotation(
+    Cluster = ComplexHeatmap::anno_block(
+      gp = grid::gpar(fill = NA, col = NA),
+      labels = names(slice_lengths),
+      labels_gp = grid::gpar(fontsize = 12, fontface = "bold")
+    ),
+    show_annotation_name = TRUE,
+    annotation_name_side = "left"
+  )
+
+  hm <- ComplexHeatmap::Heatmap(
+    missing_mat,
+    name = "Missing",
+    col = c("0" = observed_color, "1" = missing_color),
+    cluster_rows = FALSE,
+    cluster_columns = FALSE,
+    show_column_names = FALSE,
+    show_row_names = show_row_names,
+    top_annotation = top_anno,
+    column_split = cluster_factor,
+    column_title = title,
+    heatmap_legend_param = list(
+      at = c(0, 1),
+      labels = c("Observed", "Missing")
+    )
+  )
+
+  return(hm)
 }

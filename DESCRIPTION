@@ -1,6 +1,6 @@
 Package: rCISSVAE
-Title: Clustering-Informed Shared-Structure Variational Autoencoder (CISS-VAE) for Missing Data Imputation
-Version: 0.0.3
+Title: Clustering-Informed Shared-Structure VAE for Imputation
+Version: 0.0.4
 Authors@R: 
     c(  person(given = "Yasin", family = "Khadem Charvadeh", email = "khademy@mskcc.org", role = c("aut")),
         person(given = "Kenneth", family = "Seier", role = c("aut")),
@@ -18,7 +18,8 @@ Imports:
     reticulate,
     purrr,
     gtsummary,
-    rlang
+    rlang,
+    ComplexHeatmap
 Suggests: 
     testthat (>= 3.0.0),
     dplyr,

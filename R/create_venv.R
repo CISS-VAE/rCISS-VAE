@@ -9,14 +9,15 @@
 #' @param install_python Logical; if TRUE, install Python if none of at least the requested
 #'   version is found on the system.
 #' @param python_version Python version string (major.minor), used when installing Python.
-#' 
+#' @return NULL. Does not return anything
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' try({
 #' create_cissvae_env(
 #' envname = "cissvae_environment",
 #' install_python = FALSE,
-#' python_version = "3.10")
-#' }
+#' python_version = "3.10")})}
+#' 
 #' @export
 create_cissvae_env <- function(
   envname        = "cissvae_environment",

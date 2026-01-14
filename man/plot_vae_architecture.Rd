@@ -61,26 +61,28 @@ shared and cluster-specific layers. This function wraps the Python
 }
 
 \examples{
-\dontrun{
-# Train a model first
-result <- run_cissvae(my_data, return_model = TRUE)
+\donttest{
+try({
+  # Train a model first
+  result <- run_cissvae(my_data, return_model = TRUE)
 
-# Basic plot
-plot_vae_architecture(result$model)
+  # Basic plot
+  plot_vae_architecture(result$model)
 
-# Save plot to file
-plot_vae_architecture(
-  model = result$model,
-  title = "CISS-VAE Architecture",
-  save_path = "vae_architecture.png",
-  dpi = 300
-)
+  # Save plot to file
+  plot_vae_architecture(
+    model = result$model,
+    title = "CISS-VAE Architecture",
+    save_path = "vae_architecture.png",
+    dpi = 300
+  )
 
-# Return plot object for further manipulation
-fig <- plot_vae_architecture(
-  model = result$model,
-  return_plot = TRUE,
-  display_plot = FALSE
-)
+  # Return plot object for further manipulation
+  fig <- plot_vae_architecture(
+    model = result$model,
+    return_plot = TRUE,
+    display_plot = FALSE
+  )
+})
 }
 }

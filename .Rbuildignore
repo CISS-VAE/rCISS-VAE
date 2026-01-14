@@ -20,3 +20,10 @@
 ^\.github$
 README\.md$
 NEWS\.md$
+
+^\.venv$
+^venv$
+^env$
+^__pycache__$
+^.*\.pyc$
+^requirements\.txt$

@@ -80,6 +80,8 @@ pm <- create_missingness_prop_matrix(
   repeat_feature_names = c("A", "B")
 )
 
+## cluster_on_missing_prop requires a working Python environment via reticulate
+## Examples are wrapped in try() to avoid failures on CRAN check systems
 try({
 res <- cluster_on_missing_prop(
   pm,

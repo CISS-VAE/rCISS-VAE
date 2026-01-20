@@ -9,7 +9,7 @@
 #' @param install_python Logical; if TRUE, install Python if none of at least the requested
 #'   version is found on the system.
 #' @param python_version Python version string (major.minor), used when installing Python.
-#' @return NULL. Does not return anything
+#' @return NULL. Called for side effects. 
 #' @examples
 #' \donttest{
 #' ## Requires a working Python environment via reticulate

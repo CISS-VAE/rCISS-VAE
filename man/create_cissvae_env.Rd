@@ -22,7 +22,7 @@ version is found on the system.}
 \item{python_version}{Python version string (major.minor), used when installing Python.}
 }
 \value{
-NULL. Does not return anything
+NULL. Called for side effects.
 }
 \description{
 This function will either find an existing virtualenv by name (in
@@ -31,6 +31,8 @@ the default location) or at a custom filesystem path, or create it
 }
 \examples{
 \donttest{
+## Requires a working Python environment via reticulate
+## Examples are wrapped in try() to avoid failures on CRAN check systems
 try({
 create_cissvae_env(
 envname = "cissvae_environment",

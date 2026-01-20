@@ -162,8 +162,9 @@ support for both tunable and fixed parameters.
 
 \examples{
 \donttest{
+## Requires a working Python environment via reticulate
+## Examples are wrapped in try() to avoid failures on CRAN check systems
 try({
-## Configure Python environment
 reticulate::use_virtualenv("cissvae_environment", required = TRUE)
 
 

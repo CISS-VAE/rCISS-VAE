@@ -238,6 +238,8 @@ accessible via \code{reticulate}.
 
 \examples{
 \donttest{
+## Requires a working Python environment via reticulate
+## Examples are wrapped in try() to avoid failures on CRAN check systems
 library(rCISSVAE)
 
 data(df_missing)

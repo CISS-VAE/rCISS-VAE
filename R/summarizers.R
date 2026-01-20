@@ -162,6 +162,10 @@ cluster_summary <- function(
 #'
 #' # Example excluding a column prior to plotting
 #' cluster_heatmap(df, cl, cols_ignore = "x2")
+#' 
+#' # Adding a 'Cluster' label and changing colors
+#' cluster_heatmap(df, clusters = paste0("Cluster ", cl), cols_ignore = "x2", 
+#' missing_color = "red", observed_color = "blue")
 #' }
 #' 
 #' @importFrom ComplexHeatmap HeatmapAnnotation anno_block Heatmap

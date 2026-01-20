@@ -57,9 +57,10 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span><span class="fu">check_devices</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="co"># }</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Error in py_module_import(module, convert = convert) : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ModuleNotFoundError: No module named 'torch._strobelight'</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Run `reticulate::py_last_error()` for details.</span>

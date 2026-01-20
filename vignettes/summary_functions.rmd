@@ -44,7 +44,12 @@ statistic = list(
 ## Missingness Heatmap
 
 ```{r}
-cluster_heatmap(data = df_missing, clusters = clusters$clusters, cols_ignore = "index")
+cluster_heatmap(
+  data = df_missing, 
+  clusters = paste0("Cluster ", clusters$clusters), ## Adds 'Cluster' to the cluster label
+  cols_ignore = "index", 
+  observed_color = "#23013aff", ## A dark purple
+  missing_color = "yellow")
 ```
 
 ## By-cluster imputation loss function

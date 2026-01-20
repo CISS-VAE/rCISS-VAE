@@ -3,6 +3,7 @@
 - added missingness heatmap function `cluster_heatmap()` and associated vignette
 - Updated the examples to be 'donttest{}' not 'dontrun{}'
 - Added checks for reticulate to functions requiring reticulate
+- Added tutorial for loading and imputing with saved model
 
 # rCISSVAE v0.0.3
 ## Updates

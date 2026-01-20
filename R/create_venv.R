@@ -12,6 +12,8 @@
 #' @return NULL. Does not return anything
 #' @examples
 #' \donttest{
+#' ## Requires a working Python environment via reticulate
+#' ## Examples are wrapped in try() to avoid failures on CRAN check systems
 #' try({
 #' create_cissvae_env(
 #' envname = "cissvae_environment",

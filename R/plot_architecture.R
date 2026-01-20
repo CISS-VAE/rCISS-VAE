@@ -28,6 +28,8 @@
 #'
 #'
 #' @examples
+#' ## Requires a working Python environment via reticulate
+#' ## Examples are wrapped in try() to avoid failures on CRAN check systems
 #' \donttest{
 #' try({
 #'   # Train a model first

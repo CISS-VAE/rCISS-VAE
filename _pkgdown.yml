@@ -38,6 +38,7 @@ articles:
     - virtual_environment_tutorial
     - summary_functions
     - optunadb
+    - impute_with_saved_model
 
     
 

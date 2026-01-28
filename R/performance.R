@@ -130,11 +130,15 @@ performance_by_cluster <- function(
   if (length(binary_features) > 0) {
     idx <- which(colnames(val_sub) %in% binary_features)
     # define BCE function
-    bce_fun <- function(y_hat, y_true) {
-      eps <- 1e-7
-      y_hat <- pmin(pmax(y_hat, eps), 1 - eps)
-      -(y_true * log(y_hat) + (1 - y_true) * log(1 - y_hat))
-    }
+  bce_fun <- function(y_hat, y_true) {
+    # Convert to matrices immediately
+    y_hat <- as.matrix(y_hat)
+    y_true <- as.matrix(y_true)
+    
+    eps <- 1e-7
+    y_hat_clipped <- pmin(pmax(y_hat, eps), 1 - eps)
+    -(y_true * log(y_hat_clipped) + (1 - y_true) * log(1 - y_hat_clipped))
+  }
     bce_mat[, idx] <- bce_fun(pred_sub[, idx, drop = FALSE], val_sub[, idx, drop = FALSE])
     bce_mat[!used_mask] <- NA_real_
   }

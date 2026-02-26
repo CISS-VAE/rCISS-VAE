@@ -46,6 +46,8 @@
 #'   \item \code{bce}: mean binary cross-entropy across binary validation cells
 #'   \item \code{imputation_error}: \code{mse + bce}
 #' }
+#' 
+#' @importFrom stats reshape
 #'
 #' @details
 #' For features listed in \code{binary_features}, performance is binary
@@ -72,8 +74,8 @@
 #'   nrow = 10
 #' )
 #'
-#' val_data <- as.matrix(data_complete)
-#' val_data[missing_mask] <- NA
+#' val_data <- data_complete
+#' val_data[which(missing_mask, arr.ind = TRUE)] <- NA
 #'
 #' val_imputed <- data.frame(
 #'   id = data_complete$id,
@@ -82,7 +84,7 @@
 #'   x2 = mean(data_complete$x2)
 #' )
 #'
-#' val_imputed[missing_mask] <- NA
+#' val_imputed[which(missing_mask, arr.ind = TRUE)] <- NA
 #'
 #' result <- list(
 #'   val_data = val_data,

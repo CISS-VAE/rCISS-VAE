@@ -6,6 +6,7 @@
 #' @param model_py Python model object (e.g., res$model from run_cissvae)
 #' @param file Path where the model will be saved (e.g., "trained_vae.pt")
 #' @return NULL. Called for side effects.
+#' @importFrom reticulate import
 #' @examples
 #' \donttest{
 #' ## Requires a working Python environment via reticulate
@@ -37,8 +38,9 @@
 #'     silent = TRUE
 #'   )
 #'
-#'   ## Save the trained model
-#'   try(save_cissvae_model(dat$model, "model.pt"))
+#'   ## Save the trained model to a temporary file (CRAN-safe)
+#'   tmpfile <- tempfile(fileext = ".pt")
+#'   try(save_cissvae_model(dat$model, tmpfile), silent = TRUE)
 #' })}
 #' @export
 save_cissvae_model <- function(model_py, file) {
@@ -207,6 +209,8 @@ if (!is.null(imputable_matrix)) {
   pd       <- reticulate::import("pandas", convert = FALSE)
   CD_mod   <- reticulate::import("ciss_vae.classes.cluster_dataset", 
   convert = FALSE)$ClusterDataset
+  helpers <- import("ciss_vae.utils.helpers")
+  DataLoader <- import("torch.utils.data")$DataLoader
 
   data[is.na(data)] <- NaN
   data_py <- pd$DataFrame(data = data, dtype = "float64")

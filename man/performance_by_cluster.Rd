@@ -12,7 +12,8 @@ performance_by_cluster(
   binary_features = character(0),
   by_group = TRUE,
   by_cluster = TRUE,
-  cols_ignore = NULL
+  cols_ignore = NULL,
+  eps = 1e-07
 )
 }
 \arguments{
@@ -24,80 +25,105 @@ performance_by_cluster(
 }}
 
 \item{clusters}{Optional vector (same length as rows in \code{val_data}) of cluster labels.
-If \code{NULL}, will use \code{res$clusters}.}
+If \code{NULL}, \code{res$clusters} will be used.}
 
-\item{group_col}{Optional character, name of the column in \code{val_data} for grouping.}
+\item{group_col}{Optional character string naming a column in \code{val_data}
+used for grouping (e.g., sex, treatment group, etc.). If supplied,
+summaries can be computed per group and group-by-cluster.}
 
-\item{feature_cols}{Character vector specifying which feature columns to evaluate. Defaults to all numeric
-columns except \code{group_col} and those in \code{cols_ignore}.}
+\item{feature_cols}{Character vector specifying which feature columns to evaluate.
+Defaults to all numeric columns except \code{group_col} and those in
+\code{cols_ignore}.}
 
-\item{binary_features}{Character vector naming those columns (subset of \code{feature_cols}) that
-should use BCE instead of MSE.}
+\item{binary_features}{Character vector naming those columns (subset of
+\code{feature_cols}) that should use BCE instead of MSE.}
 
-\item{by_group}{Logical; if \code{TRUE} (default), summarize by \code{group_col}.}
+\item{by_group}{Logical; if \code{TRUE}, compute summaries by \code{group_col}.
+Ignored if \code{group_col} is \code{NULL}.}
 
-\item{by_cluster}{Logical; if \code{TRUE} (default), summarize by cluster.}
+\item{by_cluster}{Logical; if \code{TRUE}, compute summaries by cluster.}
 
-\item{cols_ignore}{Character vector of column names to exclude from scoring (e.g., “id”).}
+\item{cols_ignore}{Character vector of column names to exclude from scoring
+(e.g., IDs).}
+
+\item{eps}{Numeric. Small constant used for clipping probabilities in BCE
+calculation. Default is \code{1e-7}.}
 }
 \value{
 A named list containing:
 \itemize{
-\item \code{overall}: overall average metric (MSE for continuous, BCE for binary)
-\item \code{per_cluster}: summaries by cluster
-\item \code{per_group}: summaries by group
-\item \code{group_by_cluster}: summaries by group and cluster
-\item \code{per_feature_overall}: average per-feature metric
+\item \code{overall}: overall validation metrics (MSE, BCE, total)
+\item \code{per_cluster}: metrics summarized by cluster (if \code{by_cluster = TRUE})
+\item \code{per_group}: metrics summarized by group (if \code{by_group = TRUE})
+\item \code{group_by_cluster}: metrics summarized by group and cluster
+(if both \code{by_group} and \code{by_cluster} are \code{TRUE})
+}
+
+Each summary contains:
+\itemize{
+\item \code{mse}: mean squared error across continuous validation cells
+\item \code{bce}: mean binary cross-entropy across binary validation cells
+\item \code{imputation_error}: \code{mse + bce}
 }
 }
 \description{
 Calculates mean squared error (MSE) for continuous features and binary
-cross-entropy (BCE) for features you explicitly mark as binary,
-comparing model-imputed validation values against ground-truth validation data.
+cross-entropy (BCE) for features explicitly marked as binary, comparing
+model-imputed validation values against ground-truth validation data.
 }
 \details{
-For features listed in \code{binary_features}, performance is binary cross-entropy (BCE):
-\deqn{-[y\log(p) + (1-y)\log(1-p)]}.
-For other numeric features, performance is mean squared error (MSE).
+Validation loss is computed at the cell level and then aggregated to produce
+overall, per-cluster, per-group, and group-by-cluster summaries.
+
+For features listed in \code{binary_features}, performance is binary
+cross-entropy (BCE):
+\deqn{-[y\log(p) + (1-y)\log(1-p)]}
+where \eqn{p} is the predicted probability.
+
+For other numeric features, performance is mean squared error (MSE):
+\deqn{(y - \hat{y})^2}.
+
+Losses are computed at the individual cell level using only validation
+entries (non-NA in \code{val_data}), then aggregated.
 }
 \examples{
-library(tidyverse)
-library(reticulate)
-library(rCISSVAE)
-library(kableExtra)
-library(gtsummary)
-
-## Make example results
-data_complete = data.frame(
-index = 1:10,
-x1 = rnorm(10),
-x2 = rnorm(10)*rnorm(10, mean = 50, sd=10)
- )
-
-missing_mask = matrix(data = c(rep(FALSE, 10), 
-sample(c(TRUE, FALSE), 
-size = 20, replace = TRUE, 
-prob = c(0.7, 0.3))), nrow = 10)
-
-## Example validation dataset
-val_data = data_complete
-val_data[missing_mask] <- NA
-
-## Example 'imputed' validation dataset
-val_imputed = data.frame(index = 1:10, x1 = mean(data_complete$x1), x2 = mean(data_complete$x2))
-val_imputed[missing_mask] <- NA
-
-## Example result list
-result = list("val_data" = val_data, "val_imputed" = val_imputed)
-clusters = sample(c(0, 1), size = 10, replace = TRUE)
-
-## Run the function
-performance_by_cluster(res = result, 
-  group_col = NULL, 
-  clusters = clusters,
-  feature_cols = NULL, 
-  by_group = FALSE,
-  by_cluster = TRUE,
-  cols_ignore = c("index") 
+data_complete <- data.frame(
+  id = 1:10,
+  group = sample(c("A", "B"), 10, replace = TRUE),
+  x1 = rnorm(10),
+  x2 = rnorm(10)
 )
+
+missing_mask <- matrix(
+  sample(c(TRUE, FALSE), 20, replace = TRUE),
+  nrow = 10
+)
+
+val_data <- data_complete
+val_data[which(missing_mask, arr.ind = TRUE)] <- NA
+
+val_imputed <- data.frame(
+  id = data_complete$id,
+  group = data_complete$group,
+  x1 = mean(data_complete$x1),
+  x2 = mean(data_complete$x2)
+)
+
+val_imputed[which(missing_mask, arr.ind = TRUE)] <- NA
+
+result <- list(
+  val_data = val_data,
+  val_imputed = val_imputed,
+  clusters = sample(c(0, 1), 10, replace = TRUE)
+)
+
+performance_by_cluster(
+  res = result,
+  group_col = "group",
+  binary_features = character(0),
+  by_group = TRUE,
+  by_cluster = TRUE,
+  cols_ignore = "id"
+)
+
 }

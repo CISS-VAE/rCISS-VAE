@@ -1,6 +1,6 @@
 Package: rCISSVAE
 Title: Clustering-Informed Shared-Structure VAE for Imputation
-Version: 0.0.4
+Version: 0.0.5
 Authors@R: 
     c(  person(given = "Yasin", family = "Khadem Charvadeh", email = "khademy@mskcc.org", role = c("aut")),
         person(given = "Kenneth", family = "Seier", role = c("aut")),
@@ -19,7 +19,8 @@ Imports:
     purrr,
     gtsummary,
     rlang,
-    ComplexHeatmap
+    ComplexHeatmap,
+    stats
 Suggests: 
     testthat (>= 3.0.0),
     dplyr,

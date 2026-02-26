@@ -1,3 +1,14 @@
+# rCISSVAE v0.0.5
+## Updates
+- `performance_by_cluster()` imputation error calculation now matches python implementation
+
+## New additions
+- `save_cissvae_model()` will save CISSVAE models to disk
+- `load_cissvae_model()` loads a saved CISSVAE model from disk
+- `impute_with_cissvae()` accepts a model and R data.frame with missingness and uses the model to impute the data
+
+
+
 # rCISSVAE v0.0.4
 ## Updates
 - added missingness heatmap function `cluster_heatmap()` and associated vignette

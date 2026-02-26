@@ -20,6 +20,7 @@
 #' @param by_group Logical; if \code{TRUE} (default), summarize by \code{group_col}.
 #' @param by_cluster Logical; if \code{TRUE} (default), summarize by cluster.
 #' @param cols_ignore Character vector of column names to exclude from scoring (e.g., “id”).
+#' @param eps Optional eps for calculating BCE. Default 1e-7
 #'
 #' @return A named list containing:
 #'   \itemize{
@@ -71,113 +72,181 @@
 #'   group_col = NULL, 
 #'   clusters = clusters,
 #'   feature_cols = NULL, 
-#'   by_group = FALSE,
 #'   by_cluster = TRUE,
 #'   cols_ignore = c("index") 
 #' )
 #' @export
 performance_by_cluster <- function(
   res,
-  clusters         = NULL,
-  group_col        = NULL,
-  feature_cols     = NULL,
-  binary_features  = character(0),
-  by_group         = TRUE,
-  by_cluster       = TRUE,
-  cols_ignore      = NULL
+  clusters        = NULL,
+  group_col  = NULL,
+  feature_cols    = NULL,
+  binary_features = character(0),
+  by_group = FALSE, ## no longer needed
+  by_cluster      = TRUE,
+  cols_ignore     = NULL,
+  eps             = 1e-7
 ) {
+
+  ## ------------------------------------------------------------------
+  ## Extract and validate inputs
+  ## ------------------------------------------------------------------
   val_data    <- res$val_data
   val_imputed <- res$val_imputed
 
-  ## If clsuters not passed, take clusters from res
-  if (is.null(clusters)) clusters <- res$clusters
-
-  ## make checks
   if (!is.data.frame(val_data) || !is.data.frame(val_imputed))
-    stop("`val_data` and `val_imputed` must both be data.frames.")
+    stop("`val_data` and `val_imputed` must be data.frames.")
+
   if (nrow(val_data) != nrow(val_imputed))
     stop("Row counts differ between `val_data` and `val_imputed`.")
+
+  ## Clusters
+  if (is.null(clusters)) {
+    if (!is.null(res$clusters)) {
+      clusters <- res$clusters
+    } else {
+      stop("Clusters must be provided via `clusters` or `res$clusters`.")
+    }
+  }
   if (length(clusters) != nrow(val_data))
-    stop("`clusters` length must match number of rows in `val_data`.")
+    stop("`clusters` length must match number of rows.")
 
-  has_group <- !is.null(group_col) && group_col %in% names(val_data)
-  if (!has_group) by_group <- FALSE
-
-  ## Determine features
+  ## ------------------------------------------------------------------
+  ## Feature selection
+  ## ------------------------------------------------------------------
   if (is.null(feature_cols)) {
     num_cols <- names(val_data)[vapply(val_data, is.numeric, logical(1))]
-    ignores  <- unique(c(cols_ignore, group_col))
-    feature_cols <- setdiff(num_cols, ignores)
+    feature_cols <- setdiff(num_cols, cols_ignore)
   }
-  feature_cols <- Reduce(intersect, list(feature_cols, colnames(val_data), colnames(val_imputed)))
-  if (length(feature_cols) == 0L)
-    stop("No feature columns available to score.")
 
-  ## Ensure binary_features subset of feature_cols
+  feature_cols <- Reduce(intersect, list(
+    feature_cols,
+    colnames(val_data),
+    colnames(val_imputed)
+  ))
+
   if (!all(binary_features %in% feature_cols))
     stop("`binary_features` must be a subset of `feature_cols`.")
 
+  if (!is.null(group_col)) {
+    if (!all(group_col %in% feature_cols))
+      stop("All `group_col` must be contained in `feature_cols`.")
+  }
+
+  ## ------------------------------------------------------------------
+  ## Subset data and build validation mask
+  ## ------------------------------------------------------------------
   val_sub  <- val_data[, feature_cols, drop = FALSE]
   pred_sub <- val_imputed[, feature_cols, drop = FALSE]
+
   used_mask <- !is.na(val_sub)
 
-  ## Squared error matrix for MSE
-  se_mat <- (as.matrix(pred_sub) - as.matrix(val_sub))^2
-  se_mat[!used_mask] <- NA_real_
+  ## ------------------------------------------------------------------
+  ## Build long-form cell-level loss table
+  ## ------------------------------------------------------------------
+  out <- vector("list", length(feature_cols))
+  names(out) <- feature_cols
 
-  ## Binary cross‐entropy for binary features -- assumes that yhat is prbabilty
-  bce_mat <- matrix(NA_real_, nrow = nrow(val_sub), ncol = ncol(val_sub))
-  if (length(binary_features) > 0) {
-    idx <- which(colnames(val_sub) %in% binary_features)
-    # define BCE function
-  bce_fun <- function(y_hat, y_true) {
-    # Convert to matrices immediately
-    y_hat <- as.matrix(y_hat)
-    y_true <- as.matrix(y_true)
-    
-    eps <- 1e-7
-    y_hat_clipped <- pmin(pmax(y_hat, eps), 1 - eps)
-    -(y_true * log(y_hat_clipped) + (1 - y_true) * log(1 - y_hat_clipped))
-  }
-    bce_mat[, idx] <- bce_fun(pred_sub[, idx, drop = FALSE], val_sub[, idx, drop = FALSE])
-    bce_mat[!used_mask] <- NA_real_
-  }
+  for (j in seq_along(feature_cols)) {
 
-  ## Long format
-  df_long <- data.frame(
-    row     = rep(seq_len(nrow(val_sub)), times = ncol(val_sub)),
-    feature = rep(feature_cols, each = nrow(val_sub)),
-    cluster = rep(clusters, times = ncol(val_sub)),
-    type    = rep(ifelse(colnames(val_sub) %in% binary_features, "binary", "continuous"), each = nrow(val_sub)),
-    se      = as.vector(se_mat),
-    bce     = as.vector(bce_mat),
-    used    = as.vector(used_mask),
-    check.names = FALSE
-  )
-  if (has_group) df_long$group <- rep(val_data[[group_col]], times = ncol(val_sub))
+    feat <- feature_cols[j]
+    y    <- val_sub[[feat]]
+    yhat <- pred_sub[[feat]]
+    mask <- used_mask[, j]
 
-  df_long <- df_long[df_long$used & !is.na(ifelse(df_long$type == "binary", df_long$bce, df_long$se)), ]
-  df_long$metric_value <- ifelse(df_long$type == "binary", df_long$bce, df_long$se)
-  df_long <- df_long[, c("row", "feature", "cluster", "type", if (has_group) "group", "metric_value")]
+    if (feat %in% binary_features) {
+      y[is.na(y)] <- 0
+      yhat <- pmin(pmax(yhat, eps), 1 - eps)
+      loss <- -(y * log(yhat) + (1 - y) * log(1 - yhat))
+      type <- "binary"
+    } else {
+      loss <- (yhat - y)^2
+      type <- "continuous"
+    }
 
-  ## make safe aggrigation
-  .safe_aggs <- function(data, keys) {
-    m <- stats::aggregate(metric_value ~ ., data = data[, c(keys, "metric_value")], FUN = mean)
-    n <- stats::aggregate(metric_value ~ ., data = data[, c(keys, "metric_value")], FUN = length)
-    names(m)[names(m) == "metric_value"] <- "mean_imputation_loss"
-    names(n)[names(n) == "metric_value"] <- "n"
-    merge(m, n, by = keys, sort = TRUE)
+    out[[j]] <- data.frame(
+      cluster = clusters,
+      feature = feat,
+      type    = type,
+      loss    = loss,
+      used    = mask
+    )
   }
 
+  df <- do.call(rbind, out)
+  df <- df[df$used & is.finite(df$loss), ]
+
+  ## Restrict to selected features if requested
+  if (!is.null(group_col)) {
+    df <- df[df$feature %in% group_col, ]
+  }
+
+  ## ------------------------------------------------------------------
+  ## Aggregation helper
+  ## ------------------------------------------------------------------
+  agg <- function(keys) {
+    stats::aggregate(
+      loss ~ ., data = df[, c(keys, "loss"), drop = FALSE],
+      FUN = mean
+    )
+  }
+
+  ## ------------------------------------------------------------------
+  ## Results
+  ## ------------------------------------------------------------------
   results <- list()
+
+  ## Overall
   results$overall <- data.frame(
-    metric = mean(df_long$metric_value, na.rm = TRUE),
-    n      = sum(!is.na(df_long$metric_value))
+    mse = mean(df$loss[df$type == "continuous"], na.rm = TRUE),
+    bce = mean(df$loss[df$type == "binary"],     na.rm = TRUE)
   )
-  if (by_cluster)   results$per_cluster       <- .safe_aggs(df_long, c("cluster"))
-  if (by_group && has_group)   results$per_group        <- .safe_aggs(df_long, c("group"))
-  if (by_group && by_cluster && has_group) results$group_by_cluster <- .safe_aggs(df_long, c("group", "cluster"))
-  results$per_feature_overall <- .safe_aggs(df_long, c("feature", "type"))
+  results$overall$imputation_error <-
+    results$overall$mse + results$overall$bce
+
+  ## By cluster
+  if (by_cluster) {
+
+    cdat <- agg(c("cluster", "type"))
+
+    by_cluster <- reshape(
+      cdat,
+      idvar   = "cluster",
+      timevar = "type",
+      direction = "wide"
+    )
+
+    ## Rename columns
+    names(by_cluster) <- sub("loss.continuous", "mse", names(by_cluster))
+    names(by_cluster) <- sub("loss.binary",     "bce", names(by_cluster))
+
+    by_cluster$imputation_error <-
+      rowSums(by_cluster[, c("mse", "bce"), drop = FALSE], na.rm = TRUE)
+
+    results$by_cluster <- by_cluster
+  }
+
+  ## By cluster × selected feature(s)
+  if (isTRUE(by_cluster) && !is.null(group_col)) {
+
+    cfdat <- agg(c("cluster", "feature", "type"))
+
+    by_cluster_feature <- reshape(
+      cfdat,
+      idvar   = c("cluster", "feature"),
+      timevar = "type",
+      direction = "wide"
+    )
+
+    ## Rename columns
+    names(by_cluster_feature) <- sub("loss.continuous", "mse", names(by_cluster_feature))
+    names(by_cluster_feature) <- sub("loss.binary",     "bce", names(by_cluster_feature))
+
+    by_cluster_feature$imputation_error <-
+      rowSums(by_cluster_feature[, c("mse", "bce"), drop = FALSE], na.rm = TRUE)
+
+    results$by_cluster_feature <- by_cluster_feature
+  }
 
   results
 }

@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,7 @@
 
       <h1>Summary Functions</h1>
             
-            <h4 data-toc-skip class="date">2026-01-20</h4>
+            <h4 data-toc-skip class="date">2026-02-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CISS-VAE/rCISS-VAE/blob/HEAD/vignettes/summary_functions.rmd" class="external-link"><code>vignettes/summary_functions.rmd</code></a></small>
       <div class="d-none name"><code>summary_functions.rmd</code></div>
@@ -1144,43 +1144,15 @@ part of the return object. Otherwise, use the ‘clusters’ parameter in
 <span>  cols_ignore <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"index"</span>, <span class="st">"Age"</span>, <span class="st">"Salary"</span>, <span class="st">"ZipCode10001"</span>, <span class="st">"ZipCode20002"</span>, <span class="st">"ZipCode30003"</span><span class="op">)</span> <span class="co">## columns to not score</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## $overall</span></span>
-<span><span class="co">##     metric     n</span></span>
-<span><span class="co">## 1 90.99783 13783</span></span>
+<span><span class="co">##        mse bce imputation_error</span></span>
+<span><span class="co">## 1 90.99783  NA         90.99783</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $per_cluster</span></span>
-<span><span class="co">##   cluster mean_imputation_loss    n</span></span>
-<span><span class="co">## 1       0             48.70336 3408</span></span>
-<span><span class="co">## 2       1             96.68600 1787</span></span>
-<span><span class="co">## 3       2             80.57138 5000</span></span>
-<span><span class="co">## 4       3            142.86713 3588</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## $per_feature_overall</span></span>
-<span><span class="co">##    feature       type mean_imputation_loss   n</span></span>
-<span><span class="co">## 1      Y11 continuous            41.565153 486</span></span>
-<span><span class="co">## 2      Y12 continuous            89.328866 486</span></span>
-<span><span class="co">## 3      Y13 continuous           119.401816 488</span></span>
-<span><span class="co">## 4      Y14 continuous           160.124733 486</span></span>
-<span><span class="co">## 5      Y15 continuous           252.965269 484</span></span>
-<span><span class="co">## 6      Y21 continuous            66.576460 485</span></span>
-<span><span class="co">## 7      Y22 continuous           137.619200 489</span></span>
-<span><span class="co">## 8      Y23 continuous           127.223039 489</span></span>
-<span><span class="co">## 9      Y24 continuous           202.076766 484</span></span>
-<span><span class="co">## 10     Y25 continuous           234.807206 488</span></span>
-<span><span class="co">## 11     Y31 continuous            47.142491 592</span></span>
-<span><span class="co">## 12     Y32 continuous            87.786836 593</span></span>
-<span><span class="co">## 13     Y33 continuous           146.073318 597</span></span>
-<span><span class="co">## 14     Y34 continuous           168.344495 593</span></span>
-<span><span class="co">## 15     Y35 continuous           205.363351 593</span></span>
-<span><span class="co">## 16     Y41 continuous             7.179157 596</span></span>
-<span><span class="co">## 17     Y42 continuous            18.288482 596</span></span>
-<span><span class="co">## 18     Y43 continuous            37.223463 597</span></span>
-<span><span class="co">## 19     Y44 continuous            47.033124 597</span></span>
-<span><span class="co">## 20     Y45 continuous            61.172087 590</span></span>
-<span><span class="co">## 21     Y51 continuous             5.400970 591</span></span>
-<span><span class="co">## 22     Y52 continuous            19.634923 595</span></span>
-<span><span class="co">## 23     Y53 continuous            24.613987 601</span></span>
-<span><span class="co">## 24     Y54 continuous            26.400094 594</span></span>
-<span><span class="co">## 25     Y55 continuous            37.428103 593</span></span></code></pre>
+<span><span class="co">##   cluster       mse bce imputation_error</span></span>
+<span><span class="co">## 1       0  48.70336  NA         48.70336</span></span>
+<span><span class="co">## 2       1  96.68600  NA         96.68600</span></span>
+<span><span class="co">## 3       2  80.57138  NA         80.57138</span></span>
+<span><span class="co">## 4       3 142.86713  NA        142.86713</span></span></code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

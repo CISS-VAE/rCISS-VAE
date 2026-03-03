@@ -3,7 +3,7 @@
 #' Uses reticulate to call Python's torch.save on a model object returned
 #' from run_cissvae (or any Python model in the R session).
 #'
-#' @param model_py Python model object (e.g., res$model from run_cissvae)
+#' @param model Python model object (e.g., res$model from run_cissvae)
 #' @param file Path where the model will be saved (e.g., "trained_vae.pt")
 #' @return NULL. Called for side effects.
 #' @importFrom reticulate import
@@ -22,7 +22,7 @@
 #'       data = df_missing,
 #'       index_col = "index",
 #'       val_proportion = 0.1,
-#'       columns_ignore = c(
+#'       cols_ignore = c(
 #'         "Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"
 #'       ),
 #'       clusters = clusters$clusters,
@@ -43,11 +43,11 @@
 #'   try(save_cissvae_model(dat$model, tmpfile), silent = TRUE)
 #' })}
 #' @export
-save_cissvae_model <- function(model_py, file) {
+save_cissvae_model <- function(model, file) {
   # Import torch via reticulate
   torch <- reticulate::import("torch")
   # Save full model (architecture + weights)
-  torch$save(model_py, file)
+  torch$save(model, file)
 }
 
 
@@ -101,16 +101,15 @@ load_cissvae_model <- function(file, python_env = NULL) {
 #' this builds the Python ClusterDataset and DataLoader, runs inference,
 #' and returns an imputed data frame in R.
 #'
-#' @param model_py Python model object loaded via load_cissvae_model()
+#' @param model Python model object loaded via load_cissvae_model()
 #' @param data R data.frame with missing values
 #' @param index_col String name of index column to preserve (optional)
-#' @param columns_ignore Character vector of column names to exclude from imputation scoring.
+#' @param cols_ignore Character vector of column names to exclude from imputation scoring.
 #' @param clusters Integer vector of cluster labels for rows of data
 #' @param imputable_matrix Logical matrix indicating entries allowed to be imputed.
 #' @param binary_feature_mask Logical vector marking which columns are binary.
-#' @param val_proportion Proportion of non-missing data to hold out for validation.
 #' @param replacement_value Numeric value used to replace missing entries before model input.
-#' @param batch_size Batch size passed to Python DataLoader (default 4000L)
+#' @param batch_size Batch size passed to Python DataLoader. If NULL, batch_size = nrow(data)
 #' @param seed Base random seed for reproducible results
 #' @return Imputed R data.frame
 #' @section Tips:
@@ -137,14 +136,13 @@ load_cissvae_model <- function(file, python_env = NULL) {
 #'   # Perform imputation on new data
 #'   imputed_df <- try(
 #'     impute_with_cissvae(
-#'       model_py = model,
+#'       model = model,
 #'       data = df_missing,
 #'       index_col = "index",
-#'       columns_ignore = c("Age", "Salary"),
+#'       cols_ignore = c("Age", "Salary"),
 #'       clusters = clusters$clusters,
 #'       imputable_matrix = NULL,
 #'       binary_feature_mask = NULL,
-#'       val_proportion = 0.1,
 #'       replacement_value = 0,
 #'       batch_size = 4000L,
 #'       seed = 42
@@ -153,8 +151,9 @@ load_cissvae_model <- function(file, python_env = NULL) {
 #' })
 #' }
 #' @export
-impute_with_cissvae <- function(model_py,  data, index_col = NULL, columns_ignore= NULL,  
-  clusters, imputable_matrix = NULL, binary_feature_mask = NULL, val_proportion = 0.1, replacement_value = 0, batch_size = 4000L, seed = 42) {
+impute_with_cissvae <- function(model,  data, index_col = NULL, cols_ignore= NULL,  
+  clusters, imputable_matrix = NULL, binary_feature_mask = NULL, 
+  replacement_value = 0, batch_size = NULL, seed = 42) {
 
   ## --------------- Setup Stuff ----------------------
   ## Check if reticulate has initialized Python
@@ -204,30 +203,81 @@ if (!is.null(imputable_matrix)) {
 
   ## --------------- End Handle Index Column ---------------
 
+  ## ----------------- Set batch size to dataset size if not defined ----------------
+  if(is.null(batch_size)){
+    batch_size = as.integer(nrow(data))
+  }
+  if(batch_size > nrow(data)){
+     batch_size = as.integer(nrow(data))
+  }
+  batch_size = as.integer(batch_size)
+
   ## --------------- Prepare data and python imports ----------
   np       <- reticulate::import("numpy", convert = FALSE)
   pd       <- reticulate::import("pandas", convert = FALSE)
   CD_mod   <- reticulate::import("ciss_vae.classes.cluster_dataset", 
   convert = FALSE)$ClusterDataset
-  helpers <- import("ciss_vae.utils.helpers")
-  DataLoader <- import("torch.utils.data")$DataLoader
+  helpers <- reticulate::import("ciss_vae.utils.helpers")
+  DataLoader <- reticulate::import("torch.utils.data")$DataLoader
 
   data[is.na(data)] <- NaN
   data_py <- pd$DataFrame(data = data, dtype = "float64")
   clusters_py <- np$array(as.integer(clusters), dtype = "int64")
-
-  # columns_ignore as a Python list (safer when convert = FALSE)
-  cols_ignore_py <- if (is.null(columns_ignore)) NULL else reticulate::r_to_py(as.character(columns_ignore))
+  seed <- as.integer(seed)
+  # cols_ignore as a Python list (safer when convert = FALSE)
+  cols_ignore_py <- if (is.null(cols_ignore)) NULL else reticulate::r_to_py(as.character(cols_ignore))
 
   if (!is.null(imputable_matrix)) {
       dni_py <- pd$DataFrame(imputable_matrix)
   } else dni_py <- NULL
 
+  ## ---------- make sure everything is valid before sending ot python -------------------------
+
+# Ensure we have at least 1 feature column after all filtering
+if (ncol(data) == 0L) {
+  stop(
+    "After dropping index_col/cols_ignore, there are 0 feature columns left. ",
+    "Check `index_col` and `cols_ignore` against your input data."
+  )
+}
+
+# Ensure no duplicated column names (pandas can behave badly here)
+if (anyDuplicated(colnames(data))) {
+  stop("Duplicate column names detected after preprocessing. Resolve duplicates before imputing.")
+}
+
+# If you have a binary feature mask, it MUST match the number of feature cols being sent
+if (!is.null(binary_feature_mask)) {
+  if (length(binary_feature_mask) != ncol(data)) {
+    stop(
+      "binary_feature_mask length (", length(binary_feature_mask),
+      ") does not match number of feature columns sent to python (", ncol(data), "). ",
+      "The mask must be defined AFTER column dropping/reordering."
+    )
+  }
+}
+
+# clusters must match rows
+if (!is.null(clusters) && length(clusters) != nrow(data)) {
+  stop("`clusters` length must equal number of rows in the data being imputed.")
+}
+
+# Ensure seed is an integer for python
+if (!is.null(seed)) seed <- as.integer(seed)
+
+# Ensure batch size is a positive integer 
+if (!is.null(batch_size)) {
+  batch_size <- as.integer(batch_size)
+  if (is.na(batch_size) || batch_size < 1L) stop("`batch_size` must be a positive integer.")
+}
+
+## --------------- send things to python =-=--------------
+
   ## Build dataset + loader
   dataset_py   <- CD_mod(
     data = data_py, 
     cluster_labels = clusters_py, 
-    val_proportion = val_proportion, 
+    val_proportion = 0L, 
     replacement_value = replacement_value, 
     columns_ignore = cols_ignore_py, 
     imputable = dni_py,
@@ -235,10 +285,30 @@ if (!is.null(imputable_matrix)) {
     binary_feature_mask =  reticulate::r_to_py(binary_feature_mask))
   data_loader  <- DataLoader(dataset_py, batch_size = as.integer(batch_size))
 
+    ## Sanity checks: loaded model must have a non-empty layer order
+  lo_enc <- tryCatch(model$layer_order_enc, error = function(e) NULL)
+  lo_dec <- tryCatch(model$layer_order_dec, error = function(e) NULL)
+
+  len0 <- function(x) is.null(x) || length(x) == 0
+
+  if (len0(lo_enc) || len0(lo_dec)) {
+    stop(
+      "Loaded model has empty `layer_order_enc`/`layer_order_dec`. ",
+      "This usually means the R load routine reconstructed the model incorrectly ",
+      "(e.g., defaults) rather than restoring the original architecture/config."
+    )
+  }
+
   ## Run model inference & get imputed df
-  imputed_py   <- helpers$get_imputed_df(model_py, data_loader)
+  imputed_py   <- helpers$get_imputed_df(model, data_loader)
 
   ## Convert Python pandas DataFrame back to R
   imputed_r    <- reticulate::py_to_r(imputed_py)
+
+  if(!is.null(index_col)){
+      imputed_r[[index_col]] = index_vals
+  imputed_r <- imputed_r[c(index_col, setdiff(names(imputed_r), index_col))]
+  }
+
   return(imputed_r)
 }

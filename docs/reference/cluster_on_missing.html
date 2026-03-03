@@ -50,7 +50,8 @@ of missingness and returns cluster labels plus silhouette score.</p>
 <span>  k_neighbors <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  leiden_resolution <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  leiden_objective <span class="op">=</span> <span class="st">"CPM"</span>,</span>
-<span>  use_snn <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  use_snn <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  columns_ignore <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -90,6 +91,10 @@ If <code>NULL</code>, defaults to <code>nrow(data) %/% 25</code>.</p></dd>
 
 <dt id="arg-use-snn">use_snn<a class="anchor" aria-label="anchor" href="#arg-use-snn"></a></dt>
 <dd><p>use snn</p></dd>
+
+
+<dt id="arg-columns-ignore">columns_ignore<a class="anchor" aria-label="anchor" href="#arg-columns-ignore"></a></dt>
+<dd><p>Alias for cols_ignore. Kept for continuity.</p></dd>
 
 </dl></div>
     <div class="section level2">

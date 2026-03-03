@@ -5,27 +5,26 @@
 \title{Impute new data with a loaded Python CISS-VAE model}
 \usage{
 impute_with_cissvae(
-  model_py,
+  model,
   data,
   index_col = NULL,
-  columns_ignore = NULL,
+  cols_ignore = NULL,
   clusters,
   imputable_matrix = NULL,
   binary_feature_mask = NULL,
-  val_proportion = 0.1,
   replacement_value = 0,
-  batch_size = 4000L,
+  batch_size = NULL,
   seed = 42
 )
 }
 \arguments{
-\item{model_py}{Python model object loaded via load_cissvae_model()}
+\item{model}{Python model object loaded via load_cissvae_model()}
 
 \item{data}{R data.frame with missing values}
 
 \item{index_col}{String name of index column to preserve (optional)}
 
-\item{columns_ignore}{Character vector of column names to exclude from imputation scoring.}
+\item{cols_ignore}{Character vector of column names to exclude from imputation scoring.}
 
 \item{clusters}{Integer vector of cluster labels for rows of data}
 
@@ -33,11 +32,9 @@ impute_with_cissvae(
 
 \item{binary_feature_mask}{Logical vector marking which columns are binary.}
 
-\item{val_proportion}{Proportion of non-missing data to hold out for validation.}
-
 \item{replacement_value}{Numeric value used to replace missing entries before model input.}
 
-\item{batch_size}{Batch size passed to Python DataLoader (default 4000L)}
+\item{batch_size}{Batch size passed to Python DataLoader. If NULL, batch_size = nrow(data)}
 
 \item{seed}{Base random seed for reproducible results}
 }
@@ -76,14 +73,13 @@ try({
   # Perform imputation on new data
   imputed_df <- try(
     impute_with_cissvae(
-      model_py = model,
+      model = model,
       data = df_missing,
       index_col = "index",
-      columns_ignore = c("Age", "Salary"),
+      cols_ignore = c("Age", "Salary"),
       clusters = clusters$clusters,
       imputable_matrix = NULL,
       binary_feature_mask = NULL,
-      val_proportion = 0.1,
       replacement_value = 0,
       batch_size = 4000L,
       seed = 42

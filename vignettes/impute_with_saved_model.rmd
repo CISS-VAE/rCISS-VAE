@@ -9,7 +9,7 @@ output:
     fig_height: 5
     dpi: 600
 vignette: >
-  %\VignetteIndexEntry{"Saving and Using Saved Models"}
+  %\VignetteIndexEntry{Saving and Using Saved Models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

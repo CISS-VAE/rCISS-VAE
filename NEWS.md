@@ -1,6 +1,7 @@
 # rCISSVAE v0.0.5
 ## Updates
 - `performance_by_cluster()` imputation error calculation now matches python implementation
+- changed all `columns_ignore` parameters to `cols_ignore`. Keeping `columns_ignore` as an alias for continuity.
 
 ## New additions
 - `save_cissvae_model()` will save CISSVAE models to disk

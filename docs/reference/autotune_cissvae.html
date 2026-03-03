@@ -47,7 +47,7 @@ support for both tunable and fixed parameters.</p>
 <span>  index_col <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  val_proportion <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  replacement_value <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  columns_ignore <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  cols_ignore <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  imputable_matrix <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  binary_feature_mask <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">clusters</span>,</span>
@@ -83,7 +83,8 @@ support for both tunable and fixed parameters.</p>
 <span>  refit_loops <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  epochs_per_loop <span class="op">=</span> <span class="fl">500</span>,</span>
 <span>  reset_lr_refit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">FALSE</span><span class="op">)</span>,</span>
-<span>  debug <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  debug <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  columns_ignore <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -107,7 +108,7 @@ support for both tunable and fixed parameters.</p>
 <dd><p>Numeric value used to replace missing entries before model input.</p></dd>
 
 
-<dt id="arg-columns-ignore">columns_ignore<a class="anchor" aria-label="anchor" href="#arg-columns-ignore"></a></dt>
+<dt id="arg-cols-ignore">cols_ignore<a class="anchor" aria-label="anchor" href="#arg-cols-ignore"></a></dt>
 <dd><p>Character vector of column names to exclude from imputation scoring.</p></dd>
 
 
@@ -253,6 +254,10 @@ support for both tunable and fixed parameters.</p>
 
 <dt id="arg-debug">debug<a class="anchor" aria-label="anchor" href="#arg-debug"></a></dt>
 <dd><p>Logical; if TRUE, additional metadata is returned for debugging.</p></dd>
+
+
+<dt id="arg-columns-ignore">columns_ignore<a class="anchor" aria-label="anchor" href="#arg-columns-ignore"></a></dt>
+<dd><p>Alias of cols_ignore. Kept for continuity.</p></dd>
 
 </dl></div>
     <div class="section level2">

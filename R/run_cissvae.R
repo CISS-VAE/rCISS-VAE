@@ -19,7 +19,7 @@
 #'   validation during training. Must be between 0 and 1. Default `0.1`.
 #' @param replacement_value Numeric. Fill value for masked entries during training.
 #'   Default `0.0`.
-#' @param columns_ignore Character or integer vector. Columns to exclude from validation set.
+#' @param cols_ignore Character or integer vector. Columns to exclude from validation set.
 #'   Can specify by name or index. Default `NULL`.
 #' @param print_dataset Logical. If `TRUE`, prints dataset summary information during
 #'   processing. Default `TRUE`.
@@ -89,7 +89,7 @@
 #' @param debug Logical; if TRUE, additional metadata is returned for debugging.
 #' @param return_validation_dataset Logical. If `TRUE` returns validation dataset 
 #' @param return_clusters Logical. If TRUE returns cluster vector
-#' 
+#' @param columns_ignore Alias of cols_ignore. Kept for continuity
 #' @details
 #' The CISS-VAE method works in two main phases:
 #' 
@@ -153,7 +153,7 @@
 #'  data = df_missing,
 #'  index_col = "index",
 #'  val_proportion = 0.1, ## pass a vector for different proportions by cluster
-#'  columns_ignore = c("Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"), 
+#'  cols_ignore = c("Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"), 
 #'  clusters = clusters$clusters, ## we have precomputed cluster labels so we pass them here
 #'  epochs = 5,
 #'  return_silhouettes = FALSE,
@@ -173,7 +173,7 @@ run_cissvae <- function(
   index_col              = NULL,
   val_proportion         = 0.1,
   replacement_value      = 0.0,
-  columns_ignore         = NULL,
+  cols_ignore         = NULL,
   imputable_matrix   = NULL,
   binary_feature_mask = NULL,
   print_dataset          = TRUE, 
@@ -214,8 +214,12 @@ run_cissvae <- function(
   return_history         = FALSE,
   return_dataset         = FALSE,
   return_validation_dataset = FALSE,
-  debug                  = FALSE
+  debug                  = FALSE,
+  columns_ignore = NULL
 ){
+    if(!is.null(columns_ignore) & is.null(cols_ignore)){
+    cols_ignore = columns_ignore
+  }
 
       # Check if reticulate has initialized Python
   if (is.null(reticulate::py_config()$python)) {
@@ -373,7 +377,7 @@ run_cissvae <- function(
     data                  = data_py,
     val_proportion        = val_proportion,
     replacement_value     = replacement_value,
-    columns_ignore        = if (is.null(columns_ignore)) NULL else reticulate::r_to_py(list(as.character(columns_ignore))),
+    columns_ignore        = if (is.null(cols_ignore)) NULL else reticulate::r_to_py(list(as.character(cols_ignore))),
     print_dataset         = print_dataset,
     clusters              = clusters_py,
     n_clusters            = n_clusters,
@@ -490,8 +494,8 @@ run_cissvae <- function(
     # -----------------
     # If there were columns we wanted the model to ignore for validation, we want to keep them the same in the val_data  so we can filter by them for mse funct
     # ------------------
-    if (!is.null(columns_ignore)){
-      for(col in columns_ignore){
+    if (!is.null(cols_ignore)){
+      for(col in cols_ignore){
         val_data[[col]] = data[[col]]
         val_imputed[[col]] = data[[col]]
       }

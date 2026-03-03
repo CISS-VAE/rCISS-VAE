@@ -12,7 +12,8 @@ cluster_on_missing(
   k_neighbors = NULL,
   leiden_resolution = 0.25,
   leiden_objective = "CPM",
-  use_snn = TRUE
+  use_snn = TRUE,
+  columns_ignore = NULL
 )
 }
 \arguments{
@@ -33,6 +34,8 @@ If \code{NULL}, defaults to \code{nrow(data) \%/\% 25}.}
 \item{leiden_objective}{objective}
 
 \item{use_snn}{use snn}
+
+\item{columns_ignore}{Alias for cols_ignore. Kept for continuity.}
 }
 \value{
 A list with components:

@@ -9,7 +9,7 @@ autotune_cissvae(
   index_col = NULL,
   val_proportion = 0.1,
   replacement_value = 0,
-  columns_ignore = NULL,
+  cols_ignore = NULL,
   imputable_matrix = NULL,
   binary_feature_mask = NULL,
   clusters,
@@ -45,7 +45,8 @@ autotune_cissvae(
   refit_loops = 100,
   epochs_per_loop = 500,
   reset_lr_refit = c(TRUE, FALSE),
-  debug = FALSE
+  debug = FALSE,
+  columns_ignore = NULL
 )
 }
 \arguments{
@@ -57,7 +58,7 @@ autotune_cissvae(
 
 \item{replacement_value}{Numeric value used to replace missing entries before model input.}
 
-\item{columns_ignore}{Character vector of column names to exclude from imputation scoring.}
+\item{cols_ignore}{Character vector of column names to exclude from imputation scoring.}
 
 \item{imputable_matrix}{Logical matrix indicating entries allowed to be imputed.}
 
@@ -130,6 +131,8 @@ autotune_cissvae(
 \item{reset_lr_refit}{Logical vector: whether to reset LR before refit}
 
 \item{debug}{Logical; if TRUE, additional metadata is returned for debugging.}
+
+\item{columns_ignore}{Alias of cols_ignore. Kept for continuity.}
 }
 \value{
 A named list with the following components:

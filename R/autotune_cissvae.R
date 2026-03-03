@@ -41,11 +41,12 @@
 #' @param reset_lr_refit Logical vector: whether to reset LR before refit
 #' @param val_proportion Proportion of non-missing data to hold out for validation.
 #' @param replacement_value Numeric value used to replace missing entries before model input.
-#' @param columns_ignore Character vector of column names to exclude from imputation scoring.
+#' @param cols_ignore Character vector of column names to exclude from imputation scoring.
 #' @param imputable_matrix Logical matrix indicating entries allowed to be imputed.
 #' @param binary_feature_mask Logical vector marking which columns are binary.
 #' @param weight_decay Weight decay (L2 penalty) used in Adam optimizer.
 #' @param debug Logical; if TRUE, additional metadata is returned for debugging.
+#' @param columns_ignore Alias of cols_ignore. Kept for continuity. 
 #'
 #' @return A named list with the following components:
 #' \describe{
@@ -134,7 +135,7 @@ autotune_cissvae <- function(
   index_col              = NULL,
   val_proportion         = 0.1,
   replacement_value      = 0.0,
-  columns_ignore         = NULL,
+  cols_ignore         = NULL,
   imputable_matrix   = NULL,
   binary_feature_mask = NULL,
   clusters, ## cluster identities must be provided by user
@@ -173,8 +174,13 @@ autotune_cissvae <- function(
   epochs_per_loop   = 500,
   reset_lr_refit    = c(TRUE, FALSE),
   ## defaults to returning helpful things
-  debug = FALSE
+  debug = FALSE,
+  columns_ignore = NULL
 ) {
+
+  if(!is.null(columns_ignore) & is.null(cols_ignore)){
+    cols_ignore = columns_ignore
+  }
 
   if (!requireNamespace("reticulate", quietly = TRUE)) {
     stop("Package 'reticulate' is required. Install it to use this function.")
@@ -249,7 +255,7 @@ if (!is.null(imputable_matrix)) {
 }
 
 # -- 3.2) Quick coverage diagnostics on FEATURE columns only --
-feat_cols <- if (is.null(columns_ignore)) colnames(data) else setdiff(colnames(data), columns_ignore)
+feat_cols <- if (is.null(cols_ignore)) colnames(data) else setdiff(colnames(data), cols_ignore)
 
 if (!is.null(imputable_matrix)) {
   obs_mat <- !is.na(as.matrix(data[, feat_cols, drop = FALSE]))
@@ -321,8 +327,8 @@ if (!is.null(imputable_matrix)) {
   # }
   clusters_py <- np$array(as.integer(clusters), dtype = "int64")
 
-  # columns_ignore as a Python list (safer when convert = FALSE)
-  cols_ignore_py <- if (is.null(columns_ignore)) NULL else reticulate::r_to_py(as.character(columns_ignore))
+  # cols_ignore as a Python list (safer when convert = FALSE)
+  cols_ignore_py <- if (is.null(cols_ignore)) NULL else reticulate::r_to_py(as.character(cols_ignore))
 
   if (!is.null(imputable_matrix)) {
       dni_py <- pd$DataFrame(imputable_matrix)
@@ -437,8 +443,8 @@ if (!is.null(imputable_matrix)) {
   # -----------------
   # If there were columns we wanted the model to ignore for validation, we want to keep them the same in the val_data  so we can filter by them for mse funct
   # ------------------
-  if (!is.null(columns_ignore)){
-    for(col in columns_ignore){
+  if (!is.null(cols_ignore)){
+    for(col in cols_ignore){
       val_data[[col]] = data[[col]]
       val_imputed[[col]] = data[[col]]
     }

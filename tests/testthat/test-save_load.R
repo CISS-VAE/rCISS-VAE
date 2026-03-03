@@ -69,7 +69,7 @@ test_that("load_cissvae_model loads a saved model", {
   save_cissvae_model(res$model, tmp_file)
 
   # Loading should return a Python object
-  loaded <- load_cissvae_model(tmp_file, python_env = "cissvae_environment")
+  loaded <- load_cissvae_model(tmp_file)
   expect_true(inherits(loaded, "python.builtin.object"))
 })
 
@@ -79,16 +79,12 @@ test_that("impute_with_cissvae produces expected output structure", {
   tmp_file <- tempfile(fileext = ".pt")
 
   # Train a minimal model
-  df_missing <- data.frame(
-    x = c(NA_real_, 1.0, 2.0),
-    y = c(1.0, NA_real_, 3.0)
-  )
-  clusters <- c(1L, 1L, 2L)
+  data(df_missing, clusters)
   
   res <- run_cissvae(
     data = df_missing,
     index_col = NULL,
-    clusters = clusters,
+    clusters = clusters$clusters,
     epochs = 1,
     return_model = TRUE,
     verbose = FALSE,
@@ -97,20 +93,19 @@ test_that("impute_with_cissvae produces expected output structure", {
   save_cissvae_model(res$model, tmp_file)
 
   # Load it
-  model <- load_cissvae_model(tmp_file, python_env = "cissvae_environment")
+  model <- load_cissvae_model(tmp_file)
 
   # Run imputation
   out <- impute_with_cissvae(
-    model_py = model,
+    model = model,
     data = df_missing,
     index_col = NULL,
-    columns_ignore = NULL,
-    clusters = clusters,
+    cols_ignore = NULL,
+    clusters = clusters$clusters,
     imputable_matrix = NULL,
     binary_feature_mask = NULL,
-    val_proportion = 0.1,
     replacement_value = 0,
-    batch_size = 2L,
+    batch_size = 4000L,
     seed = 123
   )
 

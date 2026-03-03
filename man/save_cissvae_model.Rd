@@ -4,10 +4,10 @@
 \alias{save_cissvae_model}
 \title{Save a trained Python CISS-VAE model to disk}
 \usage{
-save_cissvae_model(model_py, file)
+save_cissvae_model(model, file)
 }
 \arguments{
-\item{model_py}{Python model object (e.g., res$model from run_cissvae)}
+\item{model}{Python model object (e.g., res$model from run_cissvae)}
 
 \item{file}{Path where the model will be saved (e.g., "trained_vae.pt")}
 }
@@ -33,7 +33,7 @@ try({
       data = df_missing,
       index_col = "index",
       val_proportion = 0.1,
-      columns_ignore = c(
+      cols_ignore = c(
         "Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"
       ),
       clusters = clusters$clusters,

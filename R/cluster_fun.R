@@ -138,6 +138,7 @@ cluster_on_missing <- function(
 #' }
 #'
 #' @examples
+#' \donttest{
 #' set.seed(123)
 #'
 #' dat <- data.frame(
@@ -169,7 +170,7 @@ cluster_on_missing <- function(
 #'
 #' table(res$clusters)
 #' res$silhouette_score
-#' })
+#' })}
 #'
 #' @export
 cluster_on_missing_prop <- function(

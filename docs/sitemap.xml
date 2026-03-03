@@ -23,10 +23,13 @@
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/create_missingness_prop_matrix.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/df_missing.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/dni.html</loc></url>
+<url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/impute_with_cissvae.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/index.html</loc></url>
+<url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/load_cissvae_model.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/mock_surv.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/performance_by_cluster.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/plot_vae_architecture.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/run_cissvae.html</loc></url>
+<url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/save_cissvae_model.html</loc></url>
 </urlset>
 

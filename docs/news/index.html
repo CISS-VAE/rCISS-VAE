@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,7 +33,25 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.0.4" id="rcissvae-v004">rCISSVAE v0.0.4<a class="anchor" aria-label="anchor" href="#rcissvae-v004"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.0.5" id="rcissvae-v005">rCISSVAE v0.0.5<a class="anchor" aria-label="anchor" href="#rcissvae-v005"></a></h2>
+<div class="section level3">
+<h3 id="updates-0-0-5">Updates<a class="anchor" aria-label="anchor" href="#updates-0-0-5"></a></h3>
+<ul><li>
+<code><a href="../reference/performance_by_cluster.html">performance_by_cluster()</a></code> imputation error calculation now matches python implementation</li>
+<li>changed all <code>columns_ignore</code> parameters to <code>cols_ignore</code>. Keeping <code>columns_ignore</code> as an alias for continuity.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-additions-0-0-5">New additions<a class="anchor" aria-label="anchor" href="#new-additions-0-0-5"></a></h3>
+<ul><li>
+<code><a href="../reference/save_cissvae_model.html">save_cissvae_model()</a></code> will save CISSVAE models to disk</li>
+<li>
+<code><a href="../reference/load_cissvae_model.html">load_cissvae_model()</a></code> loads a saved CISSVAE model from disk</li>
+<li>
+<code><a href="../reference/impute_with_cissvae.html">impute_with_cissvae()</a></code> accepts a model and R data.frame with missingness and uses the model to impute the data</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.0.4" id="rcissvae-v004">rCISSVAE v0.0.4<a class="anchor" aria-label="anchor" href="#rcissvae-v004"></a></h2><p class="text-muted">CRAN release: 2026-01-23</p>
 <div class="section level3">
 <h3 id="updates-0-0-4">Updates<a class="anchor" aria-label="anchor" href="#updates-0-0-4"></a></h3>
 <ul><li>added missingness heatmap function <code><a href="../reference/cluster_heatmap.html">cluster_heatmap()</a></code> and associated vignette</li>

@@ -14,6 +14,9 @@
 \.csv$
 \.png$
 
+^\./inst/synthetic_example_data/synthetic_missing\.csv$
+^\./inst/synthetic_example_data/$
+
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.git$

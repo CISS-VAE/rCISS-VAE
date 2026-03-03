@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,13 +58,17 @@ Additionally, CISS-VAE incorporates an iterative learning procedure, with a vali
 </details><div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Install devtools or remotes if not already installed:</p>
+<p>rCISSVAE can now be installed via CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"rCISSVAE"</span><span class="op">)</span></span></code></pre></div>
+<p>For the latest development version, please install via github:</p>
+<p>Install devtools or remotes if not already installed:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
 <span><span class="co"># or</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span></code></pre></div>
-<p>The rCISSVAE package can be installed with:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<p>The rCISSVAE package can then be installed with:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"CISS-VAE/rCISS-VAE"</span><span class="op">)</span></span>
 <span><span class="co"># or</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"CISS-VAE/rCISS-VAE"</span><span class="op">)</span></span></code></pre></div>
@@ -75,16 +79,16 @@ Additionally, CISS-VAE incorporates an iterative learning procedure, with a vali
 <p>This package uses <code>reticulate</code> to interface with the python version of the package <code>ciss-vae</code>, which can be installed via pip.</p>
 <p>If you are comfortable creating a venv or conda environment and installing the package, great! Then all you need to do is tell reticulate where to point.</p>
 <p><strong>For Venv</strong></p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_virtualenv</a></span><span class="op">(</span><span class="st">"./.venv"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><strong>For conda</strong></p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_condaenv</a></span><span class="op">(</span><span class="st">"myenv"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="virtual-environment-helper-function">Virtual environment helper function<a class="anchor" aria-label="anchor" href="#virtual-environment-helper-function"></a>
 </h3>
 <p>If you do not want to manually create the virtual environment, you can use the helper function <code><a href="reference/create_cissvae_env.html">create_cissvae_env()</a></code> to create a virtual environment (venv).</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/create_cissvae_env.html">create_cissvae_env</a></span><span class="op">(</span></span>
 <span>  envname <span class="op">=</span> <span class="st">"cissvae_environment"</span>, <span class="co">## name of environment</span></span>
 <span>  path <span class="op">=</span> <span class="cn">NULL</span>, <span class="co">## add path to wherever you want virtual environment to be. If null will create environment in current working directory</span></span>
@@ -92,7 +96,7 @@ Additionally, CISS-VAE incorporates an iterative learning procedure, with a vali
 <span>  python_version <span class="op">=</span> <span class="st">"3.10"</span> <span class="co">## set to whatever version you want &gt;=3.10. Python 3.10 or 3.11 recommended</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Once the environment is created, activate it using:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_virtualenv</a></span><span class="op">(</span><span class="st">"./cissvae_environment"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># In other words,</span></span>
@@ -103,7 +107,7 @@ Additionally, CISS-VAE incorporates an iterative learning procedure, with a vali
 <h2 id="quickstart">Quickstart<a class="anchor" aria-label="anchor" href="#quickstart"></a>
 </h2>
 <p>The input dataset should be a <code>matrix</code> or <code>data.frame</code> and missing values should be represented with <code>NA</code> or <code>NaN</code>. Precomputed clusters should be passed as a numeric vector of length ‘n’ for an ‘n x p’ dataset. For more information on having <code><a href="reference/run_cissvae.html">run_cissvae()</a></code> handle the clustering see the <a href="https://ciss-vae.github.io/rCISS-VAE/articles/vignette.html#clustering-features-by-missingness-patterns">‘Clustering Features by Missingness Patterns’ vignette</a>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ciss-vae.github.io/rCISS-VAE/">rCISSVAE</a></span><span class="op">)</span></span>
 <span></span>
@@ -165,6 +169,7 @@ Additionally, CISS-VAE incorporates an iterative learning procedure, with a vali
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
+<li><a href="https://cloud.r-project.org/package=rCISSVAE" class="external-link">View on CRAN</a></li>
 <li><a href="https://github.com/CISS-VAE/rCISS-VAE/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/CISS-VAE/rCISS-VAE/issues" class="external-link">Report a bug</a></li>
 </ul>

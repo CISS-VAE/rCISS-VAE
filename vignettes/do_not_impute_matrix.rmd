@@ -9,7 +9,7 @@ output:
     fig_height: 5
     dpi: 600
 vignette: >
-  %\VignetteIndexEntry{'Masking certain entries from imputation model'}
+  %\VignetteIndexEntry{Masking certain entries from imputation model}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

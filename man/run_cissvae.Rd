@@ -9,7 +9,7 @@ run_cissvae(
   index_col = NULL,
   val_proportion = 0.1,
   replacement_value = 0,
-  columns_ignore = NULL,
+  cols_ignore = NULL,
   imputable_matrix = NULL,
   binary_feature_mask = NULL,
   print_dataset = TRUE,
@@ -47,7 +47,8 @@ run_cissvae(
   return_history = FALSE,
   return_dataset = FALSE,
   return_validation_dataset = FALSE,
-  debug = FALSE
+  debug = FALSE,
+  columns_ignore = NULL
 )
 }
 \arguments{
@@ -63,7 +64,7 @@ validation during training. Must be between 0 and 1. Default \code{0.1}.}
 \item{replacement_value}{Numeric. Fill value for masked entries during training.
 Default \code{0.0}.}
 
-\item{columns_ignore}{Character or integer vector. Columns to exclude from validation set.
+\item{cols_ignore}{Character or integer vector. Columns to exclude from validation set.
 Can specify by name or index. Default \code{NULL}.}
 
 \item{imputable_matrix}{Logical matrix indicating entries allowed to be imputed.}
@@ -171,6 +172,8 @@ during training (contains validation data, masks, etc.). Default \code{FALSE}.}
 \item{return_validation_dataset}{Logical. If \code{TRUE} returns validation dataset}
 
 \item{debug}{Logical; if TRUE, additional metadata is returned for debugging.}
+
+\item{columns_ignore}{Alias of cols_ignore. Kept for continuity}
 }
 \value{
 A list containing imputed data and optional additional outputs:
@@ -250,7 +253,7 @@ dat = run_cissvae(
  data = df_missing,
  index_col = "index",
  val_proportion = 0.1, ## pass a vector for different proportions by cluster
- columns_ignore = c("Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"), 
+ cols_ignore = c("Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"), 
  clusters = clusters$clusters, ## we have precomputed cluster labels so we pass them here
  epochs = 5,
  return_silhouettes = FALSE,

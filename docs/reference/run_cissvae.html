@@ -21,7 +21,7 @@ patterns within and across different data subgroups."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,7 +65,7 @@ patterns within and across different data subgroups.</p>
 <span>  index_col <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  val_proportion <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  replacement_value <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  columns_ignore <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  cols_ignore <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  imputable_matrix <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  binary_feature_mask <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  print_dataset <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -103,7 +103,8 @@ patterns within and across different data subgroups.</p>
 <span>  return_history <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  return_dataset <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  return_validation_dataset <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  debug <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  debug <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  columns_ignore <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -131,7 +132,7 @@ validation during training. Must be between 0 and 1. Default <code>0.1</code>.</
 Default <code>0.0</code>.</p></dd>
 
 
-<dt id="arg-columns-ignore">columns_ignore<a class="anchor" aria-label="anchor" href="#arg-columns-ignore"></a></dt>
+<dt id="arg-cols-ignore">cols_ignore<a class="anchor" aria-label="anchor" href="#arg-cols-ignore"></a></dt>
 <dd><p>Character or integer vector. Columns to exclude from validation set.
 Can specify by name or index. Default <code>NULL</code>.</p></dd>
 
@@ -317,6 +318,10 @@ during training (contains validation data, masks, etc.). Default <code>FALSE</co
 <dt id="arg-debug">debug<a class="anchor" aria-label="anchor" href="#arg-debug"></a></dt>
 <dd><p>Logical; if TRUE, additional metadata is returned for debugging.</p></dd>
 
+
+<dt id="arg-columns-ignore">columns_ignore<a class="anchor" aria-label="anchor" href="#arg-columns-ignore"></a></dt>
+<dd><p>Alias of cols_ignore. Kept for continuity</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -401,7 +406,7 @@ accessible via <code>reticulate</code>.</p>
 <span class="r-in"><span> data <span class="op">=</span> <span class="va">df_missing</span>,</span></span>
 <span class="r-in"><span> index_col <span class="op">=</span> <span class="st">"index"</span>,</span></span>
 <span class="r-in"><span> val_proportion <span class="op">=</span> <span class="fl">0.1</span>, <span class="co">## pass a vector for different proportions by cluster</span></span></span>
-<span class="r-in"><span> columns_ignore <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Age"</span>, <span class="st">"Salary"</span>, <span class="st">"ZipCode10001"</span>, <span class="st">"ZipCode20002"</span>, <span class="st">"ZipCode30003"</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span> cols_ignore <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Age"</span>, <span class="st">"Salary"</span>, <span class="st">"ZipCode10001"</span>, <span class="st">"ZipCode20002"</span>, <span class="st">"ZipCode30003"</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span> clusters <span class="op">=</span> <span class="va">clusters</span><span class="op">$</span><span class="va">clusters</span>, <span class="co">## we have precomputed cluster labels so we pass them here</span></span></span>
 <span class="r-in"><span> epochs <span class="op">=</span> <span class="fl">5</span>,</span></span>
 <span class="r-in"><span> return_silhouettes <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
@@ -413,9 +418,6 @@ accessible via <code>reticulate</code>.</p>
 <span class="r-in"><span> layer_order_dec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shared"</span>, <span class="st">"unshared"</span>, <span class="st">"shared"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Error in py_module_import(module, convert = convert) : </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ModuleNotFoundError: No module named 'ciss_vae'</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Run `reticulate::py_last_error()` for details.</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

@@ -16,6 +16,15 @@ Additionally, CISS-VAE incorporates an iterative learning procedure, with a vali
 
 ## Installation 
 
+rCISSVAE can now be installed via CRAN: 
+
+```{.r}
+install.packages("rCISSVAE")
+
+```
+
+For the latest development version, please install via github:
+
 Install devtools or remotes if not already installed: 
 
 ```{.r}
@@ -25,7 +34,7 @@ install.packages("devtools")
 
 ```
 
-The rCISSVAE package can be installed with:
+The rCISSVAE package can then be installed with:
 
 ```{.r}
 remotes::install_github("CISS-VAE/rCISS-VAE")

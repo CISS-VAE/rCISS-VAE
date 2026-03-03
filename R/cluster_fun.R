@@ -5,6 +5,7 @@
 #'
 #' @param data A data.frame or matrix (samples × features), may contain `NA`.
 #' @param cols_ignore Character vector of column names to ignore when clustering.
+#' @param columns_ignore Alias for cols_ignore. Kept for continuity.
 #' @param n_clusters Integer; if provided, will run KMeans with this many clusters.
 #'                   If `NULL`, will use Leiden.
 #' @param seed Integer; random seed for KMeans (or reproducibility in Leiden).
@@ -19,14 +20,20 @@
 #' @export
 cluster_on_missing <- function(
   data,
-  cols_ignore            = NULL,
+  cols_ignore         = NULL,
   n_clusters             = NULL,
   seed                   = 42,
   k_neighbors       = NULL,
   leiden_resolution = 0.25,
   leiden_objective = "CPM",
-  use_snn = TRUE
+  use_snn = TRUE,
+  columns_ignore            = NULL
 ) {
+
+  if(!is.null(columns_ignore) & is.null(cols_ignore)){
+    cols_ignore = columns_ignore
+  }
+
   # load reticulate
   requireNamespace("reticulate", quietly = TRUE)
   
@@ -62,8 +69,8 @@ cluster_on_missing <- function(
     k_neighbors = reticulate::r_to_py(as.integer(k_neighbors))
 
   )
-  if (!is.null(cols_ignore)) {
-    args_py$cols_ignore <- reticulate::r_to_py(as.character(cols_ignore))
+  if (!is.null(columns_ignore)) {
+    args_py$columns_ignore <- reticulate::r_to_py(as.character(columns_ignore))
   }
   if (!is.null(n_clusters))       args_py$n_clusters       <- as.integer(n_clusters)
   if (!is.null(seed))             args_py$seed             <- as.integer(seed)

@@ -1,0 +1,314 @@
+#' Save a trained Python CISS-VAE model to disk
+#'
+#' Uses reticulate to call Python's torch.save on a model object returned
+#' from run_cissvae (or any Python model in the R session).
+#'
+#' @param model Python model object (e.g., res$model from run_cissvae)
+#' @param file Path where the model will be saved (e.g., "trained_vae.pt")
+#' @return NULL. Called for side effects.
+#' @importFrom reticulate import
+#' @examples
+#' \donttest{
+#' ## Requires a working Python environment via reticulate
+#' ## Examples are wrapped in try() to avoid failures on CRAN check
+#' try({
+#'   reticulate::use_virtualenv("cissvae_environment", required = TRUE)
+#'   data(df_missing)
+#'   data(clusters)
+#'
+#'   ## Run CISS-VAE training
+#'   dat <- try(
+#'     run_cissvae(
+#'       data = df_missing,
+#'       index_col = "index",
+#'       val_proportion = 0.1,
+#'       cols_ignore = c(
+#'         "Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"
+#'       ),
+#'       clusters = clusters$clusters,
+#'       epochs = 5,
+#'       return_silhouettes = FALSE,
+#'       return_history = TRUE,
+#'       verbose = FALSE,
+#'       return_model = TRUE,
+#'       device = "cpu",
+#'       layer_order_enc = c("unshared", "shared", "unshared"),
+#'       layer_order_dec = c("shared", "unshared", "shared")
+#'     ),
+#'     silent = TRUE
+#'   )
+#'
+#'   ## Save the trained model to a temporary file (CRAN-safe)
+#'   tmpfile <- tempfile(fileext = ".pt")
+#'   try(save_cissvae_model(dat$model, tmpfile), silent = TRUE)
+#' })}
+#' @export
+save_cissvae_model <- function(model, file) {
+  # Import torch via reticulate
+  torch <- reticulate::import("torch")
+  # Save full model (architecture + weights)
+  torch$save(model, file)
+}
+
+
+#' Load a saved Python CISS-VAE model
+#'
+#' Loads a full CISSVAE model into R via reticulate.
+#'
+#' @param file Path to the saved model file (e.g., "trained_vae.pt")
+#' @param python_env Optional: Python virtualenv or conda env to activate
+#' @return CISSVAE model object
+#' @examples
+#' \donttest{
+#' ## Requires a working Python environment via reticulate
+#' ## Wrapped in try() and donttest to avoid CRAN check failures
+#' try({
+#'   # Activate the Python virtualenv or conda env where CISSVAE is installed
+#'   reticulate::use_virtualenv("cissvae_environment", required = TRUE)
+#'
+#'   # Path to a previously saved model file
+#'   model_file <- "trained_vae.pt"
+#'
+#'   # Load the CISS-VAE model
+#'   loaded_model <- try(
+#'     load_cissvae_model(file = model_file, python_env = "cissvae_environment")
+#'   )
+#'
+#' })
+#' }
+#' @export
+load_cissvae_model <- function(file, python_env = NULL) {
+  if (!is.null(python_env)) {
+    reticulate::use_virtualenv(python_env, required = TRUE)
+  }
+
+  # Import torch and ensure VAE class is registered
+  torch <- reticulate::import("torch")
+  reticulate::import("ciss_vae.classes.vae")
+
+  # Load and put model into eval mode
+  model <- torch$load(file, map_location = "cpu", weights_only = FALSE)
+  model$eval()
+  return(model)
+}
+
+
+
+
+#' Impute new data with a loaded Python CISS-VAE model
+#'
+#' Given a loaded model, an R data frame, and a vector of cluster labels,
+#' this builds the Python ClusterDataset and DataLoader, runs inference,
+#' and returns an imputed data frame in R.
+#'
+#' @param model Python model object loaded via load_cissvae_model()
+#' @param data R data.frame with missing values
+#' @param index_col String name of index column to preserve (optional)
+#' @param cols_ignore Character vector of column names to exclude from imputation scoring.
+#' @param clusters Integer vector of cluster labels for rows of data
+#' @param imputable_matrix Logical matrix indicating entries allowed to be imputed.
+#' @param binary_feature_mask Logical vector marking which columns are binary.
+#' @param replacement_value Numeric value used to replace missing entries before model input.
+#' @param batch_size Batch size passed to Python DataLoader. If NULL, batch_size = nrow(data)
+#' @param seed Base random seed for reproducible results
+#' @return Imputed R data.frame
+#' @section Tips:
+#' \itemize{
+#'   \item Use same ClusterDataset parameters as for initial model training. 
+#'   \item Clusters must have same labels as clusters used for model training
+#'   \item 'binary_feature_mask' is required for correct imputation of binary columns. 
+#' }
+#' @examples
+#' ## Requires a working Python environment via reticulate
+#' ## Wrapped in try() and donttest to avoid CRAN check failures
+#' \donttest{
+#' try({
+#'   # Activate your reticulate Python environment with ciss-vae installed
+#'   reticulate::use_virtualenv("cissvae_environment", required = TRUE)
+#'
+#'   # Load example data and clusters (replace with your own)
+#'   data(df_missing)
+#'   data(clusters)
+#'
+#'   # Load a previously saved model
+#'   model <- try(load_cissvae_model("model.pt", python_env = "cissvae_environment"))
+#'
+#'   # Perform imputation on new data
+#'   imputed_df <- try(
+#'     impute_with_cissvae(
+#'       model = model,
+#'       data = df_missing,
+#'       index_col = "index",
+#'       cols_ignore = c("Age", "Salary"),
+#'       clusters = clusters$clusters,
+#'       imputable_matrix = NULL,
+#'       binary_feature_mask = NULL,
+#'       replacement_value = 0,
+#'       batch_size = 4000L,
+#'       seed = 42
+#'     )
+#'   )
+#' })
+#' }
+#' @export
+impute_with_cissvae <- function(model,  data, index_col = NULL, cols_ignore= NULL,  
+  clusters, imputable_matrix = NULL, binary_feature_mask = NULL, 
+  replacement_value = 0, batch_size = NULL, seed = 42) {
+
+  ## --------------- Setup Stuff ----------------------
+  ## Check if reticulate has initialized Python
+  if (is.null(reticulate::py_config()$python)) {
+      stop(
+        "Python is not initialized in this session. ",
+        "Please activate a reticulate Python environment before calling this function, ",
+        "for example by calling:\n",
+        "  reticulate::use_virtualenv(\"your/env/path\", required = TRUE)\n",
+        "or\n",
+        "  reticulate::use_condaenv(\"your_env_name\", required = TRUE)\n",
+        "and then re-run the function.",
+        call. = FALSE
+      )
+    }   
+
+  ## Python obj chekcer
+  is_py_obj <- function(x) inherits(x, "python.builtin.object")
+  ## -------------- End Setup Stuff --------------------
+
+  ## -------------- Handle Index column -----------------
+
+  if (!is.null(index_col)) {
+    if (!index_col %in% colnames(data)) stop("`index_col` not found in data.")
+    index_vals <- data[[index_col]]
+    data       <- data[, setdiff(colnames(data), 
+      index_col), drop = FALSE]
+    imputable_matrix = imputable_matrix[, setdiff(colnames(imputable_matrix), 
+      index_col), drop = FALSE]
+    ## handle index col in binary_feature_mask
+    if(!is.null(binary_feature_mask) & !is.null(names(binary_feature_mask))){
+      binary_feature_mask =  binary_feature_mask[ setdiff(names(binary_feature_mask), 
+        index_col), drop = FALSE]
+      if(debug){
+        cat("Binary feature mask: ", 
+        paste0(names(binary_feature_mask), collapse = ", "))
+      }
+    }
+  } else index_vals <- NULL
+
+  # Ensure data and mask columns match EXACTLY (after index removal) 
+if (!is.null(imputable_matrix)) {
+  if (!identical(colnames(data), colnames(imputable_matrix))) {
+    stop("`data` and `imputable_matrix` columns must match exactly (same names & order) after removing index_col.")
+  }
+}
+
+  ## --------------- End Handle Index Column ---------------
+
+  ## ----------------- Set batch size to dataset size if not defined ----------------
+  if(is.null(batch_size)){
+    batch_size = as.integer(nrow(data))
+  }
+  if(batch_size > nrow(data)){
+     batch_size = as.integer(nrow(data))
+  }
+  batch_size = as.integer(batch_size)
+
+  ## --------------- Prepare data and python imports ----------
+  np       <- reticulate::import("numpy", convert = FALSE)
+  pd       <- reticulate::import("pandas", convert = FALSE)
+  CD_mod   <- reticulate::import("ciss_vae.classes.cluster_dataset", 
+  convert = FALSE)$ClusterDataset
+  helpers <- reticulate::import("ciss_vae.utils.helpers")
+  DataLoader <- reticulate::import("torch.utils.data")$DataLoader
+
+  data[is.na(data)] <- NaN
+  data_py <- pd$DataFrame(data = data, dtype = "float64")
+  clusters_py <- np$array(as.integer(clusters), dtype = "int64")
+  seed <- as.integer(seed)
+  # cols_ignore as a Python list (safer when convert = FALSE)
+  cols_ignore_py <- if (is.null(cols_ignore)) NULL else reticulate::r_to_py(as.character(cols_ignore))
+
+  if (!is.null(imputable_matrix)) {
+      dni_py <- pd$DataFrame(imputable_matrix)
+  } else dni_py <- NULL
+
+  ## ---------- make sure everything is valid before sending ot python -------------------------
+
+# Ensure we have at least 1 feature column after all filtering
+if (ncol(data) == 0L) {
+  stop(
+    "After dropping index_col/cols_ignore, there are 0 feature columns left. ",
+    "Check `index_col` and `cols_ignore` against your input data."
+  )
+}
+
+# Ensure no duplicated column names (pandas can behave badly here)
+if (anyDuplicated(colnames(data))) {
+  stop("Duplicate column names detected after preprocessing. Resolve duplicates before imputing.")
+}
+
+# If you have a binary feature mask, it MUST match the number of feature cols being sent
+if (!is.null(binary_feature_mask)) {
+  if (length(binary_feature_mask) != ncol(data)) {
+    stop(
+      "binary_feature_mask length (", length(binary_feature_mask),
+      ") does not match number of feature columns sent to python (", ncol(data), "). ",
+      "The mask must be defined AFTER column dropping/reordering."
+    )
+  }
+}
+
+# clusters must match rows
+if (!is.null(clusters) && length(clusters) != nrow(data)) {
+  stop("`clusters` length must equal number of rows in the data being imputed.")
+}
+
+# Ensure seed is an integer for python
+if (!is.null(seed)) seed <- as.integer(seed)
+
+# Ensure batch size is a positive integer 
+if (!is.null(batch_size)) {
+  batch_size <- as.integer(batch_size)
+  if (is.na(batch_size) || batch_size < 1L) stop("`batch_size` must be a positive integer.")
+}
+
+## --------------- send things to python =-=--------------
+
+  ## Build dataset + loader
+  dataset_py   <- CD_mod(
+    data = data_py, 
+    cluster_labels = clusters_py, 
+    val_proportion = 0L, 
+    replacement_value = replacement_value, 
+    columns_ignore = cols_ignore_py, 
+    imputable = dni_py,
+    val_seed = seed,
+    binary_feature_mask =  reticulate::r_to_py(binary_feature_mask))
+  data_loader  <- DataLoader(dataset_py, batch_size = as.integer(batch_size))
+
+    ## Sanity checks: loaded model must have a non-empty layer order
+  lo_enc <- tryCatch(model$layer_order_enc, error = function(e) NULL)
+  lo_dec <- tryCatch(model$layer_order_dec, error = function(e) NULL)
+
+  len0 <- function(x) is.null(x) || length(x) == 0
+
+  if (len0(lo_enc) || len0(lo_dec)) {
+    stop(
+      "Loaded model has empty `layer_order_enc`/`layer_order_dec`. ",
+      "This usually means the R load routine reconstructed the model incorrectly ",
+      "(e.g., defaults) rather than restoring the original architecture/config."
+    )
+  }
+
+  ## Run model inference & get imputed df
+  imputed_py   <- helpers$get_imputed_df(model, data_loader)
+
+  ## Convert Python pandas DataFrame back to R
+  imputed_r    <- reticulate::py_to_r(imputed_py)
+
+  if(!is.null(index_col)){
+      imputed_r[[index_col]] = index_vals
+  imputed_r <- imputed_r[c(index_col, setdiff(names(imputed_r), index_col))]
+  }
+
+  return(imputed_r)
+}

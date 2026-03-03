@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,7 @@
 
       <h1>Saving and Using Saved Models</h1>
             
-            <h4 data-toc-skip class="date">2026-01-20</h4>
+            <h4 data-toc-skip class="date">2026-03-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CISS-VAE/rCISS-VAE/blob/HEAD/vignettes/impute_with_saved_model.rmd" class="external-link"><code>vignettes/impute_with_saved_model.rmd</code></a></small>
       <div class="d-none name"><code>impute_with_saved_model.rmd</code></div>
@@ -59,67 +59,60 @@
 
     
     
-<p>To save a CISS-VAE model, use reticulate to save the model with
-‘torch’:</p>
+<div class="section level2">
+<h2 id="saving-a-trained-ciss-vae-model">Saving a trained CISS-VAE model<a class="anchor" aria-label="anchor" href="#saving-a-trained-ciss-vae-model"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a></span><span class="op">)</span></span>
-<span><span class="va">res</span> <span class="op">=</span> <span class="fu"><a href="../reference/run_cissvae.html">run_cissvae</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ciss-vae.github.io/rCISS-VAE/">rCISSVAE</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Import Python torch module</span></span>
-<span><span class="va">torch</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rstudio.github.io/reticulate/reference/import.html" class="external-link">import</a></span><span class="op">(</span><span class="st">"torch"</span><span class="op">)</span></span>
+<span><span class="co"># Train a model</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_cissvae.html">run_cissvae</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Assume `model` is a Python object already available in the R session</span></span>
-<span><span class="co"># (e.g., created earlier via reticulate)</span></span>
-<span><span class="va">torch</span><span class="op">$</span><span class="fu">save</span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">model</span>, <span class="st">"trained_vae.pt"</span><span class="op">)</span></span></code></pre></div>
-<blockquote>
-<p><strong>IMPORTANT</strong></p>
-<p>The python environment must be activated before trying to import the
-torch module. {.warning}</p>
-</blockquote>
-<p>To load a saved CISS-VAE model and use it to impute new data (called
-<code>data</code> in example below, with cluster vector
-<code>clusters</code>),</p>
+<span><span class="co"># Save the trained model to disk</span></span>
+<span><span class="fu"><a href="../reference/save_cissvae_model.html">save_cissvae_model</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">model</span>, <span class="st">"trained_vae.pt"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># IMPORTANT</span></span>
+<span><span class="co"># The Python environment must be active so 'torch' can be imported.</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="loading-a-saved-model-and-imputing-data">Loading a saved model and imputing data<a class="anchor" aria-label="anchor" href="#loading-a-saved-model-and-imputing-data"></a>
+</h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ciss-vae.github.io/rCISS-VAE/">rCISSVAE</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">## Activate your virtual environment</span></span>
+<span><span class="co">## Activate your Python environment </span></span>
 <span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_virtualenv</a></span><span class="op">(</span><span class="st">"cissvae_environment"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">## Use CISSVAE to load the model</span></span>
-<span><span class="co"># Import the module so the class is registered (required for full-model loading)</span></span>
-<span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/import.html" class="external-link">import</a></span><span class="op">(</span><span class="st">"ciss_vae.classes.vae"</span><span class="op">)</span></span>
+<span><span class="co">## Load full model object</span></span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_cissvae_model.html">load_cissvae_model</a></span><span class="op">(</span></span>
+<span>  file <span class="op">=</span> <span class="st">"trained_vae.pt"</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Load full model object</span></span>
-<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="va">torch</span><span class="op">$</span><span class="fu">load</span><span class="op">(</span><span class="st">"trained_vae.pt"</span>, map_location <span class="op">=</span> <span class="st">"cpu"</span>, weights_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="va">model</span><span class="op">$</span><span class="fu">eval</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">## Perform imputation on new data</span></span>
+<span><span class="co"># Make sure your `data` has valid NAs and `clusters` vector is ready</span></span>
+<span><span class="va">imputed_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/impute_with_cissvae.html">impute_with_cissvae</a></span><span class="op">(</span></span>
+<span>  model_py <span class="op">=</span> <span class="va">model</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">data</span>,</span>
+<span>  index_col <span class="op">=</span> <span class="st">"index"</span>,</span>
+<span>  columns_ignore <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  clusters <span class="op">=</span> <span class="va">clusters</span>,</span>
+<span>  imputable_matrix <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  binary_feature_mask <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  val_proportion <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  replacement_value <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  batch_size <span class="op">=</span> <span class="fl">4000L</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">42</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Optional: get imputed dataset</span></span>
-<span><span class="va">helpers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rstudio.github.io/reticulate/reference/import.html" class="external-link">import</a></span><span class="op">(</span><span class="st">"ciss_vae.utils.helpers"</span><span class="op">)</span></span>
-<span><span class="va">DataLoader</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rstudio.github.io/reticulate/reference/import.html" class="external-link">import</a></span><span class="op">(</span><span class="st">"torch.utils.data"</span><span class="op">)</span><span class="op">$</span><span class="va">DataLoader</span></span>
-<span></span>
-<span><span class="co">## Convert your dataset to python ClusterDataset object</span></span>
-<span>  <span class="va">CD_mod</span>   <span class="op">&lt;-</span> <span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/import.html" class="external-link">import</a></span><span class="op">(</span><span class="st">"ciss_vae.classes.cluster_dataset"</span>, </span>
-<span>  convert <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">ClusterDataset</span></span>
-<span>  <span class="va">np</span>       <span class="op">&lt;-</span> <span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/import.html" class="external-link">import</a></span><span class="op">(</span><span class="st">"numpy"</span>, convert <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span>  <span class="va">pd</span>       <span class="op">&lt;-</span> <span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/import.html" class="external-link">import</a></span><span class="op">(</span><span class="st">"pandas"</span>, convert <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">## make sure NAs are python compatible</span></span>
-<span>  <span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NaN</span></span>
-<span></span>
-<span><span class="co">## Convert data and clusters into python objects</span></span>
-<span>  <span class="va">data_py</span> <span class="op">&lt;-</span> <span class="va">pd</span><span class="op">$</span><span class="fu">DataFrame</span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, dtype <span class="op">=</span> <span class="st">"float64"</span><span class="op">)</span></span>
-<span>  <span class="va">clusters_py</span> <span class="op">&lt;-</span> <span class="va">np</span><span class="op">$</span><span class="fu">array</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">clusters</span><span class="op">)</span>, dtype <span class="op">=</span> <span class="st">"int64"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">## Make ClusterDataset and DataLoader</span></span>
-<span>  <span class="va">dataset</span> <span class="op">=</span> <span class="fu">CD_mod</span><span class="op">(</span></span>
-<span>    data <span class="op">=</span> <span class="va">data_py</span>, </span>
-<span>    cluster_labels <span class="op">=</span> <span class="va">clusters_py</span><span class="op">)</span></span>
-<span>  <span class="va">data_loader</span> <span class="op">&lt;-</span> <span class="fu">DataLoader</span><span class="op">(</span><span class="va">dataset</span>, batch_size <span class="op">=</span> <span class="fl">4000L</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">## Get Imputed Dataset</span></span>
-<span><span class="va">imputed_df</span> <span class="op">&lt;-</span> <span class="va">helpers</span><span class="op">$</span><span class="fu">get_imputed_df</span><span class="op">(</span><span class="va">model</span>, <span class="va">data_loader</span><span class="op">)</span></span></code></pre></div>
-  </main>
+<span><span class="co"># `imputed_df` is returned to R as a data.frame</span></span></code></pre></div>
+<p>If you have binary variables in your dataset, make sure to define the
+binary_feature_mask and convert the probabilities for the binary
+variables into {0, 1} values using desired thresholding.</p>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 

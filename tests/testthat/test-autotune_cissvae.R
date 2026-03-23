@@ -367,3 +367,347 @@ test_that("tiny optimization path runs end-to-end", {
   expect_true(all(c("imputed_dataset","model","study","results") %in% names(res)))
   expect_equal(nrow(res$results), 2L)
 })
+
+
+# -------------------------
+# Test handling of categorical validation units
+# -------------------------
+
+test_that("autotune returns cluster_dataset with categorical validation units", {
+  skip_if_no_cissvae_py()
+
+  df <- make_categorical_validation_data()
+
+  binary_feature_mask <- c(
+    index = FALSE,
+    X1 = FALSE,
+    X2 = FALSE,
+    B1 = TRUE,
+    B2 = TRUE,
+    C1b1 = TRUE,
+    C1b2 = TRUE,
+    C2b1 = TRUE,
+    C2b2 = TRUE
+  )
+
+  categorical_column_map <- list(
+    C1 = c("C1b1", "C1b2"),
+    C2 = c("C2b1", "C2b2")
+  )
+
+  clusters <- c(0L, 0L, 0L, 1L, 1L, 1L)
+
+  res <- autotune_cissvae(
+    data = df,
+    clusters = clusters,
+    index_col = "index",
+    binary_feature_mask = binary_feature_mask,
+    categorical_column_map = categorical_column_map,
+    val_proportion = 0.5,
+    n_trials = 1L,
+    device_preference = "cpu",
+    load_if_exists = FALSE,
+
+    num_hidden_layers = 1L,
+    hidden_dims       = 8L,
+    latent_dim        = 4L,
+    latent_shared     = TRUE,
+    output_shared     = FALSE,
+    lr                = 1e-3,
+    decay_factor      = 0.95,
+    weight_decay      = 0.001,
+    beta              = 0.01,
+    num_epochs        = 1L,
+    batch_size        = 4L,
+    num_shared_encode = 0L,
+    num_shared_decode = 0L,
+    refit_patience    = 1L,
+    refit_loops       = 1L,
+    epochs_per_loop   = 1L,
+    reset_lr_refit    = TRUE,
+    show_progress     = FALSE,
+    verbose           = FALSE
+  )
+
+  expect_true("cluster_dataset" %in% names(res))
+
+  validation_units <- reticulate::py_to_r(res$cluster_dataset$validation_units)
+
+  expect_true(all(c("X1", "X2", "B1", "B2", "C1", "C2") %in% names(validation_units)))
+  expect_false(any(c("C1b1", "C1b2", "C2b1", "C2b2") %in% names(validation_units)))
+
+  expect_equal(validation_units$C1$kind, "categorical")
+  expect_equal(validation_units$C2$kind, "categorical")
+
+  feature_names <- reticulate::py_to_r(res$cluster_dataset$feature_names)
+
+  c1_cols <- unlist(validation_units$C1$cols) + 1L
+  c2_cols <- unlist(validation_units$C2$cols) + 1L
+
+  expect_equal(feature_names[c1_cols], c("C1b1", "C1b2"))
+  expect_equal(feature_names[c2_cols], c("C2b1", "C2b2"))
+})
+
+
+test_that("autotune categorical_column_map masks grouped dummy columns together", {
+  skip_if_no_cissvae_py()
+
+  df <- make_categorical_validation_data()
+
+  binary_feature_mask <- c(
+    index = FALSE,
+    X1 = FALSE,
+    X2 = FALSE,
+    B1 = TRUE,
+    B2 = TRUE,
+    C1b1 = TRUE,
+    C1b2 = TRUE,
+    C2b1 = TRUE,
+    C2b2 = TRUE
+  )
+
+  categorical_column_map <- list(
+    C1 = c("C1b1", "C1b2"),
+    C2 = c("C2b1", "C2b2")
+  )
+
+  clusters <- c(0L, 0L, 0L, 1L, 1L, 1L)
+
+  res <- autotune_cissvae(
+    data = df,
+    clusters = clusters,
+    index_col = "index",
+    binary_feature_mask = binary_feature_mask,
+    categorical_column_map = categorical_column_map,
+    val_proportion = 0.5,
+    n_trials = 1L,
+    device_preference = "cpu",
+    load_if_exists = FALSE,
+
+    num_hidden_layers = 1L,
+    hidden_dims       = 8L,
+    latent_dim        = 4L,
+    latent_shared     = TRUE,
+    output_shared     = FALSE,
+    lr                = 1e-3,
+    decay_factor      = 0.95,
+    weight_decay      = 0.001,
+    beta              = 0.01,
+    num_epochs        = 1L,
+    batch_size        = 4L,
+    num_shared_encode = 0L,
+    num_shared_decode = 0L,
+    refit_patience    = 1L,
+    refit_loops       = 1L,
+    epochs_per_loop   = 1L,
+    reset_lr_refit    = TRUE,
+    show_progress     = FALSE,
+    verbose           = FALSE
+  )
+
+  feature_names <- reticulate::py_to_r(res$cluster_dataset$feature_names)
+  val_mask <- reticulate::py_to_r(res$cluster_dataset$val_mask$cpu()$numpy())
+
+  c1b1_idx <- match("C1b1", feature_names)
+  c1b2_idx <- match("C1b2", feature_names)
+  c2b1_idx <- match("C2b1", feature_names)
+  c2b2_idx <- match("C2b2", feature_names)
+
+  expect_equal(val_mask[, c1b1_idx], val_mask[, c1b2_idx])
+  expect_equal(val_mask[, c2b1_idx], val_mask[, c2b2_idx])
+})
+
+
+test_that("autotune categorical_column_map excludes partially observed grouped rows", {
+  skip_if_no_cissvae_py()
+
+  df <- make_categorical_validation_data()
+
+  # First row is only partially observed for grouped category C1.
+  df$C1b1[1] <- NA
+  df$C1b2[1] <- 0
+
+  binary_feature_mask <- c(
+    index = FALSE,
+    X1 = FALSE,
+    X2 = FALSE,
+    B1 = TRUE,
+    B2 = TRUE,
+    C1b1 = TRUE,
+    C1b2 = TRUE,
+    C2b1 = TRUE,
+    C2b2 = TRUE
+  )
+
+  categorical_column_map <- list(
+    C1 = c("C1b1", "C1b2"),
+    C2 = c("C2b1", "C2b2")
+  )
+
+  clusters <- c(0L, 0L, 0L, 1L, 1L, 1L)
+
+  res <- autotune_cissvae(
+    data = df,
+    clusters = clusters,
+    index_col = "index",
+    binary_feature_mask = binary_feature_mask,
+    categorical_column_map = categorical_column_map,
+    val_proportion = 0.5,
+    n_trials = 1L,
+    device_preference = "cpu",
+    load_if_exists = FALSE,
+
+    num_hidden_layers = 1L,
+    hidden_dims       = 8L,
+    latent_dim        = 4L,
+    latent_shared     = TRUE,
+    output_shared     = FALSE,
+    lr                = 1e-3,
+    decay_factor      = 0.95,
+    weight_decay      = 0.001,
+    beta              = 0.01,
+    num_epochs        = 1L,
+    batch_size        = 4L,
+    num_shared_encode = 0L,
+    num_shared_decode = 0L,
+    refit_patience    = 1L,
+    refit_loops       = 1L,
+    epochs_per_loop   = 1L,
+    reset_lr_refit    = TRUE,
+    show_progress     = FALSE,
+    verbose           = FALSE
+  )
+
+  feature_names <- reticulate::py_to_r(res$cluster_dataset$feature_names)
+  val_mask <- reticulate::py_to_r(res$cluster_dataset$val_mask$cpu()$numpy())
+
+  c1b1_idx <- match("C1b1", feature_names)
+  c1b2_idx <- match("C1b2", feature_names)
+
+  expect_false(isTRUE(val_mask[1, c1b1_idx]))
+  expect_false(isTRUE(val_mask[1, c1b2_idx]))
+})
+
+
+test_that("autotune stores categorical_column_map on returned cluster_dataset", {
+  skip_if_no_cissvae_py()
+
+  df <- make_categorical_validation_data()
+
+  binary_feature_mask <- c(
+    index = FALSE,
+    X1 = FALSE,
+    X2 = FALSE,
+    B1 = TRUE,
+    B2 = TRUE,
+    C1b1 = TRUE,
+    C1b2 = TRUE,
+    C2b1 = TRUE,
+    C2b2 = TRUE
+  )
+
+  categorical_column_map <- list(
+    C1 = c("C1b1", "C1b2"),
+    C2 = c("C2b1", "C2b2")
+  )
+
+  clusters <- c(0L, 0L, 0L, 1L, 1L, 1L)
+
+  res <- autotune_cissvae(
+    data = df,
+    clusters = clusters,
+    index_col = "index",
+    binary_feature_mask = binary_feature_mask,
+    categorical_column_map = categorical_column_map,
+    val_proportion = 0.5,
+    n_trials = 1L,
+    device_preference = "cpu",
+    load_if_exists = FALSE,
+
+    num_hidden_layers = 1L,
+    hidden_dims       = 8L,
+    latent_dim        = 4L,
+    latent_shared     = TRUE,
+    output_shared     = FALSE,
+    lr                = 1e-3,
+    decay_factor      = 0.95,
+    weight_decay      = 0.001,
+    beta              = 0.01,
+    num_epochs        = 1L,
+    batch_size        = 4L,
+    num_shared_encode = 0L,
+    num_shared_decode = 0L,
+    refit_patience    = 1L,
+    refit_loops       = 1L,
+    epochs_per_loop   = 1L,
+    reset_lr_refit    = TRUE,
+    show_progress     = FALSE,
+    verbose           = FALSE
+  )
+
+  returned_map <- reticulate::py_to_r(res$cluster_dataset$categorical_column_map)
+
+  expect_equal(returned_map$C1, c("C1b1", "C1b2"))
+  expect_equal(returned_map$C2, c("C2b1", "C2b2"))
+})
+
+
+test_that("autotune rejects categorical_column_map when dummy columns are not marked binary", {
+  skip_if_no_cissvae_py()
+
+  df <- make_categorical_validation_data()
+
+  bad_binary_feature_mask <- c(
+    index = FALSE,
+    X1 = FALSE,
+    X2 = FALSE,
+    B1 = TRUE,
+    B2 = TRUE,
+    C1b1 = FALSE,
+    C1b2 = TRUE,
+    C2b1 = TRUE,
+    C2b2 = TRUE
+  )
+
+  categorical_column_map <- list(
+    C1 = c("C1b1", "C1b2"),
+    C2 = c("C2b1", "C2b2")
+  )
+
+  clusters <- c(0L, 0L, 0L, 1L, 1L, 1L)
+
+  expect_error(
+    autotune_cissvae(
+      data = df,
+      clusters = clusters,
+      index_col = "index",
+      binary_feature_mask = bad_binary_feature_mask,
+      categorical_column_map = categorical_column_map,
+      val_proportion = 0.5,
+      n_trials = 1L,
+      device_preference = "cpu",
+      load_if_exists = FALSE,
+
+      num_hidden_layers = 1L,
+      hidden_dims       = 8L,
+      latent_dim        = 4L,
+      latent_shared     = TRUE,
+      output_shared     = FALSE,
+      lr                = 1e-3,
+      decay_factor      = 0.95,
+      weight_decay      = 0.001,
+      beta              = 0.01,
+      num_epochs        = 1L,
+      batch_size        = 4L,
+      num_shared_encode = 0L,
+      num_shared_decode = 0L,
+      refit_patience    = 1L,
+      refit_loops       = 1L,
+      epochs_per_loop   = 1L,
+      reset_lr_refit    = TRUE,
+      show_progress     = FALSE,
+      verbose           = FALSE
+    ),
+    regexp = "not marked True in binary_feature_mask"
+  )
+})

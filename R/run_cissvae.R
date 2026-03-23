@@ -85,6 +85,7 @@
 #'   during training (contains validation data, masks, etc.). Default `FALSE`.
 #' @param imputable_matrix Logical matrix indicating entries allowed to be imputed.
 #' @param binary_feature_mask Logical vector marking which columns are binary.
+#' @param categorical_column_map Named list. Maps generated dummy variable column names to the original categorical column name. 
 #' @param weight_decay Weight decay (L2 penalty) used in Adam optimizer.
 #' @param debug Logical; if TRUE, additional metadata is returned for debugging.
 #' @param return_validation_dataset Logical. If `TRUE` returns validation dataset 
@@ -176,6 +177,7 @@ run_cissvae <- function(
   cols_ignore         = NULL,
   imputable_matrix   = NULL,
   binary_feature_mask = NULL,
+  categorical_column_map =  NULL,
   print_dataset          = TRUE, 
   ## Cluster stuff
   clusters               = NULL,
@@ -244,6 +246,12 @@ run_cissvae <- function(
     return_clusters = TRUE
   }
 
+  if(!is.null(categorical_column_map)){
+    if(&is.null(binary_feature_mask)){
+      stop("`binary_feature_mask` is required when using categorical_column_map.")
+    }
+  }
+
   ## preserve raw data
   data_raw = as.data.frame(data)
 
@@ -284,6 +292,9 @@ run_cissvae <- function(
   hidden_dims     <- as.integer(hidden_dims)
   layer_order_enc <- as.character(layer_order_enc)
   layer_order_dec <- as.character(layer_order_dec)
+
+  ## handle categorical_column_map
+  py_categorical_column_map =  r_to_py(categorical_column_map)
   
   ## step 2: handle index col if passed
   if (!is.null(index_col)) {
@@ -383,6 +394,7 @@ run_cissvae <- function(
     n_clusters            = n_clusters,
     seed                  = seed,
     binary_feature_mask  = reticulate::r_to_py(binary_feature_mask),
+    categorical_column_map =  py_categorical_column_map ,
     missingness_proportion_matrix = prop_matrix_py,
     scale_features        = scale_features,
     hidden_dims           = reticulate::r_to_py(hidden_dims),

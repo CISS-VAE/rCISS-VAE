@@ -1,3 +1,9 @@
+# rCISSVAE v0.0.6
+## Updates
+- Added `categorical_column_map` to fix the preparation of valdata for caegorical columns
+- Added `update_cissvae_env` to update the cissvae environment when needed. 
+
+
 # rCISSVAE v0.0.5
 ## Updates
 - `performance_by_cluster()` imputation error calculation now matches python implementation

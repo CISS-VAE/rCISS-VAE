@@ -247,6 +247,12 @@ autotune_cissvae <- function(
     }
   } else index_vals <- NULL
 
+    if(!is.null(categorical_column_map)){
+    if(&is.null(binary_feature_mask)){
+      stop("`binary_feature_mask` is required when using categorical_column_map.")
+    }
+  }
+
   # -- 3.1) Ensure data and mask columns match EXACTLY (after index removal) --
 if (!is.null(imputable_matrix)) {
   if (!identical(colnames(data), colnames(imputable_matrix))) {
@@ -341,6 +347,9 @@ if (!is.null(imputable_matrix)) {
     }
   }
 
+    ## handle categorical_column_map
+  py_categorical_column_map =  r_to_py(categorical_column_map)
+
   ## correctly set up the cluster dataset
   train_ds_py <- CD_mod(
     data = data_py, 
@@ -350,7 +359,8 @@ if (!is.null(imputable_matrix)) {
     columns_ignore = cols_ignore_py, 
     imputable = dni_py,
     val_seed = seed,
-    binary_feature_mask =  reticulate::r_to_py(binary_feature_mask))
+    binary_feature_mask =  reticulate::r_to_py(binary_feature_mask),
+    categorical_column_map = py_categorical_column_map)
 
   
   if(debug){

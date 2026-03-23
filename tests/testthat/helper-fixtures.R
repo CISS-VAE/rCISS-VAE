@@ -99,6 +99,22 @@ make_large_sample_data <- function() {
   df
 }
 
+## Categorical validation data
+
+make_categorical_validation_data <- function() {
+  data.frame(
+    index = 1:6,
+    X1    = c(1, 2, 3, 4, 5, 6),
+    X2    = c(10, 20, 30, 40, 50, 60),
+    B1    = c(0, 1, 0, 1, 0, 1),
+    B2    = c(1, 0, 1, 0, 1, 0),
+    C1b1  = c(1, 0, 1, 0, 1, 0),
+    C1b2  = c(0, 1, 0, 1, 0, 1),
+    C2b1  = c(1, 1, 0, 0, 1, 0),
+    C2b2  = c(0, 0, 1, 1, 0, 1)
+  )
+}
+
 # -------------------------------------------------------------------
 # Minimal parameter sets (updated for modern run_cissvae and autotune API)
 # -------------------------------------------------------------------
@@ -228,3 +244,271 @@ make_sample_data_binary = function() {
 
   return(df)
 }
+
+# -------------------------------
+# Implement Categorical column map
+# -------------------------------
+
+test_that("categorical_column_map creates validation units using original category names", {
+  skip_if_no_cissvae_py()
+
+  df <- make_categorical_validation_data()
+
+  binary_feature_mask <- c(
+    index = FALSE,
+    X1 = FALSE,
+    X2 = FALSE,
+    B1 = TRUE,
+    B2 = TRUE,
+    C1b1 = TRUE,
+    C1b2 = TRUE,
+    C2b1 = TRUE,
+    C2b2 = TRUE
+  )
+
+  categorical_column_map <- list(
+    C1 = c("C1b1", "C1b2"),
+    C2 = c("C2b1", "C2b2")
+  )
+
+  res <- run_cissvae(
+    data = df,
+    index_col = "index",
+    binary_feature_mask = binary_feature_mask,
+    categorical_column_map = categorical_column_map,
+    clusters = c(0, 0, 0, 1, 1, 1),
+    val_proportion = 0.5,
+    seed = 42,
+    hidden_dims = c(4, 2),
+    latent_dim = 2,
+    layer_order_enc = c("unshared", "shared"),
+    layer_order_dec = c("unshared", "shared"),
+    epochs = 1,
+    max_loops = 1,
+    epochs_per_loop = 1,
+    return_dataset = TRUE,
+    verbose = FALSE
+  )
+
+  validation_units <- reticulate::py_to_r(res$cluster_dataset$validation_units)
+
+  expect_true(all(c("X1", "X2", "B1", "B2", "C1", "C2") %in% names(validation_units)))
+  expect_false(any(c("C1b1", "C1b2", "C2b1", "C2b2") %in% names(validation_units)))
+
+  expect_equal(validation_units$C1$kind, "categorical")
+  expect_equal(validation_units$C2$kind, "categorical")
+
+  feature_names <- reticulate::py_to_r(res$cluster_dataset$feature_names)
+
+  c1_cols <- unlist(validation_units$C1$cols) + 1L
+  c2_cols <- unlist(validation_units$C2$cols) + 1L
+
+  expect_equal(feature_names[c1_cols], c("C1b1", "C1b2"))
+  expect_equal(feature_names[c2_cols], c("C2b1", "C2b2"))
+})
+
+
+test_that("categorical_column_map masks all dummy variables in a category together", {
+  skip_if_no_cissvae_py()
+
+  df <- make_categorical_validation_data()
+
+  binary_feature_mask <- c(
+    index = FALSE,
+    X1 = FALSE,
+    X2 = FALSE,
+    B1 = TRUE,
+    B2 = TRUE,
+    C1b1 = TRUE,
+    C1b2 = TRUE,
+    C2b1 = TRUE,
+    C2b2 = TRUE
+  )
+
+  categorical_column_map <- list(
+    C1 = c("C1b1", "C1b2"),
+    C2 = c("C2b1", "C2b2")
+  )
+
+  res <- run_cissvae(
+    data = df,
+    index_col = "index",
+    binary_feature_mask = binary_feature_mask,
+    categorical_column_map = categorical_column_map,
+    clusters = c(0, 0, 0, 1, 1, 1),
+    val_proportion = 0.5,
+    seed = 42,
+    hidden_dims = c(4, 2),
+    latent_dim = 2,
+    layer_order_enc = c("unshared", "shared"),
+    layer_order_dec = c("unshared", "shared"),
+    epochs = 1,
+    max_loops = 1,
+    epochs_per_loop = 1,
+    return_dataset = TRUE,
+    verbose = FALSE
+  )
+
+  feature_names <- reticulate::py_to_r(res$cluster_dataset$feature_names)
+  val_mask <- reticulate::py_to_r(res$cluster_dataset$val_mask$cpu()$numpy())
+
+  c1b1_idx <- match("C1b1", feature_names)
+  c1b2_idx <- match("C1b2", feature_names)
+  c2b1_idx <- match("C2b1", feature_names)
+  c2b2_idx <- match("C2b2", feature_names)
+
+  expect_equal(val_mask[, c1b1_idx], val_mask[, c1b2_idx])
+  expect_equal(val_mask[, c2b1_idx], val_mask[, c2b2_idx])
+})
+
+
+test_that("categorical_column_map respects partially missing dummy groups", {
+  skip_if_no_cissvae_py()
+
+  df <- make_categorical_validation_data()
+
+  # Make first row partially missing for C1:
+  # this row should not be eligible for grouped validation masking for C1
+  df$C1b1[1] <- NA
+  df$C1b2[1] <- 0
+
+  binary_feature_mask <- c(
+    index = FALSE,
+    X1 = FALSE,
+    X2 = FALSE,
+    B1 = TRUE,
+    B2 = TRUE,
+    C1b1 = TRUE,
+    C1b2 = TRUE,
+    C2b1 = TRUE,
+    C2b2 = TRUE
+  )
+
+  categorical_column_map <- list(
+    C1 = c("C1b1", "C1b2"),
+    C2 = c("C2b1", "C2b2")
+  )
+
+  res <- run_cissvae(
+    data = df,
+    index_col = "index",
+    binary_feature_mask = binary_feature_mask,
+    categorical_column_map = categorical_column_map,
+    clusters = c(0, 0, 0, 1, 1, 1),
+    val_proportion = 0.5,
+    seed = 42,
+    hidden_dims = c(4, 2),
+    latent_dim = 2,
+    layer_order_enc = c("unshared", "shared"),
+    layer_order_dec = c("unshared", "shared"),
+    epochs = 1,
+    max_loops = 1,
+    epochs_per_loop = 1,
+    return_dataset = TRUE,
+    verbose = FALSE
+  )
+
+  feature_names <- reticulate::py_to_r(res$cluster_dataset$feature_names)
+  val_mask <- reticulate::py_to_r(res$cluster_dataset$val_mask$cpu()$numpy())
+
+  c1b1_idx <- match("C1b1", feature_names)
+  c1b2_idx <- match("C1b2", feature_names)
+
+  expect_false(isTRUE(val_mask[1, c1b1_idx]))
+  expect_false(isTRUE(val_mask[1, c1b2_idx]))
+})
+
+
+test_that("categorical_column_map is stored correctly on returned cluster_dataset", {
+  skip_if_no_cissvae_py()
+
+  df <- make_categorical_validation_data()
+
+  binary_feature_mask <- c(
+    index = FALSE,
+    X1 = FALSE,
+    X2 = FALSE,
+    B1 = TRUE,
+    B2 = TRUE,
+    C1b1 = TRUE,
+    C1b2 = TRUE,
+    C2b1 = TRUE,
+    C2b2 = TRUE
+  )
+
+  categorical_column_map <- list(
+    C1 = c("C1b1", "C1b2"),
+    C2 = c("C2b1", "C2b2")
+  )
+
+  res <- run_cissvae(
+    data = df,
+    index_col = "index",
+    binary_feature_mask = binary_feature_mask,
+    categorical_column_map = categorical_column_map,
+    clusters = c(0, 0, 0, 1, 1, 1),
+    val_proportion = 0.5,
+    seed = 42,
+    hidden_dims = c(4, 2),
+    latent_dim = 2,
+    layer_order_enc = c("unshared", "shared"),
+    layer_order_dec = c("unshared", "shared"),
+    epochs = 1,
+    max_loops = 1,
+    epochs_per_loop = 1,
+    return_dataset = TRUE,
+    verbose = FALSE
+  )
+
+  returned_map <- reticulate::py_to_r(res$cluster_dataset$categorical_column_map)
+
+  expect_equal(returned_map$C1, c("C1b1", "C1b2"))
+  expect_equal(returned_map$C2, c("C2b1", "C2b2"))
+})
+
+
+test_that("categorical_column_map requires dummy columns to be marked binary", {
+  skip_if_no_cissvae_py()
+
+  df <- make_categorical_validation_data()
+
+  # Deliberately mark one dummy as non-binary to trigger the validation error
+  bad_binary_feature_mask <- c(
+    index = FALSE,
+    X1 = FALSE,
+    X2 = FALSE,
+    B1 = TRUE,
+    B2 = TRUE,
+    C1b1 = FALSE,
+    C1b2 = TRUE,
+    C2b1 = TRUE,
+    C2b2 = TRUE
+  )
+
+  categorical_column_map <- list(
+    C1 = c("C1b1", "C1b2"),
+    C2 = c("C2b1", "C2b2")
+  )
+
+  expect_error(
+    run_cissvae(
+      data = df,
+      index_col = "index",
+      binary_feature_mask = bad_binary_feature_mask,
+      categorical_column_map = categorical_column_map,
+      clusters = c(0, 0, 0, 1, 1, 1),
+      val_proportion = 0.5,
+      seed = 42,
+      hidden_dims = c(4, 2),
+      latent_dim = 2,
+      layer_order_enc = c("unshared", "shared"),
+      layer_order_dec = c("unshared", "shared"),
+      epochs = 1,
+      max_loops = 1,
+      epochs_per_loop = 1,
+      return_dataset = TRUE,
+      verbose = FALSE
+    ),
+    regexp = "not marked True in binary_feature_mask"
+  )
+})

@@ -44,6 +44,7 @@
 #' @param cols_ignore Character vector of column names to exclude from imputation scoring.
 #' @param imputable_matrix Logical matrix indicating entries allowed to be imputed.
 #' @param binary_feature_mask Logical vector marking which columns are binary.
+#' @param categorical_column_map Named list indicating what categorical column dummy variables belong to.
 #' @param weight_decay Weight decay (L2 penalty) used in Adam optimizer.
 #' @param debug Logical; if TRUE, additional metadata is returned for debugging.
 #' @param columns_ignore Alias of cols_ignore. Kept for continuity. 
@@ -138,6 +139,7 @@ autotune_cissvae <- function(
   cols_ignore         = NULL,
   imputable_matrix   = NULL,
   binary_feature_mask = NULL,
+  categorical_column_map = NULL,
   clusters, ## cluster identities must be provided by user
   save_model_path        = NULL,
   save_search_space_path = NULL,
@@ -248,7 +250,7 @@ autotune_cissvae <- function(
   } else index_vals <- NULL
 
     if(!is.null(categorical_column_map)){
-    if(&is.null(binary_feature_mask)){
+    if(is.null(binary_feature_mask)){
       stop("`binary_feature_mask` is required when using categorical_column_map.")
     }
   }
@@ -348,7 +350,7 @@ if (!is.null(imputable_matrix)) {
   }
 
     ## handle categorical_column_map
-  py_categorical_column_map =  r_to_py(categorical_column_map)
+  py_categorical_column_map =  reticulate::r_to_py(categorical_column_map)
 
   ## correctly set up the cluster dataset
   train_ds_py <- CD_mod(
@@ -470,6 +472,6 @@ if (!is.null(imputable_matrix)) {
     print("added valimputed")
   }
 
-  return(out)
+  return(new_impute_result(out))
 
 }

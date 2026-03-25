@@ -60,7 +60,7 @@ and returns an imputed data frame in R.
 ## Wrapped in try() and donttest to avoid CRAN check failures
 \donttest{
 try({
-  # Activate your reticulate Python environment with ciss-vae installed
+  # Activate your reticulate Python environment with ciss_vae installed
   reticulate::use_virtualenv("cissvae_environment", required = TRUE)
 
   # Load example data and clusters (replace with your own)

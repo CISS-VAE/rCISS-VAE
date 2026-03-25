@@ -2,6 +2,8 @@
 ## Updates
 - Added `categorical_column_map` to fix the preparation of valdata for caegorical columns
 - Added `update_cissvae_env` to update the cissvae environment when needed. 
+- Added `impute_result` class and save/load methods for `impute_result` class
+- `save_cissvae_model()` and `load_cissvae_model()` can now save and load state_dicts as well as full models. State_dict is preferred. 
 
 
 # rCISSVAE v0.0.5

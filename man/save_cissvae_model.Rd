@@ -2,55 +2,81 @@
 % Please edit documentation in R/save_load_models.R
 \name{save_cissvae_model}
 \alias{save_cissvae_model}
-\title{Save a trained Python CISS-VAE model to disk}
+\title{Save a trained CISS-VAE model to disk}
 \usage{
-save_cissvae_model(model, file)
+save_cissvae_model(
+  model,
+  file,
+  method = c("state_dict", "full"),
+  overwrite = FALSE
+)
 }
 \arguments{
-\item{model}{Python model object (e.g., res$model from run_cissvae)}
+\item{model}{A \code{CISSVAE} Python object (reticulate proxy), e.g.,
+\code{res$model} from \code{run_cissvae()}.}
 
-\item{file}{Path where the model will be saved (e.g., "trained_vae.pt")}
+\item{file}{Character string. File path for the saved model. For
+\code{method = "state_dict"} two files are written:
+\itemize{
+\item \code{<file>} — the PyTorch \code{state_dict} checkpoint
+(\code{.pt}).
+\item \code{<file>.config.rds} — the architecture config needed to
+reconstruct the model on load.
+}
+For \code{method = "full"} only \code{<file>} is written.}
+
+\item{method}{Character string. One of \code{"state_dict"} (default) or
+\code{"full"}.
+\describe{
+\item{\code{"state_dict"}}{Saves weights and architecture config
+separately. Recommended. Requires \code{load_cissvae_model()} to
+reload.}
+\item{\code{"full"}}{Saves the entire Python object with
+\code{torch.save}. Less portable; may break across PyTorch versions.}
+}}
+
+\item{overwrite}{Logical. If \code{FALSE} (default), an error is raised
+when output files already exist.}
 }
 \value{
-NULL. Called for side effects.
+\code{NULL}, invisibly. Called for its side effects.
 }
 \description{
-Uses reticulate to call Python's torch.save on a model object returned
-from run_cissvae (or any Python model in the R session).
+Saves a trained \code{CISSVAE} PyTorch model to disk. The default method
+(\code{method = "state_dict"}) saves only the model weights alongside an
+automatically captured architecture config, which is the recommended
+approach for portability and long-term reproducibility. A full-object save
+(\code{method = "full"}) is also available but is less portable across
+Python / PyTorch versions.
 }
 \examples{
 \donttest{
-## Requires a working Python environment via reticulate
-## Examples are wrapped in try() to avoid failures on CRAN check
 try({
   reticulate::use_virtualenv("cissvae_environment", required = TRUE)
   data(df_missing)
   data(clusters)
 
-  ## Run CISS-VAE training
-  dat <- try(
-    run_cissvae(
-      data = df_missing,
-      index_col = "index",
-      val_proportion = 0.1,
-      cols_ignore = c(
-        "Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"
-      ),
-      clusters = clusters$clusters,
-      epochs = 5,
-      return_silhouettes = FALSE,
-      return_history = TRUE,
-      verbose = FALSE,
-      return_model = TRUE,
-      device = "cpu",
-      layer_order_enc = c("unshared", "shared", "unshared"),
-      layer_order_dec = c("shared", "unshared", "shared")
-    ),
-    silent = TRUE
+  dat <- run_cissvae(
+    data             = df_missing,
+    index_col        = "index",
+    val_proportion   = 0.1,
+    clusters         = clusters$clusters,
+    epochs           = 5,
+    return_model     = TRUE,
+    device           = "cpu",
+    layer_order_enc  = c("unshared", "shared", "unshared"),
+    layer_order_dec  = c("shared",   "unshared", "shared")
   )
 
-  ## Save the trained model to a temporary file (CRAN-safe)
-  tmpfile <- tempfile(fileext = ".pt")
-  try(save_cissvae_model(dat$model, tmpfile), silent = TRUE)
-})}
+  # default: saves state_dict + config
+  save_cissvae_model(dat$model, file = tempfile(fileext = ".pt"))
+
+  # alternative: full object save
+  save_cissvae_model(dat$model, file = tempfile(fileext = ".pt"),
+                     method = "full")
+})
+}
+}
+\seealso{
+\code{\link{load_cissvae_model}}, \code{\link{save_impute_result}}
 }

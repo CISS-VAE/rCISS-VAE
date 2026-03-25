@@ -12,6 +12,7 @@ autotune_cissvae(
   cols_ignore = NULL,
   imputable_matrix = NULL,
   binary_feature_mask = NULL,
+  categorical_column_map = NULL,
   clusters,
   save_model_path = NULL,
   save_search_space_path = NULL,
@@ -63,6 +64,8 @@ autotune_cissvae(
 \item{imputable_matrix}{Logical matrix indicating entries allowed to be imputed.}
 
 \item{binary_feature_mask}{Logical vector marking which columns are binary.}
+
+\item{categorical_column_map}{Named list indicating what categorical column dummy variables belong to.}
 
 \item{clusters}{Integer vector specifying cluster assignments for each row.}
 

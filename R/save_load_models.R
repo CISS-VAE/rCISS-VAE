@@ -1,97 +1,231 @@
-#' Save a trained Python CISS-VAE model to disk
+#' Save a trained CISS-VAE model to disk
 #'
-#' Uses reticulate to call Python's torch.save on a model object returned
-#' from run_cissvae (or any Python model in the R session).
+#' Saves a trained \code{CISSVAE} PyTorch model to disk. The default method
+#' (\code{method = "state_dict"}) saves only the model weights alongside an
+#' automatically captured architecture config, which is the recommended
+#' approach for portability and long-term reproducibility. A full-object save
+#' (\code{method = "full"}) is also available but is less portable across
+#' Python / PyTorch versions.
 #'
-#' @param model Python model object (e.g., res$model from run_cissvae)
-#' @param file Path where the model will be saved (e.g., "trained_vae.pt")
-#' @return NULL. Called for side effects.
-#' @importFrom reticulate import
+#' @param model A \code{CISSVAE} Python object (reticulate proxy), e.g.,
+#'   \code{res$model} from \code{run_cissvae()}.
+#' @param file Character string. File path for the saved model. For
+#'   \code{method = "state_dict"} two files are written:
+#'   \itemize{
+#'     \item \code{<file>} — the PyTorch \code{state_dict} checkpoint
+#'       (\code{.pt}).
+#'     \item \code{<file>.config.rds} — the architecture config needed to
+#'       reconstruct the model on load.
+#'   }
+#'   For \code{method = "full"} only \code{<file>} is written.
+#' @param method Character string. One of \code{"state_dict"} (default) or
+#'   \code{"full"}.
+#'   \describe{
+#'     \item{\code{"state_dict"}}{Saves weights and architecture config
+#'       separately. Recommended. Requires \code{load_cissvae_model()} to
+#'       reload.}
+#'     \item{\code{"full"}}{Saves the entire Python object with
+#'       \code{torch.save}. Less portable; may break across PyTorch versions.}
+#'   }
+#' @param overwrite Logical. If \code{FALSE} (default), an error is raised
+#'   when output files already exist.
+#'
+#' @return \code{NULL}, invisibly. Called for its side effects.
+#'
+#' @seealso \code{\link{load_cissvae_model}}, \code{\link{save_impute_result}}
+#'
+#' @importFrom reticulate import py_has_attr py_to_r
+#'
+#' @export
+#'
 #' @examples
 #' \donttest{
-#' ## Requires a working Python environment via reticulate
-#' ## Examples are wrapped in try() to avoid failures on CRAN check
 #' try({
 #'   reticulate::use_virtualenv("cissvae_environment", required = TRUE)
 #'   data(df_missing)
 #'   data(clusters)
 #'
-#'   ## Run CISS-VAE training
-#'   dat <- try(
-#'     run_cissvae(
-#'       data = df_missing,
-#'       index_col = "index",
-#'       val_proportion = 0.1,
-#'       cols_ignore = c(
-#'         "Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"
-#'       ),
-#'       clusters = clusters$clusters,
-#'       epochs = 5,
-#'       return_silhouettes = FALSE,
-#'       return_history = TRUE,
-#'       verbose = FALSE,
-#'       return_model = TRUE,
-#'       device = "cpu",
-#'       layer_order_enc = c("unshared", "shared", "unshared"),
-#'       layer_order_dec = c("shared", "unshared", "shared")
-#'     ),
-#'     silent = TRUE
+#'   dat <- run_cissvae(
+#'     data             = df_missing,
+#'     index_col        = "index",
+#'     val_proportion   = 0.1,
+#'     clusters         = clusters$clusters,
+#'     epochs           = 5,
+#'     return_model     = TRUE,
+#'     device           = "cpu",
+#'     layer_order_enc  = c("unshared", "shared", "unshared"),
+#'     layer_order_dec  = c("shared",   "unshared", "shared")
 #'   )
 #'
-#'   ## Save the trained model to a temporary file (CRAN-safe)
-#'   tmpfile <- tempfile(fileext = ".pt")
-#'   try(save_cissvae_model(dat$model, tmpfile), silent = TRUE)
-#' })}
-#' @export
-save_cissvae_model <- function(model, file) {
-  # Import torch via reticulate
-  torch <- reticulate::import("torch")
-  # Save full model (architecture + weights)
-  torch$save(model, file)
+#'   # default: saves state_dict + config
+#'   save_cissvae_model(dat$model, file = tempfile(fileext = ".pt"))
+#'
+#'   # alternative: full object save
+#'   save_cissvae_model(dat$model, file = tempfile(fileext = ".pt"),
+#'                      method = "full")
+#' })
+#' }
+save_cissvae_model <- function(model,
+                               file,
+                               method    = c("state_dict", "full"),
+                               overwrite = FALSE) {
+
+  method <- match.arg(method)
+  torch  <- reticulate::import("torch", delay_load = FALSE)
+
+  config_path <- paste0(file, ".config.rds")
+
+  if (!overwrite) {
+    existing <- c(
+      if (file.exists(file))        file,
+      if (method == "state_dict" &&
+          file.exists(config_path)) config_path
+    )
+    if (length(existing) > 0) {
+      stop(
+        "File(s) already exist: ",
+        paste(existing, collapse = ", "),
+        ". Use overwrite = TRUE."
+      )
+    }
+  }
+
+  if (method == "state_dict") {
+
+    if (!reticulate::py_has_attr(model, "state_dict")) {
+      stop("`model` does not appear to be a torch nn.Module (missing state_dict).")
+    }
+
+    # capture architecture config from the live model
+    config <- .cissvae_config(model)
+
+    torch$save(model$state_dict(), file)
+    saveRDS(config, config_path)
+
+    message("Saved state_dict to '", file, "'")
+    message("Saved model config to '", config_path, "'")
+
+  } else {
+
+    torch$save(model, file)
+    message("Saved full model object to '", file, "'")
+
+  }
+
+  invisible(NULL)
 }
 
 
-#' Load a saved Python CISS-VAE model
+#' Load a saved CISS-VAE model
 #'
-#' Loads a full CISSVAE model into R via reticulate.
+#' Loads a \code{CISSVAE} model previously saved by
+#' \code{\link{save_cissvae_model}}. When the model was saved with
+#' \code{method = "state_dict"} (the default), the architecture is
+#' automatically reconstructed from the paired \code{.config.rds} file and
+#' the weights are loaded via \code{load_state_dict}. When the model was saved
+#' with \code{method = "full"}, the entire Python object is deserialised
+#' directly.
 #'
-#' @param file Path to the saved model file (e.g., "trained_vae.pt")
-#' @param python_env Optional: Python virtualenv or conda env to activate
-#' @return CISSVAE model object
+#' The \code{CISSVAE} class is imported from the installed
+#' \code{ciss_vae.classes} Python package using \code{importlib} (necessary
+#' because the hyphen in the package name prevents direct attribute access via
+#' \code{reticulate::import}).
+#'
+#' @param file Character string. Path to the saved model file (\code{.pt}).
+#'   For \code{method = "state_dict"}, a paired \code{<file>.config.rds} must
+#'   exist in the same location (written automatically by
+#'   \code{\link{save_cissvae_model}}).
+#' @param method Character string. One of \code{"state_dict"} (default) or
+#'   \code{"full"}. Must match the method used when saving.
+#' @param device Character string. PyTorch device string passed to
+#'   \code{torch.load} as \code{map_location}. Defaults to \code{"cpu"}.
+#'   Use \code{"cuda"} to load directly onto GPU.
+#' @param python_env Optional character string. Name of a virtualenv or conda
+#'   environment to activate before loading. If \code{NULL} (default), the
+#'   currently active Python session is used.
+#'
+#' @return A \code{CISSVAE} Python object in evaluation mode
+#'   (\code{model.eval()} has been called).
+#'
+#' @seealso \code{\link{save_cissvae_model}}, \code{\link{load_impute_result}}
+#'
+#' @importFrom reticulate import py_run_string use_virtualenv
+#'
+#' @export
+#'
 #' @examples
 #' \donttest{
-#' ## Requires a working Python environment via reticulate
-#' ## Wrapped in try() and donttest to avoid CRAN check failures
 #' try({
-#'   # Activate the Python virtualenv or conda env where CISSVAE is installed
 #'   reticulate::use_virtualenv("cissvae_environment", required = TRUE)
 #'
-#'   # Path to a previously saved model file
-#'   model_file <- "trained_vae.pt"
+#'   pt_file <- tempfile(fileext = ".pt")
 #'
-#'   # Load the CISS-VAE model
-#'   loaded_model <- try(
-#'     load_cissvae_model(file = model_file, python_env = "cissvae_environment")
-#'   )
+#'   # save first
+#'   save_cissvae_model(dat$model, file = pt_file)
 #'
+#'   # reload in same or new session
+#'   model <- load_cissvae_model(file = pt_file, device = "cpu")
 #' })
 #' }
-#' @export
-load_cissvae_model <- function(file, python_env = NULL) {
+load_cissvae_model <- function(file,
+                               method     = c("state_dict", "full"),
+                               device     = "cpu",
+                               python_env = NULL) {
+
+  method <- match.arg(method)
+
   if (!is.null(python_env)) {
     reticulate::use_virtualenv(python_env, required = TRUE)
   }
 
-  # Import torch and ensure VAE class is registered
-  torch <- reticulate::import("torch")
-  reticulate::import("ciss_vae.classes.vae")
+  if (!file.exists(file)) {
+    stop("Model file not found: '", file, "'.")
+  }
 
-  # Load and put model into eval mode
-  model <- torch$load(file, map_location = "cpu", weights_only = FALSE)
+  torch <- reticulate::import("torch", delay_load = FALSE)
+
+  if (method == "state_dict") {
+
+    config_path <- paste0(file, ".config.rds")
+    if (!file.exists(config_path)) {
+      stop(
+        "Config file not found: '", config_path, "'. ",
+        "Expected alongside '", file, "' when method = 'state_dict'. ",
+        "If the model was saved with method = 'full', use method = 'full' here."
+      )
+    }
+
+    cfg <- readRDS(config_path)
+
+    mod <- reticulate::py_run_string(
+      "import importlib; _mod = importlib.import_module('ciss_vae.classes')"
+    )$`_mod`
+
+    model <- mod$CISSVAE(
+      input_dim           = cfg$input_dim,
+      hidden_dims         = cfg$hidden_dims,
+      layer_order_enc     = cfg$layer_order_enc,
+      layer_order_dec     = cfg$layer_order_dec,
+      latent_shared       = cfg$latent_shared,
+      latent_dim          = cfg$latent_dim,
+      output_shared       = cfg$output_shared,
+      num_clusters        = cfg$num_clusters,
+      binary_feature_mask = cfg$binary_feature_mask,
+      debug               = FALSE
+    )
+
+    sd <- torch$load(file, map_location = device)
+    model$load_state_dict(sd)
+
+  } else {
+
+    model <- torch$load(file, map_location = device, weights_only = FALSE)
+
+  }
+
   model$eval()
-  return(model)
+  model
 }
-
 
 
 
@@ -123,7 +257,7 @@ load_cissvae_model <- function(file, python_env = NULL) {
 #' ## Wrapped in try() and donttest to avoid CRAN check failures
 #' \donttest{
 #' try({
-#'   # Activate your reticulate Python environment with ciss-vae installed
+#'   # Activate your reticulate Python environment with ciss_vae installed
 #'   reticulate::use_virtualenv("cissvae_environment", required = TRUE)
 #'
 #'   # Load example data and clusters (replace with your own)
@@ -181,16 +315,14 @@ impute_with_cissvae <- function(model,  data, index_col = NULL, cols_ignore= NUL
     index_vals <- data[[index_col]]
     data       <- data[, setdiff(colnames(data), 
       index_col), drop = FALSE]
-    imputable_matrix = imputable_matrix[, setdiff(colnames(imputable_matrix), 
-      index_col), drop = FALSE]
+    if (!is.null(imputable_matrix)) {
+      imputable_matrix <- imputable_matrix[, setdiff(colnames(imputable_matrix), index_col), drop = FALSE]
+    }
     ## handle index col in binary_feature_mask
     if(!is.null(binary_feature_mask) & !is.null(names(binary_feature_mask))){
       binary_feature_mask =  binary_feature_mask[ setdiff(names(binary_feature_mask), 
         index_col), drop = FALSE]
-      if(debug){
-        cat("Binary feature mask: ", 
-        paste0(names(binary_feature_mask), collapse = ", "))
-      }
+      
     }
   } else index_vals <- NULL
 
@@ -272,7 +404,6 @@ if (!is.null(batch_size)) {
 }
 
 ## --------------- send things to python =-=--------------
-
   ## Build dataset + loader
   dataset_py   <- CD_mod(
     data = data_py, 

@@ -11,7 +11,7 @@ and returns an imputed data frame in R."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -122,7 +122,7 @@ and returns an imputed data frame in R.</p>
 <span class="r-in"><span><span class="co">## Wrapped in try() and donttest to avoid CRAN check failures</span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="co"># Activate your reticulate Python environment with ciss-vae installed</span></span></span>
+<span class="r-in"><span>  <span class="co"># Activate your reticulate Python environment with ciss_vae installed</span></span></span>
 <span class="r-in"><span>  <span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_virtualenv</a></span><span class="op">(</span><span class="st">"cissvae_environment"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Load example data and clusters (replace with your own)</span></span></span>
@@ -148,11 +148,8 @@ and returns an imputed data frame in R.</p>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Error in py_call_impl(callable, call_args$unnamed, call_args$named) : </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   FileNotFoundError: [Errno 2] No such file or directory: 'model.pt'</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Run `reticulate::py_last_error()` for details.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Error in impute_with_cissvae(model = model, data = df_missing, index_col = "index",  : </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Loaded model has empty `layer_order_enc`/`layer_order_dec`. This usually means the R load routine reconstructed the model incorrectly (e.g., defaults) rather than restoring the original architecture/config.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in reticulate::use_virtualenv("cissvae_environment", required = TRUE) : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Directory ~/.virtualenvs/cissvae_environment is not a Python virtualenv</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

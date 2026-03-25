@@ -247,7 +247,7 @@ run_cissvae <- function(
   }
 
   if(!is.null(categorical_column_map)){
-    if(&is.null(binary_feature_mask)){
+    if(is.null(binary_feature_mask)){
       stop("`binary_feature_mask` is required when using categorical_column_map.")
     }
   }
@@ -294,7 +294,7 @@ run_cissvae <- function(
   layer_order_dec <- as.character(layer_order_dec)
 
   ## handle categorical_column_map
-  py_categorical_column_map =  r_to_py(categorical_column_map)
+  py_categorical_column_map =  reticulate::r_to_py(categorical_column_map)
   
   ## step 2: handle index col if passed
   if (!is.null(index_col)) {
@@ -519,6 +519,6 @@ run_cissvae <- function(
   }
 
     
-  return(out)
+  return(new_impute_result(out))
 
 }

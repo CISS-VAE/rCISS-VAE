@@ -2,37 +2,66 @@
 % Please edit documentation in R/save_load_models.R
 \name{load_cissvae_model}
 \alias{load_cissvae_model}
-\title{Load a saved Python CISS-VAE model}
+\title{Load a saved CISS-VAE model}
 \usage{
-load_cissvae_model(file, python_env = NULL)
+load_cissvae_model(
+  file,
+  method = c("state_dict", "full"),
+  device = "cpu",
+  python_env = NULL
+)
 }
 \arguments{
-\item{file}{Path to the saved model file (e.g., "trained_vae.pt")}
+\item{file}{Character string. Path to the saved model file (\code{.pt}).
+For \code{method = "state_dict"}, a paired \code{<file>.config.rds} must
+exist in the same location (written automatically by
+\code{\link{save_cissvae_model}}).}
 
-\item{python_env}{Optional: Python virtualenv or conda env to activate}
+\item{method}{Character string. One of \code{"state_dict"} (default) or
+\code{"full"}. Must match the method used when saving.}
+
+\item{device}{Character string. PyTorch device string passed to
+\code{torch.load} as \code{map_location}. Defaults to \code{"cpu"}.
+Use \code{"cuda"} to load directly onto GPU.}
+
+\item{python_env}{Optional character string. Name of a virtualenv or conda
+environment to activate before loading. If \code{NULL} (default), the
+currently active Python session is used.}
 }
 \value{
-CISSVAE model object
+A \code{CISSVAE} Python object in evaluation mode
+(\code{model.eval()} has been called).
 }
 \description{
-Loads a full CISSVAE model into R via reticulate.
+Loads a \code{CISSVAE} model previously saved by
+\code{\link{save_cissvae_model}}. When the model was saved with
+\code{method = "state_dict"} (the default), the architecture is
+automatically reconstructed from the paired \code{.config.rds} file and
+the weights are loaded via \code{load_state_dict}. When the model was saved
+with \code{method = "full"}, the entire Python object is deserialised
+directly.
+}
+\details{
+The \code{CISSVAE} class is imported from the installed
+\code{ciss_vae.classes} Python package using \code{importlib} (necessary
+because the hyphen in the package name prevents direct attribute access via
+\code{reticulate::import}).
 }
 \examples{
 \donttest{
-## Requires a working Python environment via reticulate
-## Wrapped in try() and donttest to avoid CRAN check failures
 try({
-  # Activate the Python virtualenv or conda env where CISSVAE is installed
   reticulate::use_virtualenv("cissvae_environment", required = TRUE)
 
-  # Path to a previously saved model file
-  model_file <- "trained_vae.pt"
+  pt_file <- tempfile(fileext = ".pt")
 
-  # Load the CISS-VAE model
-  loaded_model <- try(
-    load_cissvae_model(file = model_file, python_env = "cissvae_environment")
-  )
+  # save first
+  save_cissvae_model(dat$model, file = pt_file)
 
+  # reload in same or new session
+  model <- load_cissvae_model(file = pt_file, device = "cpu")
 })
 }
+}
+\seealso{
+\code{\link{save_cissvae_model}}, \code{\link{load_impute_result}}
 }

@@ -43,11 +43,11 @@ run_cissvae(
   beta_refit = NULL,
   verbose = FALSE,
   return_model = TRUE,
-  return_clusters = FALSE,
+  return_clusters = TRUE,
   return_silhouettes = FALSE,
   return_history = FALSE,
   return_dataset = FALSE,
-  return_validation_dataset = FALSE,
+  return_validation_dataset = TRUE,
   debug = FALSE,
   columns_ignore = NULL
 )

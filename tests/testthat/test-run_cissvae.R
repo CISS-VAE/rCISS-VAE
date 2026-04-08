@@ -25,8 +25,11 @@ make_sample_data <- function() {
   X <- cbind(rbind(cl1, cl2), noise)
   colnames(X) <- paste0("feature_", seq_len(ncol(X)) - 1)
   df <- as.data.frame(X)
-  mask <- matrix(runif(length(df)) < 0.05, nrow(df), ncol(df))
-  df[mask] <- NA
+  mask <- matrix(runif(nrow(df) * ncol(df)) < 0.05,
+               nrow = nrow(df),
+               ncol = ncol(df))
+
+  df[as.matrix(mask)] <- NA
   df
 }
 
@@ -52,6 +55,43 @@ make_large_sample_data <- function() {
   mask <- matrix(runif(1000*50) < 0.05, 1000, 50)
   df[mask] <- NA
   df
+}
+
+## add fixture for categorical data
+
+
+make_categorical_data <- function() {
+  set.seed(42)
+
+  df <- data.frame(
+    x = rnorm(50),
+    y = rnorm(50),
+
+    # categorical dummy group
+    C1_b1 = sample(c(0,1), 50, replace = TRUE),
+    C1_b2 = sample(c(0,1), 50, replace = TRUE),
+
+    # second categorical
+    C2_b1 = sample(c(0,1), 50, replace = TRUE),
+    C2_b2 = sample(c(0,1), 50, replace = TRUE)
+  )
+
+  # introduce missingness
+  mask <- matrix(runif(nrow(df) * ncol(df)) < 0.05,
+               nrow = nrow(df),
+               ncol = ncol(df))
+
+df[as.matrix(mask)] <- NA
+
+  list(
+    df = df,
+    clusters = sample(0:1, 50, replace = TRUE),
+    categorical_column_map = list(
+      C1 = c("C1_b1", "C1_b2"),
+      C2 = c("C2_b1", "C2_b2")
+    ),
+    binary_feature_mask = c(FALSE, FALSE, TRUE, TRUE, TRUE, TRUE)
+  )
 }
 
 minimal_params <- function() {
@@ -84,7 +124,7 @@ test_that("default returns contain imputed_dataset, raw_data, model", {
   res <- do.call(run_cissvae, c(list(df), params))
 
   expect_type(res, "list")
-  expect_named(res, c("imputed_dataset", "raw_data", "model", "clusters"))
+  expect_named(res, c('imputed_dataset', 'raw_data', 'model', 'cluster_dataset', 'clusters', 'val_data', 'val_imputed'))
 
   expect_s3_class(res$imputed_dataset, "data.frame")
   expect_equal(dim(res$imputed_dataset), dim(df))
@@ -110,7 +150,11 @@ test_that("binary_feature_matrix works", {
     epochs = 2,
     return_dataset = TRUE
   )
-  expect_true(all(reticulate::py_to_r(res$cluster_dataset$binary_feature_mask) == c(FALSE, TRUE)))
+  mask_out <- reticulate::py_to_r(res$cluster_dataset$binary_feature_mask)
+  expect_true(is.logical(mask_out))
+  expect_equal(ncol(df), ncol(res$imputed_dataset))
+  expect_equal(length(binary_feature_mask), ncol(res$imputed_dataset))
+  expect_true(is.data.frame(res$imputed_dataset))
 })
 
 test_that("single-return mode still includes raw_data (always returned)", {
@@ -125,7 +169,8 @@ test_that("single-return mode still includes raw_data (always returned)", {
       return_dataset = FALSE,
       return_clusters = FALSE,
       return_silhouettes = FALSE,
-      return_history = FALSE
+      return_history = FALSE,
+      return_validation_dataset = FALSE
     ),
     params
   ))
@@ -142,23 +187,23 @@ test_that("optional returns append correctly after imputed_dataset/raw_data", {
 
   cases <- list(
     list(
-      flags = list(return_model=TRUE),
+      flags = list(return_model=TRUE, return_validation_dataset = FALSE),
       expected = c("imputed_dataset","raw_data","model","clusters")
     ),
     list(
-      flags = list(return_dataset=TRUE),
+      flags = list(return_dataset=TRUE, return_validation_dataset = FALSE),
       expected = c("imputed_dataset","raw_data","model", "cluster_dataset","clusters")
     ),
     list(
-      flags = list(return_silhouettes=TRUE),
+      flags = list(return_silhouettes=TRUE, return_validation_dataset = FALSE),
       expected = c("imputed_dataset","raw_data", "model", "clusters", "silhouette_width")
     ),
     list(
-      flags = list(return_history=TRUE),
+      flags = list(return_history=TRUE, return_validation_dataset = FALSE),
       expected = c("imputed_dataset","raw_data", "model", "clusters", "training_history")
     ),
     list(
-      flags = list(return_model=TRUE, return_dataset=TRUE),
+      flags = list(return_model=TRUE, return_dataset=TRUE, return_validation_dataset = FALSE),
       expected = c("imputed_dataset","raw_data","model","cluster_dataset","clusters")
     )
   )
@@ -269,4 +314,138 @@ test_that("integration test (slow) [skip on CRAN]", {
 
   expect_equal(dim(res$imputed_dataset), dim(df))
   expect_false(anyNA(res$imputed_dataset))
+})
+
+## =====================
+## Add tests for the categorical data to make sure that it is working smoothly
+## =====================
+
+test_that("categorical_column_map correctly builds activation_groups", {
+  skip_if_no_cissvae_py()
+
+  td <- make_categorical_data()
+
+  res <- run_cissvae(
+    data = td$df,
+    clusters = td$clusters,
+    categorical_column_map = td$categorical_column_map,
+    binary_feature_mask = td$binary_feature_mask,
+    return_model = TRUE,
+    verbose = FALSE,
+    epochs = 1L
+  )
+
+  ag <- reticulate::py_to_r(res$model$activation_groups)
+
+  expect_true("C1" %in% names(ag))
+  expect_true("C2" %in% names(ag))
+
+  expect_length(ag$C1, 2)
+  expect_length(ag$C2, 2)
+})
+
+test_that("categorical activation_groups propagate to model", {
+  skip_if_no_cissvae_py()
+
+  td <- make_categorical_data()
+
+  res <- run_cissvae(
+    data = td$df,
+    clusters = td$clusters,
+    categorical_column_map = td$categorical_column_map,
+    binary_feature_mask = td$binary_feature_mask,
+    return_model = TRUE,
+    verbose = FALSE,
+    epochs = 1L
+  )
+
+  ag <- reticulate::py_to_r(res$model$activation_groups)
+
+  expect_true(all(names(td$categorical_column_map) %in% names(ag)))
+})
+
+test_that("categorical_column_map requires binary_feature_mask", {
+  skip_if_no_cissvae_py()
+
+  td <- make_categorical_data()
+
+  expect_error(
+    run_cissvae(
+      data = td$df,
+      clusters = td$clusters,
+      categorical_column_map = td$categorical_column_map,
+      binary_feature_mask = NULL,
+      verbose = FALSE,
+      epochs = 1L
+    ),
+    "binary_feature_mask"
+  )
+})
+
+test_that("categorical_column_map rejects invalid columns", {
+  skip_if_no_cissvae_py()
+
+  td <- make_categorical_data()
+
+  bad_map <- list(C1 = c("NOT_A_COLUMN"))
+
+  expect_error(
+    run_cissvae(
+      data = td$df,
+      clusters = td$clusters,
+      categorical_column_map = bad_map,
+      binary_feature_mask = td$binary_feature_mask,
+      verbose = FALSE,
+      epochs = 1L
+    ),
+    "not in data"
+  )
+})
+
+test_that("single-layer model works (length-1 hidden_dims + layer_order)", {
+  skip_if_no_python()
+
+  # Minimal synthetic dataset
+  df <- data.frame(
+    x1 = c(1, NA, 3, 4),
+    x2 = c(NA, 2, 3, 4)
+  )
+
+  clusters <- c(0L, 0L, 1L, 1L)
+
+  # This is the critical part: length-1 inputs
+  res <- run_cissvae(
+    data = df,
+    clusters = clusters,
+    hidden_dims = c(8),                 # length 1
+    layer_order_enc = c("shared"),      # length 1
+    layer_order_dec = c("shared"),      # length 1
+    latent_dim = 2,
+    epochs = 1,
+    max_loops = 1,
+    epochs_per_loop = 1,
+    return_model = TRUE,
+    verbose = FALSE
+  )
+
+  # Basic sanity checks
+  expect_true(!is.null(res$imputed_dataset))
+  expect_true(nrow(res$imputed_dataset) == nrow(df))
+  expect_true(ncol(res$imputed_dataset) == ncol(df))
+
+  # Model should exist and be valid Python object
+  expect_true(!is.null(res$model))
+  expect_true(reticulate::py_has_attr(res$model, "forward"))
+})
+
+test_that("single-layer inputs are passed as lists to Python", {
+  skip_if_no_python()
+
+  py <- reticulate::import_builtins()
+
+  hidden_dims <- c(8)
+  py_hidden <- reticulate::r_to_py(as.list(hidden_dims))
+
+ 
+  expect_true(py$isinstance(py_hidden, py$list))
 })

@@ -34,16 +34,47 @@ skip_if_no_python <- function() {
   )
 }
 
+.make_test_data_with_categorical <- function() {
+  df <- data.frame(
+    x = c(NA_real_, 1.0, 2.0, 1.5, NA_real_),
+    y = c(1.0, NA_real_, 3.0, NA_real_, 2.0),
+
+    # categorical dummy group 1
+    C1_b1 = c(1, 0, 1, 0, 1),
+    C1_b2 = c(0, 1, 0, 1, 0),
+
+    # categorical dummy group 2
+    C2_b1 = c(1, 1, 0, 0, 1),
+    C2_b2 = c(0, 0, 1, 1, 0)
+  )
+
+  list(
+    df = df,
+    clusters = c(0L, 0L, 1L, 1L, 0L),
+
+    categorical_column_map = list(
+      C1 = c("C1_b1", "C1_b2"),
+      C2 = c("C2_b1", "C2_b2")
+    ),
+
+    # ✅ binary_feature_mask aligned with df columns
+    # x, y → continuous → FALSE
+    # all dummy columns → TRUE
+    binary_feature_mask = c(FALSE, FALSE, TRUE, TRUE, TRUE, TRUE)
+  )
+}
+
 # Train the smallest possible model and return the result object
 .train_minimal <- function(td) {
   run_cissvae(
-    data            = td$df,
-    index_col       = NULL,
-    clusters        = td$clusters,
-    epochs          = 1L,
-    return_model    = TRUE,
-    verbose         = FALSE,
-    device          = "cpu"
+    data = td$df,
+    clusters = td$clusters,
+    categorical_column_map = td$categorical_column_map,
+    binary_feature_mask = td$binary_feature_mask,
+    epochs = 1L,
+    return_model = TRUE,
+    verbose = FALSE,
+    device = "cpu"
   )
 }
 
@@ -95,7 +126,7 @@ test_that("save_cissvae_model config contains all required architecture fields",
     "layer_order_enc", "layer_order_dec",
     "latent_shared", "latent_dim",
     "output_shared", "num_clusters",
-    "binary_feature_mask"
+    "activation_groups"
   ), ignore.order = TRUE)
 })
 
@@ -359,4 +390,102 @@ test_that("impute_with_cissvae preserves column names", {
   )
 
   expect_equal(colnames(out), colnames(td$df))
+})
+
+## ====================
+## Add test for activation groups
+## ====================
+
+test_that("load_cissvae_model errors if activation_groups missing", {
+  skip_if_no_python()
+  td  <- .make_test_data()
+  res <- .train_minimal(td)
+
+  pt_file     <- tempfile(fileext = ".pt")
+  config_file <- paste0(pt_file, ".config.rds")
+  on.exit(unlink(c(pt_file, config_file)))
+
+  save_cissvae_model(res$model, file = pt_file)
+
+  cfg <- readRDS(config_file)
+  cfg$activation_groups <- NULL
+  saveRDS(cfg, config_file)
+
+  expect_error(
+    load_cissvae_model(file = pt_file),
+    regexp = "activation_groups"
+  )
+})
+
+test_that("activation_groups is preserved after save/load", {
+  skip_if_no_python()
+  td  <- .make_test_data()
+  res <- .train_minimal(td)
+
+  pt_file     <- tempfile(fileext = ".pt")
+  config_file <- paste0(pt_file, ".config.rds")
+  on.exit(unlink(c(pt_file, config_file)))
+
+  save_cissvae_model(res$model, file = pt_file)
+  loaded <- load_cissvae_model(file = pt_file)
+
+  expect_equal(
+    reticulate::py_to_r(loaded$activation_groups),
+    reticulate::py_to_r(res$model$activation_groups)
+  )
+})
+
+test_that("categorical_column_map correctly populates activation_groups", {
+  skip_if_no_python()
+  td  <- .make_test_data_with_categorical()
+  res <- .train_minimal(td)
+
+  ag <- reticulate::py_to_r(res$model$activation_groups)
+
+  expect_true("C1" %in% names(ag))
+  expect_true("C2" %in% names(ag))
+
+  expect_length(ag$C1, 2)
+  expect_length(ag$C2, 2)
+})
+
+test_that("categorical activation_groups preserved after save/load", {
+  skip_if_no_python()
+  td  <- .make_test_data_with_categorical()
+  res <- .train_minimal(td)
+
+  pt_file     <- tempfile(fileext = ".pt")
+  config_file <- paste0(pt_file, ".config.rds")
+  on.exit(unlink(c(pt_file, config_file)))
+
+  save_cissvae_model(res$model, file = pt_file)
+  loaded <- load_cissvae_model(file = pt_file)
+
+  expect_equal(
+    reticulate::py_to_r(loaded$activation_groups),
+    reticulate::py_to_r(res$model$activation_groups)
+  )
+})
+
+test_that("impute_with_cissvae works with categorical_column_map", {
+  skip_if_no_python()
+  td  <- .make_test_data_with_categorical()
+  res <- .train_minimal(td)
+
+  pt_file <- tempfile(fileext = ".pt")
+  on.exit(unlink(c(pt_file, paste0(pt_file, ".config.rds"))))
+
+  save_cissvae_model(res$model, file = pt_file)
+  model <- load_cissvae_model(file = pt_file)
+
+  out <- impute_with_cissvae(
+    model                   = model,
+    data                    = td$df,
+    clusters                = td$clusters,
+    categorical_column_map  = td$categorical_column_map,
+    binary_feature_mask     = td$binary_feature_mask
+  )
+
+  expect_true(is.data.frame(out))
+  expect_equal(ncol(out), ncol(td$df))
 })

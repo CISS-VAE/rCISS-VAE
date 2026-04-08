@@ -24,14 +24,22 @@ across clusters.}
 \item{\code{output_shared}}{Logical. Whether the output layer is shared
 across clusters.}
 \item{\code{num_clusters}}{Integer. Number of clusters.}
-\item{\code{binary_feature_mask}}{Logical vector of length
-\code{input_dim}. \code{TRUE} for binary columns.}
+\item{\code{activation_groups}}{Named list mapping feature groups to
+integer vectors of column indices. Always returned as vectors, even
+for groups of size one.}
 }
 }
 \description{
-Reads the architecture-defining attributes off a live \code{CISSVAE} Python
-object and returns them as a plain R list suitable for storage in an RDS
-file and for passing back to the \code{CISSVAE} constructor on load.
+Reads the architecture-defining attributes from a live \code{CISSVAE}
+Python object and returns them as a plain R list suitable for storage
+in an RDS file and for passing back to the \code{CISSVAE} constructor
+during model reconstruction.
+
+Special care is taken when converting \code{activation_groups} from Python
+to R. Due to reticulate's automatic type simplification, Python lists of
+length 1 may be converted to scalar values in R. This function ensures that
+all activation group entries are returned as integer vectors, even when they
+contain only a single column index.
 }
 \seealso{
 \code{\link{save_impute_result}}

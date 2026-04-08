@@ -43,8 +43,7 @@ directly.
 }
 \details{
 The \code{CISSVAE} class is imported from the installed
-\code{ciss_vae.classes} Python package using \code{importlib} (necessary
-because the hyphen in the package name prevents direct attribute access via
+\code{ciss_vae.classes} using \code{reticulate::import}
 \code{reticulate::import}).
 }
 \examples{

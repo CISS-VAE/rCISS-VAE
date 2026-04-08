@@ -1,6 +1,6 @@
 Package: rCISSVAE
 Title: Clustering-Informed Shared-Structure VAE for Imputation
-Version: 0.0.6
+Version: 1.0.0
 Authors@R: 
     c(  person(given = "Yasin", family = "Khadem Charvadeh", email = "khademy@mskcc.org", role = c("aut")),
         person(given = "Kenneth", family = "Seier", role = c("aut")),

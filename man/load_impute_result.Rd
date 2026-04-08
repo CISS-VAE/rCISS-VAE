@@ -10,18 +10,12 @@ load_impute_result(dir, name = "result", device = "cpu")
 \item{dir}{Character string. Path to the directory written by
 \code{\link{save_impute_result}}.}
 
-\item{name}{Character string. Base name used when saving. Must match the
-value passed to \code{\link{save_impute_result}}. Defaults to
-\code{"result"}.}
+\item{name}{Character string. Base name used when saving.}
 
-\item{device}{Character string. PyTorch device string passed to
-\code{torch.load} as \code{map_location}. Defaults to \code{"cpu"}.
-Use \code{"cuda"} to load directly onto GPU.}
+\item{device}{Character string. PyTorch device ("cpu" or "cuda").}
 }
 \value{
-An object of class \code{impute_result} with all fields restored.
-The \code{$model} field (if present) is a live \code{CISSVAE} Python
-object in evaluation mode.
+An \code{impute_result} object with model restored if present.
 }
 \description{
 Reads an \code{impute_result} previously saved by
@@ -31,17 +25,5 @@ the stored configuration, the \code{state_dict} weights are loaded, and the
 model is placed in evaluation mode (\code{model.eval()}).
 
 The \code{CISSVAE} class is imported from the installed
-\code{ciss_vae.classes} Python package using \code{importlib}.
-}
-\examples{
-\dontrun{
-# Save
-save_impute_result(res, dir = "run_001", name = "imputer")
-
-# Load in a fresh session
-res2 <- load_impute_result(dir = "run_001", name = "imputer", device = "cpu")
-}
-}
-\seealso{
-\code{\link{save_impute_result}}, \code{\link{impute_result}}
+\code{ciss_vae.classes} Python package using \code{reticulate::import}.
 }

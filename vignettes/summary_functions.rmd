@@ -85,12 +85,16 @@ cat(paste("Check necessary returns:", paste0(names(result), collapse = ", ")))
 ```
 
 ```{r perf_by_clus}
+feature_cols = setdiff(
+  names(result$val_data),
+  c("index", "Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003")
+)
 performance_by_cluster(res = result, 
   group_col = NULL, 
   clusters = clusters$clusters,
-  feature_cols = NULL, ## default, all numeric columns excluding group_col & cols_ignore
+  feature_cols = feature_cols,
   by_group = FALSE,
   by_cluster = TRUE,
-  cols_ignore =  c( "index", "Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003") ## columns to not score
+  cols_ignore =  c( "index", "Age", "Salary", "ZipCode10001", "ZipCode20002", "ZipCode30003"), ## columns to not score
   )
 ```

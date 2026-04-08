@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,7 @@
 
       <h1>rCISSVAE Vignette</h1>
             
-            <h4 data-toc-skip class="date">2026-03-25</h4>
+            <h4 data-toc-skip class="date">2026-04-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CISS-VAE/rCISS-VAE/blob/HEAD/vignettes/vignette.rmd" class="external-link"><code>vignettes/vignette.rmd</code></a></small>
       <div class="d-none name"><code>vignette.rmd</code></div>
@@ -1743,41 +1743,41 @@ function.</p>
   • .masks shape:    (8000, 30)
   • .val_data shape: (8000, 30)</code></pre>
 <p><img src="test_plot_arch.png"></p>
-<pre><code><span><span class="co">#&gt;   index       Age   Salary ZipCode10001 ZipCode20002 ZipCode30003         Y11</span></span>
-<span><span class="co">#&gt; 0     0 11.044449 6.366204            0            1            0  -4.0495372</span></span>
-<span><span class="co">#&gt; 1     1  9.727260 5.912558            1            0            0   0.5461677</span></span>
-<span><span class="co">#&gt; 2     2 11.383020 6.636472            0            1            0  -1.2134339</span></span>
-<span><span class="co">#&gt; 3     3 13.560905 5.896255            0            0            1 -10.6082144</span></span>
-<span><span class="co">#&gt; 4     4  9.542490 6.128326            1            0            0   0.3575883</span></span>
-<span><span class="co">#&gt; 5     5  9.542521 6.393217            1            0            0   4.7617960</span></span>
-<span><span class="co">#&gt;         Y12         Y13        Y14        Y15        Y21       Y22       Y23</span></span>
-<span><span class="co">#&gt; 0 -14.39339  -0.5147629 -14.369148 -17.564449 -10.736261 -18.53887 -35.77263</span></span>
-<span><span class="co">#&gt; 1 -19.02272 -12.1895180  -7.722473   3.319988  -7.470250 -20.88160 -25.92436</span></span>
-<span><span class="co">#&gt; 2 -19.03144 -20.3589058 -15.126495 -17.251385 -18.448421 -21.01385 -34.40086</span></span>
-<span><span class="co">#&gt; 3 -22.24773  -7.1759834 -14.207619 -21.339748 -21.971752 -24.32133 -40.18794</span></span>
-<span><span class="co">#&gt; 4 -16.48769 -11.3127708   7.535458  10.184475  -7.576005 -27.63498 -15.74972</span></span>
-<span><span class="co">#&gt; 5 -18.96558 -12.2694435   5.667511  -9.094982  -4.120708 -29.16836 -25.07210</span></span>
-<span><span class="co">#&gt;          Y24       Y25       Y31        Y32        Y33         Y34        Y35</span></span>
-<span><span class="co">#&gt; 0 -28.098907 -30.24259 -1.627203  -6.557133 -16.769653 -10.6946259 -13.900185</span></span>
-<span><span class="co">#&gt; 1 -17.231422 -18.69529  4.355482  -9.500225 -10.927032  -5.8868866  -6.088921</span></span>
-<span><span class="co">#&gt; 2 -27.250603 -28.83982 -2.169048 -10.735180 -17.193771 -10.4940796 -12.286621</span></span>
-<span><span class="co">#&gt; 3 -26.304344 -33.35109 -7.478534 -13.641594 -25.310104  -0.5022125 -15.429726</span></span>
-<span><span class="co">#&gt; 4  -1.223648 -18.55935  8.103012 -13.563183  -9.832379  11.2815590  -2.962196</span></span>
-<span><span class="co">#&gt; 5  -4.624435 -19.35896  7.710739  -8.304111 -10.381554   7.6654510  -4.992691</span></span>
-<span><span class="co">#&gt;          Y41       Y42       Y43       Y44       Y45      Y51         Y52</span></span>
-<span><span class="co">#&gt; 0 -0.9049605 -2.512167  3.527925 -3.694853 -5.680294 2.587588  1.84293461</span></span>
-<span><span class="co">#&gt; 1  2.6245856 -4.218277 -5.776196 -1.379498 -2.329605 6.080512  0.04265404</span></span>
-<span><span class="co">#&gt; 2  0.1033239 -4.733656 -7.215717 -3.350798 -6.895340 2.531148  0.31131554</span></span>
-<span><span class="co">#&gt; 3 -2.8251922 -6.273870 -8.293898 -2.398297  3.204130 0.138556 -0.79631424</span></span>
-<span><span class="co">#&gt; 4  3.6173897 -4.619453 -3.856878  7.120106 -1.495659 2.406390 -3.34118080</span></span>
-<span><span class="co">#&gt; 5  2.1276770 -4.269014 -4.685389  5.764248 -2.990555 2.464692 -3.37204909</span></span>
+<pre><code><span><span class="co">#&gt;   index        Age    Salary ZipCode10001 ZipCode20002 ZipCode30003         Y11</span></span>
+<span><span class="co">#&gt; 0     0  0.4069684 0.8971117   -0.6994281    1.4022268   -0.7087438  -4.0495372</span></span>
+<span><span class="co">#&gt; 1     1 -0.2264316 0.1531322    1.4297290   -0.7131446   -0.7087438   0.5461677</span></span>
+<span><span class="co">#&gt; 2     2  0.5697781 1.3403502   -0.6994281    1.4022268   -0.7087438  -2.6992331</span></span>
+<span><span class="co">#&gt; 3     3  1.6170629 0.1263959   -0.6994281   -0.7131446    1.4108638 -10.6082144</span></span>
+<span><span class="co">#&gt; 4     4 -0.3152823 0.5069913    1.4297290   -0.7131446   -0.7087438   0.3575883</span></span>
+<span><span class="co">#&gt; 5     5 -0.3152676 0.9414127    1.4297290   -0.7131446   -0.7087438   4.7617960</span></span>
+<span><span class="co">#&gt;         Y12       Y13        Y14        Y15        Y21       Y22       Y23</span></span>
+<span><span class="co">#&gt; 0 -18.11057 -10.22395 -14.369148 -17.564449 -11.837106 -30.04692 -35.77263</span></span>
+<span><span class="co">#&gt; 1 -18.15558 -12.18952  -7.722473  -4.973331  -7.470250 -30.10021 -25.92436</span></span>
+<span><span class="co">#&gt; 2 -18.11004 -20.35891 -15.126495 -17.251385 -18.448421 -30.04632 -34.40086</span></span>
+<span><span class="co">#&gt; 3 -18.11560 -10.23074 -14.207619 -21.339748 -21.971752 -30.05286 -40.18794</span></span>
+<span><span class="co">#&gt; 4 -16.48769 -11.31277  -2.467445  -4.978687  -7.576005 -27.63498 -21.05280</span></span>
+<span><span class="co">#&gt; 5 -18.96558 -12.26944  -2.521141  -9.094982  -4.120708 -29.16836 -25.07210</span></span>
+<span><span class="co">#&gt;         Y24       Y25       Y31       Y32        Y33         Y34        Y35</span></span>
+<span><span class="co">#&gt; 0 -28.09891 -30.24259 -1.627203 -14.59241 -16.769653 -10.6946259 -13.900185</span></span>
+<span><span class="co">#&gt; 1 -17.23142 -18.69529  4.355482 -14.64218 -10.927032  -5.8868866  -6.088921</span></span>
+<span><span class="co">#&gt; 2 -27.25060 -28.83982 -2.169048 -14.59186 -17.193771 -10.4940796 -12.286621</span></span>
+<span><span class="co">#&gt; 3 -26.30434 -33.35109 -7.478534 -14.59805 -25.310104   0.4747162 -15.429726</span></span>
+<span><span class="co">#&gt; 4 -14.29105 -18.55935  8.103012 -13.56318  -9.832379   0.4035034  -2.962196</span></span>
+<span><span class="co">#&gt; 5 -14.34004 -19.35896  7.710739 -14.68376 -10.381554   0.3462753  -4.992691</span></span>
+<span><span class="co">#&gt;          Y41       Y42       Y43        Y44         Y45      Y51       Y52</span></span>
+<span><span class="co">#&gt; 0 -0.9049605 -6.289772 -2.731691 -3.6948528 -5.68029404 2.587588 -4.016743</span></span>
+<span><span class="co">#&gt; 1  2.6245856 -6.317087 -5.776196 -1.3794975 -2.32960510 6.080512 -4.037258</span></span>
+<span><span class="co">#&gt; 2  0.3733391 -6.289455 -7.215717 -3.3507977 -6.89533997 2.531148 -4.016510</span></span>
+<span><span class="co">#&gt; 3 -2.8251922 -6.292833 -8.293898 -2.3982968 -0.03046799 0.138556 -4.019068</span></span>
+<span><span class="co">#&gt; 4  3.6173897 -4.619453 -3.856878  0.4907188 -1.49565887 2.035684 -3.341181</span></span>
+<span><span class="co">#&gt; 5  2.1276770 -4.269014 -4.685389  0.4670086 -2.99055481 2.036615 -3.372049</span></span>
 <span><span class="co">#&gt;         Y53        Y54        Y55</span></span>
 <span><span class="co">#&gt; 0 -4.681194 -2.2484055 -2.6790791</span></span>
 <span><span class="co">#&gt; 1 -2.290062 -0.8873978  0.5625324</span></span>
 <span><span class="co">#&gt; 2 -5.427431 -1.3301620 -2.3243809</span></span>
 <span><span class="co">#&gt; 3 -5.729860 -1.6395874 -4.4457073</span></span>
-<span><span class="co">#&gt; 4 -1.915190  6.5168343  0.1034508</span></span>
-<span><span class="co">#&gt; 5 -2.237415  5.5294094 -1.0737858</span></span></code></pre>
+<span><span class="co">#&gt; 4 -1.915190  2.0707684  0.1034508</span></span>
+<span><span class="co">#&gt; 5 -2.237415  2.0505142 -1.0737858</span></span></code></pre>
 </div>
 </div>
 <div class="section level3">

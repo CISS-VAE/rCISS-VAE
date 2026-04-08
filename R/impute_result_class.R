@@ -170,6 +170,11 @@ print.impute_result <- function(x, n = 6, ...) {
     if (!is.null(x$val_imputed))
       sprintf("%d rows x %d cols", nrow(x$val_imputed), ncol(x$val_imputed))
     else ""))
+  if (!is.null(x$model)) {
+    ag <- reticulate::py_to_r(x$model$activation_groups)
+    cat("\nActivation groups:\n")
+    print(ag)
+  }
 
   cat(ruler, "\n")
   cat("Use save_impute_result() to save this object.\n")
@@ -184,9 +189,16 @@ print.impute_result <- function(x, n = 6, ...) {
 #' Extract CISSVAE constructor arguments from a live model object
 #'
 #' @description
-#' Reads the architecture-defining attributes off a live \code{CISSVAE} Python
-#' object and returns them as a plain R list suitable for storage in an RDS
-#' file and for passing back to the \code{CISSVAE} constructor on load.
+#' Reads the architecture-defining attributes from a live \code{CISSVAE}
+#' Python object and returns them as a plain R list suitable for storage
+#' in an RDS file and for passing back to the \code{CISSVAE} constructor
+#' during model reconstruction.
+#'
+#' Special care is taken when converting \code{activation_groups} from Python
+#' to R. Due to reticulate's automatic type simplification, Python lists of
+#' length 1 may be converted to scalar values in R. This function ensures that
+#' all activation group entries are returned as integer vectors, even when they
+#' contain only a single column index.
 #'
 #' @param model A \code{CISSVAE} Python object (reticulate proxy).
 #'
@@ -204,14 +216,35 @@ print.impute_result <- function(x, n = 6, ...) {
 #'   \item{\code{output_shared}}{Logical. Whether the output layer is shared
 #'     across clusters.}
 #'   \item{\code{num_clusters}}{Integer. Number of clusters.}
-#'   \item{\code{binary_feature_mask}}{Logical vector of length
-#'     \code{input_dim}. \code{TRUE} for binary columns.}
+#'   \item{\code{activation_groups}}{Named list mapping feature groups to
+#'     integer vectors of column indices. Always returned as vectors, even
+#'     for groups of size one.}
 #' }
 #'
 #' @seealso \code{\link{save_impute_result}}
 #'
 #' @keywords internal
 .cissvae_config <- function(model) {
+
+  # Extract activation_groups from Python
+  activation_groups <- reticulate::py_to_r(model$activation_groups)
+
+  # force all groups to be integer vectors
+  activation_groups <- lapply(activation_groups, function(x) {
+
+  if (is.null(x)) {
+    return(integer(0))
+  }
+
+  x <- unlist(x, use.names = FALSE)
+
+  if (length(x) == 1L) {
+    return(as.integer(c(x)))
+  }
+
+  return(as.integer(x))
+})
+
   list(
     input_dim           = as.integer(reticulate::py_to_r(model$input_dim)),
     hidden_dims         = as.integer(reticulate::py_to_r(model$hidden_dims)),
@@ -221,9 +254,7 @@ print.impute_result <- function(x, n = 6, ...) {
     latent_dim          = as.integer(reticulate::py_to_r(model$latent_dim)),
     output_shared       = as.logical(reticulate::py_to_r(model$output_shared)),
     num_clusters        = as.integer(reticulate::py_to_r(model$num_clusters)),
-    binary_feature_mask = as.logical(
-      reticulate::py_to_r(model$binary_mask$detach()$cpu()$numpy())
-    )
+    activation_groups   = activation_groups
   )
 }
 
@@ -298,7 +329,6 @@ save_impute_result <- function(x, dir, name = "result", overwrite = FALSE) {
     model = if (file.exists(model_path)) model_path else NULL
   ))
 }
-
 # ============================================================
 # load_impute_result
 # ============================================================
@@ -313,71 +343,100 @@ save_impute_result <- function(x, dir, name = "result", overwrite = FALSE) {
 #' model is placed in evaluation mode (\code{model.eval()}).
 #'
 #' The \code{CISSVAE} class is imported from the installed
-#' \code{ciss_vae.classes} Python package using \code{importlib}.
+#' \code{ciss_vae.classes} Python package using \code{reticulate::import}.
 #'
 #' @param dir Character string. Path to the directory written by
 #'   \code{\link{save_impute_result}}.
-#' @param name Character string. Base name used when saving. Must match the
-#'   value passed to \code{\link{save_impute_result}}. Defaults to
-#'   \code{"result"}.
-#' @param device Character string. PyTorch device string passed to
-#'   \code{torch.load} as \code{map_location}. Defaults to \code{"cpu"}.
-#'   Use \code{"cuda"} to load directly onto GPU.
+#' @param name Character string. Base name used when saving.
+#' @param device Character string. PyTorch device ("cpu" or "cuda").
 #'
-#' @return An object of class \code{impute_result} with all fields restored.
-#'   The \code{$model} field (if present) is a live \code{CISSVAE} Python
-#'   object in evaluation mode.
-#'
-#' @seealso \code{\link{save_impute_result}}, \code{\link{impute_result}}
+#' @return An \code{impute_result} object with model restored if present.
 #'
 #' @export
-#'
-#' @examples
-#' \dontrun{
-#' # Save
-#' save_impute_result(res, dir = "run_001", name = "imputer")
-#'
-#' # Load in a fresh session
-#' res2 <- load_impute_result(dir = "run_001", name = "imputer", device = "cpu")
-#' }
 load_impute_result <- function(dir, name = "result", device = "cpu") {
+
   meta_path <- file.path(dir, paste0(name, ".rds"))
-  if (!file.exists(meta_path)) stop("No file found at '", meta_path, "'.")
+  if (!file.exists(meta_path)) {
+    stop("No file found at '", meta_path, "'.")
+  }
 
   x <- readRDS(meta_path)
   class(x) <- "impute_result"
 
   if (!is.null(x$model_path)) {
+
     if (is.null(x$model_config)) {
       stop("Saved object lacks model_config; cannot rebuild CISSVAE.")
     }
 
-    torch <- reticulate::import("torch", delay_load = FALSE)
-    mod   <- reticulate::py_run_string(
-      "import importlib; _mod = importlib.import_module('ciss_vae.classes')"
-    )$`_mod`
+    cfg <- x$model_config
 
-    cfg   <- x$model_config
+    # ============================================================
+    # 🔴 STRICT VALIDATION (MUST COME FIRST)
+    # ============================================================
+    if (is.null(cfg$activation_groups) || !is.list(cfg$activation_groups)) {
+      stop("activation_groups must be a non-null list.")
+    }
+
+    for (name in names(cfg$activation_groups)) {
+
+      g <- cfg$activation_groups[[name]]
+
+      if (is.null(g)) {
+        stop(sprintf("activation_groups[['%s']] is NULL.", name))
+      }
+
+      if (!is.numeric(unlist(g))) {
+        stop(sprintf("activation_groups[['%s']] must be numeric.", name))
+      }
+    }
+
+    # ============================================================
+    # NORMALIZE (safe AFTER validation)
+    # ============================================================
+    cfg$activation_groups <- lapply(cfg$activation_groups, function(x) {
+      as.integer(unlist(x, use.names = FALSE))
+    })
+
+    # ============================================================
+    # IMPORT PYTHON
+    # ============================================================
+    torch <- reticulate::import("torch", delay_load = FALSE)
+    mod   <- reticulate::import("ciss_vae.classes", delay_load = FALSE)
+
+    # ============================================================
+    # BUILD MODEL (NO conversion hacks needed)
+    # ============================================================
     model <- mod$CISSVAE(
-      input_dim           = cfg$input_dim,
-      hidden_dims         = cfg$hidden_dims,
-      layer_order_enc     = cfg$layer_order_enc,
-      layer_order_dec     = cfg$layer_order_dec,
-      latent_shared       = cfg$latent_shared,
-      latent_dim          = cfg$latent_dim,
-      output_shared       = cfg$output_shared,
-      num_clusters        = cfg$num_clusters,
-      binary_feature_mask = cfg$binary_feature_mask,
-      debug               = FALSE
+      input_dim         = cfg$input_dim,
+      hidden_dims       = cfg$hidden_dims,
+      layer_order_enc   = cfg$layer_order_enc,
+      layer_order_dec   = cfg$layer_order_dec,
+      latent_shared     = cfg$latent_shared,
+      latent_dim        = cfg$latent_dim,
+      output_shared     = cfg$output_shared,
+      num_clusters      = cfg$num_clusters,
+      activation_groups = cfg$activation_groups,
+      debug             = FALSE
     )
 
-    sd <- torch$load(file.path(dir, x$model_path), map_location = device)
-    model$load_state_dict(sd)
+    # ============================================================
+    # LOAD WEIGHTS
+    # ============================================================
+    state_path <- file.path(dir, x$model_path)
+
+    if (!file.exists(state_path)) {
+      stop("State dict file not found at '", state_path, "'.")
+    }
+
+    state_dict <- torch$load(state_path, map_location = device)
+
+    model$load_state_dict(state_dict)
     model$eval()
 
-    x$model      <- model
+    x$model <- model
     x$model_path <- NULL
   }
 
-  x
+  return(x)
 }

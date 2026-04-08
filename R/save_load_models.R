@@ -127,8 +127,7 @@ save_cissvae_model <- function(model,
 #' directly.
 #'
 #' The \code{CISSVAE} class is imported from the installed
-#' \code{ciss_vae.classes} Python package using \code{importlib} (necessary
-#' because the hyphen in the package name prevents direct attribute access via
+#' \code{ciss_vae.classes} using \code{reticulate::import}
 #' \code{reticulate::import}).
 #'
 #' @param file Character string. Path to the saved model file (\code{.pt}).
@@ -197,9 +196,14 @@ load_cissvae_model <- function(file,
 
     cfg <- readRDS(config_path)
 
-    mod <- reticulate::py_run_string(
-      "import importlib; _mod = importlib.import_module('ciss_vae.classes')"
-    )$`_mod`
+    if (is.null(cfg$activation_groups)) {
+      stop("Missing activation_groups in saved model config.")
+    }
+    if (!is.list(cfg$activation_groups)) {
+      stop("activation_groups must be a list.")
+    }
+    
+    mod <- reticulate::import("ciss_vae.classes", delay_load = FALSE)
 
     model <- mod$CISSVAE(
       input_dim           = cfg$input_dim,
@@ -210,7 +214,8 @@ load_cissvae_model <- function(file,
       latent_dim          = cfg$latent_dim,
       output_shared       = cfg$output_shared,
       num_clusters        = cfg$num_clusters,
-      binary_feature_mask = cfg$binary_feature_mask,
+      ## Now using activation_groups instead of bfm!!
+      activation_groups = cfg$activation_groups,
       debug               = FALSE
     )
 
@@ -242,6 +247,7 @@ load_cissvae_model <- function(file,
 #' @param clusters Integer vector of cluster labels for rows of data
 #' @param imputable_matrix Logical matrix indicating entries allowed to be imputed.
 #' @param binary_feature_mask Logical vector marking which columns are binary.
+#' @param categorical_column_map Named list. Maps generated dummy variable column names to the original categorical column name.
 #' @param replacement_value Numeric value used to replace missing entries before model input.
 #' @param batch_size Batch size passed to Python DataLoader. If NULL, batch_size = nrow(data)
 #' @param seed Base random seed for reproducible results
@@ -286,7 +292,7 @@ load_cissvae_model <- function(file,
 #' }
 #' @export
 impute_with_cissvae <- function(model,  data, index_col = NULL, cols_ignore= NULL,  
-  clusters, imputable_matrix = NULL, binary_feature_mask = NULL, 
+  clusters, imputable_matrix = NULL, binary_feature_mask = NULL, categorical_column_map = NULL,
   replacement_value = 0, batch_size = NULL, seed = 42) {
 
   ## --------------- Setup Stuff ----------------------
@@ -319,7 +325,7 @@ impute_with_cissvae <- function(model,  data, index_col = NULL, cols_ignore= NUL
       imputable_matrix <- imputable_matrix[, setdiff(colnames(imputable_matrix), index_col), drop = FALSE]
     }
     ## handle index col in binary_feature_mask
-    if(!is.null(binary_feature_mask) & !is.null(names(binary_feature_mask))){
+    if(!is.null(binary_feature_mask) && !is.null(names(binary_feature_mask))){
       binary_feature_mask =  binary_feature_mask[ setdiff(names(binary_feature_mask), 
         index_col), drop = FALSE]
       
@@ -413,7 +419,8 @@ if (!is.null(batch_size)) {
     columns_ignore = cols_ignore_py, 
     imputable = dni_py,
     val_seed = seed,
-    binary_feature_mask =  reticulate::r_to_py(binary_feature_mask))
+    binary_feature_mask =  reticulate::r_to_py(binary_feature_mask),
+    categorical_column_map = reticulate::r_to_py(categorical_column_map))
   data_loader  <- DataLoader(dataset_py, batch_size = as.integer(batch_size))
 
     ## Sanity checks: loaded model must have a non-empty layer order

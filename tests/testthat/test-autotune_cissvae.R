@@ -711,3 +711,68 @@ test_that("autotune rejects categorical_column_map when dummy columns are not ma
     regexp = "not marked True in binary_feature_mask"
   )
 })
+
+
+test_that("autotune handles single-layer and single placement correctly", {
+  skip_if_no_python()
+
+  # Minimal dataset
+  df <- data.frame(
+    x1 = c(1, NA, 3, 4),
+    x2 = c(NA, 2, 3, 4)
+  )
+
+  clusters <- c(0L, 0L, 1L, 1L)
+
+  res <- autotune_cissvae(
+    data = df,
+    clusters = clusters,
+
+    # single-value inputs (critical case)
+    num_hidden_layers = 1,
+    hidden_dims = 64,
+    latent_dim = 2,
+
+    latent_shared = TRUE,
+    output_shared = TRUE,
+
+    encoder_shared_placement = "at_end",
+    decoder_shared_placement = "at_end",
+
+    n_trials = 1,
+    refit_loops = 1,
+    epochs_per_loop = 1,
+    val_proportion = 0.5,
+
+    verbose = FALSE
+  )
+
+  # ---- BASIC STRUCTURE ----
+  expect_true(is.list(res))
+
+  expect_true(all(c(
+    "imputed_dataset",
+    "model",
+    "cluster_dataset",
+    "study",
+    "results"
+  ) %in% names(res)))
+
+  # ---- DATA INTEGRITY ----
+  expect_true(is.data.frame(res$imputed_dataset))
+  expect_equal(ncol(res$imputed_dataset), ncol(df))
+  expect_equal(nrow(res$imputed_dataset), nrow(df))
+
+  # ---- MODEL EXISTS ----
+  expect_true(!is.null(res$model))
+  expect_true(reticulate::py_has_attr(res$model, "forward"))
+
+  # ---- CRITICAL: ensure Python didn't break ----
+  # If scalar/list bug exists → this will error BEFORE here
+
+  expect_true(nrow(res$results) >= 1)
+
+  # ---- OPTIONAL: sanity check activation_groups ----
+  ag <- reticulate::py_to_r(res$model$activation_groups)
+  expect_true(is.list(ag))
+})

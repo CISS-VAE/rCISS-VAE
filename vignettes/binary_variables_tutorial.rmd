@@ -28,7 +28,7 @@ set.seed(42)
 
 ```
 
-The [Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/) dataset has both continuous (bill_length, bill_depth, flipper_length, body_mass) and categorical (species, island, sex) values so it makes a good example for this. We can use the `dummy_cols()` function from the `fastDummies` package to create dummy variables for our categories. Set `ignore_na = TRUE` and `remove_selected_columns = TRUE` to avoid creating a new column for NA values and to remove the original categoricals once the dummies are created. 
+The [Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/) dataset has both continuous (bill_length, bill_depth, flipper_length, body_mass) and categorical (species, island, sex) values so it makes a good example for this. We can use the `dummy_cols()` function from the `fastDummies` package to create dummy variables for our categories. Set `ignore_na = TRUE` and `remove_selected_columns = TRUE` to avoid creating a new column for NA values and to remove the original categoricals once the dummies are created. The dummy variable columns must be mapped back to their original categorical variables using a `categorical_column_map`, which is a named list where each entry corresponds to a categorical feature and contains the names of its associated dummy columns.
 
 ```{r start}
 library(tidyverse)
@@ -70,24 +70,33 @@ glue::glue("\nMissingness proportion of penguins_missing: {round(mean(is.na(as.m
 penguin_dummies_complete = penguins_clean %>% 
     dummy_cols(select_columns = c("species", "island", "sex"),
     ignore_na = TRUE,
-    remove_first_dummy = TRUE,
+    remove_first_dummy = FALSE, 
     remove_selected_columns = TRUE) 
 
 penguin_dummies = penguins_missing %>% 
     dummy_cols(select_columns = c("species", "island", "sex"),
     ignore_na = TRUE,
-    remove_first_dummy = TRUE,
+    remove_first_dummy = FALSE, 
     remove_selected_columns = TRUE)
 
 head(penguin_dummies) %>% kable()
+
+
+## define categorical_column_map
+categorical_column_map <- list(
+  species = grep("^species_", names(penguin_dummies), value = TRUE),
+  island  = grep("^island_",  names(penguin_dummies), value = TRUE),
+  sex     = grep("^sex_",     names(penguin_dummies), value = TRUE)
+)
+
+categorical_column_map
 
 ```
 
 Now that the dummy vars are created and there is missingness, we can create a `binary_feature_mask` and impute with `run_cissvae()`.
 
-
 ```{r eval=FALSE}
-binary_feature_mask = c(rep(FALSE, 5), rep(TRUE, 5))
+binary_feature_mask = c(rep(FALSE, 5), rep(TRUE, 8))
 
 glue::glue("Binary Feature Mask: {paste0(binary_feature_mask, collapse = ', ')}")
 
@@ -96,6 +105,7 @@ results = run_cissvae(
     val_proportion = 0.20, ## small dataset so using higher val proportion
     columns_ignore = "year",
     binary_feature_mask = binary_feature_mask,
+    categorical_column_map = categorical_column_map,
     clusters = NULL,
     n_clusters = 1,
     scale_features = TRUE,

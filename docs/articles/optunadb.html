@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,7 @@
 
       <h1>Using Optuna Dashboard with rCISSVAE</h1>
             
-            <h4 data-toc-skip class="date">2026-03-03</h4>
+            <h4 data-toc-skip class="date">2026-04-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CISS-VAE/rCISS-VAE/blob/HEAD/vignettes/optunadb.rmd" class="external-link"><code>vignettes/optunadb.rmd</code></a></small>
       <div class="d-none name"><code>optunadb.rmd</code></div>
@@ -137,6 +137,12 @@ creating an Optuna Dashboard database.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Trial results:"</span><span class="op">)</span></span>
 <span><span class="va">results</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span>font_size<span class="op">=</span><span class="fl">12</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning: package 'tidyverse' was built under R version 4.5.2</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: package 'ggplot2' was built under R version 4.5.2</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: package 'tibble' was built under R version 4.5.1</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: package 'tidyr' was built under R version 4.5.2</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: package 'purrr' was built under R version 4.5.2</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: package 'stringr' was built under R version 4.5.2</span></span></code></pre>
 <pre><code><span><span class="co">## ── <span style="font-weight: bold;">Attaching core tidyverse packages</span> ──────────────────────── tidyverse 2.0.0 ──</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">dplyr    </span> 1.1.4     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">readr    </span> 2.1.5</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">forcats  </span> 1.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">stringr  </span> 1.6.0</span></span>
@@ -378,7 +384,7 @@ S,S
 </table>
 <p>To view the dashboard:</p>
 <p><strong>From Command Line</strong></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="ex">optuna-dashboard</span> <span class="st">"sqlite:///optuna_study_demo.db"</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="ex">optuna-dashboard</span> <span class="st">"sqlite:///optuna_study_demo.db"</span></span></code></pre></div>
 <p>For more information see the <a href="https://optuna-dashboard.readthedocs.io/en/latest/getting-started.html" class="external-link">optuna
 dashboard documentation</a>.</p>
 </div>

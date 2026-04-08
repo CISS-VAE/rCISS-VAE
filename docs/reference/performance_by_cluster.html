@@ -11,7 +11,7 @@ model-imputed validation values against ground-truth validation data."></head><b
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,6 +51,7 @@ model-imputed validation values against ground-truth validation data.</p>
 <span>  group_col <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  feature_cols <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  binary_features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
+<span>  categorical_features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  by_group <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  by_cluster <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  cols_ignore <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -89,6 +90,11 @@ Defaults to all numeric columns except <code>group_col</code> and those in
 <dt id="arg-binary-features">binary_features<a class="anchor" aria-label="anchor" href="#arg-binary-features"></a></dt>
 <dd><p>Character vector naming those columns (subset of
 <code>feature_cols</code>) that should use BCE instead of MSE.</p></dd>
+
+
+<dt id="arg-categorical-features">categorical_features<a class="anchor" aria-label="anchor" href="#arg-categorical-features"></a></dt>
+<dd><p>List of categorical features. Key should be the category name
+and values should be the name of the dummy/one-hot-encoded variables.</p></dd>
 
 
 <dt id="arg-by-group">by_group<a class="anchor" aria-label="anchor" href="#arg-by-group"></a></dt>
@@ -176,18 +182,24 @@ entries (non-NA in <code>val_data</code>), then aggregated.</p>
 <span class="r-in"><span>  cols_ignore <span class="op">=</span> <span class="st">"id"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $overall</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         mse bce imputation_error</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.7640603  NA        0.7640603</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         mse bce ce accuracy imputation_error</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.7640603  NA NA       NA        0.7640603</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $per_cluster</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   cluster       mse bce imputation_error</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1       0 1.1924671  NA        1.1924671</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2       1 0.4784558  NA        0.4784558</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   cluster       mse bce ce accuracy imputation_error</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       0 1.1924671  NA NA       NA        1.1924671</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       1 0.4784558  NA NA       NA        0.4784558</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $per_group</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   group       mse bce imputation_error</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     A 0.4385655  NA        0.4385655</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2     B 0.9086065  NA        0.9086065</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   group       mse bce ce accuracy imputation_error</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     A 0.4385655  NA NA       NA        0.4385655</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     B 0.9086065  NA NA       NA        0.9086065</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $group_by_cluster</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   group cluster         mse bce ce accuracy imputation_error</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     B       0 1.361755517  NA NA       NA      1.361755517</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     A       1 0.438565481  NA NA       NA      0.438565481</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     B       1 0.002308592  NA NA       NA      0.002308592</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

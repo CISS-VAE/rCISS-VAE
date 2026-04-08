@@ -9,6 +9,7 @@
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/articles/vignette.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/articles/virtual_environment_tutorial.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/authors.html</loc></url>
+<url><loc>https://ciss-vae.github.io/rCISS-VAE/ign_paper_plans.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/index.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/LICENSE-text.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/news/index.html</loc></url>
@@ -23,13 +24,20 @@
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/create_missingness_prop_matrix.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/df_missing.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/dni.html</loc></url>
+<url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/dot-cissvae_config.html</loc></url>
+<url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/impute_result.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/impute_with_cissvae.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/index.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/load_cissvae_model.html</loc></url>
+<url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/load_impute_result.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/mock_surv.html</loc></url>
+<url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/new_impute_result.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/performance_by_cluster.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/plot_vae_architecture.html</loc></url>
+<url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/print.impute_result.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/run_cissvae.html</loc></url>
 <url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/save_cissvae_model.html</loc></url>
+<url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/save_impute_result.html</loc></url>
+<url><loc>https://ciss-vae.github.io/rCISS-VAE/reference/update_cissvae_env.html</loc></url>
 </urlset>
 

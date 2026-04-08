@@ -10,6 +10,7 @@ performance_by_cluster(
   group_col = NULL,
   feature_cols = NULL,
   binary_features = character(0),
+  categorical_features = list(),
   by_group = TRUE,
   by_cluster = TRUE,
   cols_ignore = NULL,
@@ -37,6 +38,9 @@ Defaults to all numeric columns except \code{group_col} and those in
 
 \item{binary_features}{Character vector naming those columns (subset of
 \code{feature_cols}) that should use BCE instead of MSE.}
+
+\item{categorical_features}{List of categorical features. Key should be the category name
+and values should be the name of the dummy/one-hot-encoded variables.}
 
 \item{by_group}{Logical; if \code{TRUE}, compute summaries by \code{group_col}.
 Ignored if \code{group_col} is \code{NULL}.}

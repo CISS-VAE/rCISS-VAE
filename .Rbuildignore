@@ -1,6 +1,7 @@
 ^rCISSVAE\.Rproj$
 ^\.Rproj\.user$
 ^ign_.*\.R$
+^ign_.*$
 ^\.venv(/|$)
 ^\.readthedocs\.yaml$
 ^docs/

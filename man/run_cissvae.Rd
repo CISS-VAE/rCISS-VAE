@@ -12,6 +12,7 @@ run_cissvae(
   cols_ignore = NULL,
   imputable_matrix = NULL,
   binary_feature_mask = NULL,
+  categorical_column_map = NULL,
   print_dataset = TRUE,
   clusters = NULL,
   n_clusters = NULL,
@@ -42,11 +43,11 @@ run_cissvae(
   beta_refit = NULL,
   verbose = FALSE,
   return_model = TRUE,
-  return_clusters = FALSE,
+  return_clusters = TRUE,
   return_silhouettes = FALSE,
   return_history = FALSE,
   return_dataset = FALSE,
-  return_validation_dataset = FALSE,
+  return_validation_dataset = TRUE,
   debug = FALSE,
   columns_ignore = NULL
 )
@@ -70,6 +71,8 @@ Can specify by name or index. Default \code{NULL}.}
 \item{imputable_matrix}{Logical matrix indicating entries allowed to be imputed.}
 
 \item{binary_feature_mask}{Logical vector marking which columns are binary.}
+
+\item{categorical_column_map}{Named list. Maps generated dummy variable column names to the original categorical column name.}
 
 \item{print_dataset}{Logical. If \code{TRUE}, prints dataset summary information during
 processing. Default \code{TRUE}.}

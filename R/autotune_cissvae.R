@@ -1,3 +1,27 @@
+# ============================================================
+# INTERNAL: Safe conversion to Python list
+# ============================================================
+.to_py_list_safe <- function(x, type = c("integer", "numeric", "character", "logical")) {
+
+  type <- match.arg(type)
+
+  if (is.null(x)) return(NULL)
+
+  #force vector (prevents scalar collapse)
+  if (length(x) == 1L) {
+    x <- c(x)
+  }
+
+  # enforce type
+  if (type == "integer")   x <- as.integer(x)
+  if (type == "numeric")   x <- as.numeric(x)
+  if (type == "character") x <- as.character(x)
+  if (type == "logical")   x <- as.logical(x)
+
+  #  convert via list → Python list
+  reticulate::r_to_py(as.list(x))
+}
+
 #' Autotune CISS-VAE hyperparameters with Optuna
 #'
 #' @importFrom purrr keep
@@ -44,6 +68,7 @@
 #' @param cols_ignore Character vector of column names to exclude from imputation scoring.
 #' @param imputable_matrix Logical matrix indicating entries allowed to be imputed.
 #' @param binary_feature_mask Logical vector marking which columns are binary.
+#' @param categorical_column_map Named list indicating what categorical column dummy variables belong to.
 #' @param weight_decay Weight decay (L2 penalty) used in Adam optimizer.
 #' @param debug Logical; if TRUE, additional metadata is returned for debugging.
 #' @param columns_ignore Alias of cols_ignore. Kept for continuity. 
@@ -138,6 +163,7 @@ autotune_cissvae <- function(
   cols_ignore         = NULL,
   imputable_matrix   = NULL,
   binary_feature_mask = NULL,
+  categorical_column_map = NULL,
   clusters, ## cluster identities must be provided by user
   save_model_path        = NULL,
   save_search_space_path = NULL,
@@ -178,7 +204,7 @@ autotune_cissvae <- function(
   columns_ignore = NULL
 ) {
 
-  if(!is.null(columns_ignore) & is.null(cols_ignore)){
+  if(!is.null(columns_ignore) && is.null(cols_ignore)){
     cols_ignore = columns_ignore
   }
 
@@ -237,7 +263,7 @@ autotune_cissvae <- function(
     imputable_matrix = imputable_matrix[, setdiff(colnames(imputable_matrix), 
       index_col), drop = FALSE]
     ## handle index col in binary_feature_mask
-    if(!is.null(binary_feature_mask) & !is.null(names(binary_feature_mask))){
+    if(!is.null(binary_feature_mask) && !is.null(names(binary_feature_mask))){
       binary_feature_mask =  binary_feature_mask[ setdiff(names(binary_feature_mask), 
         index_col), drop = FALSE]
       if(debug){
@@ -246,6 +272,44 @@ autotune_cissvae <- function(
       }
     }
   } else index_vals <- NULL
+
+    if (!is.null(categorical_column_map)) {
+    all_dummy_cols <- unlist(categorical_column_map)
+
+    if (!is.null(index_col) && index_col %in% all_dummy_cols) {
+      stop(sprintf(
+        "index_col '%s' cannot appear in categorical_column_map.",
+        index_col
+      ))
+    }
+  }
+
+    if(!is.null(categorical_column_map)){
+    if(is.null(binary_feature_mask)){
+      stop("`binary_feature_mask` is required when using categorical_column_map.")
+    }
+  }
+  if (!is.null(binary_feature_mask)) {
+  if (length(binary_feature_mask) != ncol(data)) {
+    stop("binary_feature_mask must have same length as number of columns in data.")
+  }
+}
+
+  if (!is.null(categorical_column_map)) {
+    if (!is.list(categorical_column_map)) {
+      stop("categorical_column_map must be a named list.")
+    }
+
+    all_dummy_cols <- unlist(categorical_column_map)
+
+    if (!all(all_dummy_cols %in% colnames(data))) {
+      missing_cols <- setdiff(all_dummy_cols, colnames(data))
+      stop(sprintf(
+        "categorical_column_map contains columns not in data: %s",
+        paste(missing_cols, collapse = ", ")
+      ))
+    }
+  }
 
   # -- 3.1) Ensure data and mask columns match EXACTLY (after index removal) --
 if (!is.null(imputable_matrix)) {
@@ -289,27 +353,29 @@ if (!is.null(imputable_matrix)) {
   
   # -- 5) Build Python SearchSpace -----------------------------------------
   ss_py <- SS(
-    num_hidden_layers = reticulate::r_to_py(num_hidden_layers),
-    hidden_dims       = reticulate::r_to_py(hidden_dims),
-    latent_dim        = reticulate::r_to_py(latent_dim),
-    latent_shared     = reticulate::r_to_py(latent_shared),
-    output_shared     = reticulate::r_to_py(output_shared),
-    lr                = reticulate::r_to_py(lr),
-    decay_factor      = reticulate::r_to_py(decay_factor),
-    beta              = beta,
-    weight_decay = reticulate::r_to_py(weight_decay),
-    num_epochs        = num_epochs,
-    batch_size        = batch_size,
-    num_shared_encode = reticulate::r_to_py(num_shared_encode),
-    num_shared_decode = reticulate::r_to_py(num_shared_decode),
-    # NEW: Add placement strategy parameters
-    encoder_shared_placement = reticulate::r_to_py(encoder_shared_placement),
-    decoder_shared_placement = reticulate::r_to_py(decoder_shared_placement),
-    refit_patience    = refit_patience,
-    refit_loops       = refit_loops,
-    epochs_per_loop   = epochs_per_loop,
-    reset_lr_refit    = reticulate::r_to_py(reset_lr_refit)
-  )
+  num_hidden_layers = .to_py_list_safe(num_hidden_layers, "integer"),
+  hidden_dims       = .to_py_list_safe(hidden_dims, "integer"),
+  latent_dim        = .to_py_list_safe(latent_dim, "integer"),
+  latent_shared     = .to_py_list_safe(latent_shared, "logical"),
+  output_shared     = .to_py_list_safe(output_shared, "logical"),
+  lr                = .to_py_list_safe(lr, "numeric"),
+  decay_factor      = .to_py_list_safe(decay_factor, "numeric"),
+  beta              = beta,
+  weight_decay      = weight_decay,
+  num_epochs        = num_epochs,
+  batch_size        = batch_size,
+
+  num_shared_encode = .to_py_list_safe(num_shared_encode, "integer"),
+  num_shared_decode = .to_py_list_safe(num_shared_decode, "integer"),
+
+  encoder_shared_placement = .to_py_list_safe(encoder_shared_placement, "character"),
+  decoder_shared_placement = .to_py_list_safe(decoder_shared_placement, "character"),
+
+  refit_patience    = refit_patience,
+  refit_loops       = refit_loops,
+  epochs_per_loop   = epochs_per_loop,
+  reset_lr_refit    = .to_py_list_safe(reset_lr_refit, "logical")
+)
   
   if (verbose) print("Built search space")
   
@@ -341,6 +407,9 @@ if (!is.null(imputable_matrix)) {
     }
   }
 
+    ## handle categorical_column_map
+  py_categorical_column_map =  reticulate::r_to_py(categorical_column_map)
+
   ## correctly set up the cluster dataset
   train_ds_py <- CD_mod(
     data = data_py, 
@@ -350,7 +419,8 @@ if (!is.null(imputable_matrix)) {
     columns_ignore = cols_ignore_py, 
     imputable = dni_py,
     val_seed = seed,
-    binary_feature_mask =  reticulate::r_to_py(binary_feature_mask))
+    binary_feature_mask =  reticulate::r_to_py(binary_feature_mask),
+    categorical_column_map = py_categorical_column_map)
 
   
   if(debug){
@@ -460,6 +530,6 @@ if (!is.null(imputable_matrix)) {
     print("added valimputed")
   }
 
-  return(out)
+  return(new_impute_result(out))
 
 }

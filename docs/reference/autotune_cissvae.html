@@ -9,7 +9,7 @@ support for both tunable and fixed parameters."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,6 +50,7 @@ support for both tunable and fixed parameters.</p>
 <span>  cols_ignore <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  imputable_matrix <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  binary_feature_mask <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  categorical_column_map <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">clusters</span>,</span>
 <span>  save_model_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  save_search_space_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -118,6 +119,10 @@ support for both tunable and fixed parameters.</p>
 
 <dt id="arg-binary-feature-mask">binary_feature_mask<a class="anchor" aria-label="anchor" href="#arg-binary-feature-mask"></a></dt>
 <dd><p>Logical vector marking which columns are binary.</p></dd>
+
+
+<dt id="arg-categorical-column-map">categorical_column_map<a class="anchor" aria-label="anchor" href="#arg-categorical-column-map"></a></dt>
+<dd><p>Named list indicating what categorical column dummy variables belong to.</p></dd>
 
 
 <dt id="arg-clusters">clusters<a class="anchor" aria-label="anchor" href="#arg-clusters"></a></dt>
@@ -358,6 +363,8 @@ support for both tunable and fixed parameters.</p>
 <span class="r-in"><span>  title <span class="op">=</span> <span class="st">"Optimized CISSVAE Architecture"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in reticulate::use_virtualenv("cissvae_environment", required = TRUE) : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Directory ~/.virtualenvs/cissvae_environment is not a Python virtualenv</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

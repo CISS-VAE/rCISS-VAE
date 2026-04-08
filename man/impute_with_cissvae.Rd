@@ -12,6 +12,7 @@ impute_with_cissvae(
   clusters,
   imputable_matrix = NULL,
   binary_feature_mask = NULL,
+  categorical_column_map = NULL,
   replacement_value = 0,
   batch_size = NULL,
   seed = 42
@@ -31,6 +32,8 @@ impute_with_cissvae(
 \item{imputable_matrix}{Logical matrix indicating entries allowed to be imputed.}
 
 \item{binary_feature_mask}{Logical vector marking which columns are binary.}
+
+\item{categorical_column_map}{Named list. Maps generated dummy variable column names to the original categorical column name.}
 
 \item{replacement_value}{Numeric value used to replace missing entries before model input.}
 
@@ -60,7 +63,7 @@ and returns an imputed data frame in R.
 ## Wrapped in try() and donttest to avoid CRAN check failures
 \donttest{
 try({
-  # Activate your reticulate Python environment with ciss-vae installed
+  # Activate your reticulate Python environment with ciss_vae installed
   reticulate::use_virtualenv("cissvae_environment", required = TRUE)
 
   # Load example data and clusters (replace with your own)

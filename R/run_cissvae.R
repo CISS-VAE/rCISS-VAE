@@ -85,6 +85,7 @@
 #'   during training (contains validation data, masks, etc.). Default `FALSE`.
 #' @param imputable_matrix Logical matrix indicating entries allowed to be imputed.
 #' @param binary_feature_mask Logical vector marking which columns are binary.
+#' @param categorical_column_map Named list. Maps generated dummy variable column names to the original categorical column name. 
 #' @param weight_decay Weight decay (L2 penalty) used in Adam optimizer.
 #' @param debug Logical; if TRUE, additional metadata is returned for debugging.
 #' @param return_validation_dataset Logical. If `TRUE` returns validation dataset 
@@ -176,6 +177,7 @@ run_cissvae <- function(
   cols_ignore         = NULL,
   imputable_matrix   = NULL,
   binary_feature_mask = NULL,
+  categorical_column_map =  NULL,
   print_dataset          = TRUE, 
   ## Cluster stuff
   clusters               = NULL,
@@ -209,15 +211,15 @@ run_cissvae <- function(
   ## other params
   verbose                = FALSE,
   return_model           = TRUE,
-  return_clusters        = FALSE,     # if clusters initiially null, will automatically return clusters. 
+  return_clusters        = TRUE,     # if clusters initiially null, will automatically return clusters. 
   return_silhouettes     = FALSE,
   return_history         = FALSE,
   return_dataset         = FALSE,
-  return_validation_dataset = FALSE,
+  return_validation_dataset = TRUE,
   debug                  = FALSE,
   columns_ignore = NULL
 ){
-    if(!is.null(columns_ignore) & is.null(cols_ignore)){
+    if(!is.null(columns_ignore) && is.null(cols_ignore)){
     cols_ignore = columns_ignore
   }
 
@@ -243,6 +245,41 @@ run_cissvae <- function(
   if(is.null(clusters)){
     return_clusters = TRUE
   }
+
+  if(!is.null(categorical_column_map)){
+    if(is.null(binary_feature_mask)){
+      stop("`binary_feature_mask` is required when using categorical_column_map.")
+    }
+
+  if (!is.list(categorical_column_map)) {
+    stop("categorical_column_map must be a named list.")
+  }
+
+  # flatten all dummy columns
+  all_dummy_cols <- unlist(categorical_column_map)
+
+  # check existence
+  if (!all(all_dummy_cols %in% colnames(data))) {
+    missing_cols <- setdiff(all_dummy_cols, colnames(data))
+    stop(sprintf(
+      "categorical_column_map contains columns not in data: %s",
+      paste(missing_cols, collapse = ", ")
+    ))
+  }
+
+  }
+  if (!is.null(index_col) && !is.null(categorical_column_map)) {
+  all_dummy_cols <- unlist(categorical_column_map)
+
+  if (index_col %in% all_dummy_cols) {
+    stop(sprintf(
+      "index_col '%s' cannot appear in categorical_column_map.",
+      index_col
+    ))
+  }
+}
+  
+  
 
   ## preserve raw data
   data_raw = as.data.frame(data)
@@ -284,6 +321,20 @@ run_cissvae <- function(
   hidden_dims     <- as.integer(hidden_dims)
   layer_order_enc <- as.character(layer_order_enc)
   layer_order_dec <- as.character(layer_order_dec)
+
+  ## CRITICAL: force vector shape
+  if (length(hidden_dims) == 1) {
+    hidden_dims <- as.integer(c(hidden_dims))
+  }
+  if (length(layer_order_enc) == 1) {
+    layer_order_enc <- as.character(c(layer_order_enc))
+  }
+  if (length(layer_order_dec) == 1) {
+    layer_order_dec <- as.character(c(layer_order_dec))
+  }
+
+  ## handle categorical_column_map
+  py_categorical_column_map =  reticulate::r_to_py(categorical_column_map)
   
   ## step 2: handle index col if passed
   if (!is.null(index_col)) {
@@ -295,7 +346,7 @@ run_cissvae <- function(
       imputable_matrix <- imputable_matrix[, setdiff(colnames(imputable_matrix), index_col), drop = FALSE]
     }
     ## handle index col in binary_feature_mask
-    if(!is.null(binary_feature_mask) & !is.null(names(binary_feature_mask))){
+    if(!is.null(binary_feature_mask) && !is.null(names(binary_feature_mask))){
       binary_feature_mask =  binary_feature_mask[ setdiff(names(binary_feature_mask), index_col), drop = FALSE]
       if(debug){
         cat("Binary feature mask: ", paste0(names(binary_feature_mask), collapse = ", "))
@@ -383,12 +434,13 @@ run_cissvae <- function(
     n_clusters            = n_clusters,
     seed                  = seed,
     binary_feature_mask  = reticulate::r_to_py(binary_feature_mask),
+    categorical_column_map =  py_categorical_column_map ,
     missingness_proportion_matrix = prop_matrix_py,
     scale_features        = scale_features,
-    hidden_dims           = reticulate::r_to_py(hidden_dims),
+    hidden_dims = reticulate::r_to_py(as.list(hidden_dims)),
     latent_dim            = latent_dim,
-    layer_order_enc       = reticulate::r_to_py(layer_order_enc),
-    layer_order_dec       = reticulate::r_to_py(layer_order_dec),
+    layer_order_enc = reticulate::r_to_py(as.list(layer_order_enc)),
+    layer_order_dec = reticulate::r_to_py(as.list(layer_order_dec)),
     latent_shared         = latent_shared,
     output_shared         = output_shared,
     batch_size            = batch_size,
@@ -491,6 +543,14 @@ run_cissvae <- function(
       val_imputed[[index_col]] = index_vals
       val_imputed <- val_imputed[c(index_col, setdiff(names(val_imputed), index_col))]
     }
+
+    if (return_model && !is.null(categorical_column_map)) {
+    ag <- reticulate::py_to_r(out$model$activation_groups)
+
+    if (!all(names(categorical_column_map) %in% names(ag))) {
+      warning("Some categorical groups missing in model activation_groups.")
+    }
+  }
     # -----------------
     # If there were columns we wanted the model to ignore for validation, we want to keep them the same in the val_data  so we can filter by them for mse funct
     # ------------------
@@ -507,6 +567,6 @@ run_cissvae <- function(
   }
 
     
-  return(out)
+  return(new_impute_result(out))
 
 }

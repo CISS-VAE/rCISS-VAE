@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rCISSVAE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,7 @@
 
       <h1>Saving and Using Saved Models</h1>
             
-            <h4 data-toc-skip class="date">2026-03-03</h4>
+            <h4 data-toc-skip class="date">2026-04-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CISS-VAE/rCISS-VAE/blob/HEAD/vignettes/impute_with_saved_model.rmd" class="external-link"><code>vignettes/impute_with_saved_model.rmd</code></a></small>
       <div class="d-none name"><code>impute_with_saved_model.rmd</code></div>
@@ -59,6 +59,13 @@
 
     
     
+<p>This vignette shows how to save a trained CISS-VAE model, reload it
+in a later R session, and use it to impute new data.</p>
+<p>As of rCISSVAE version 0.0.6, the recommended workflow is to save the
+model as a PyTorch <code>state_dict</code> together with an
+automatically generated architecture config file. This is more portable
+across Python and PyTorch and more robust than saving the full live
+Python object.</p>
 <div class="section level2">
 <h2 id="saving-a-trained-ciss-vae-model">Saving a trained CISS-VAE model<a class="anchor" aria-label="anchor" href="#saving-a-trained-ciss-vae-model"></a>
 </h2>
@@ -67,13 +74,18 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ciss-vae.github.io/rCISS-VAE/">rCISSVAE</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Train a model</span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_cissvae.html">run_cissvae</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_cissvae.html">run_cissvae</a></span><span class="op">(</span><span class="va">data</span>, return_model <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Save the trained model to disk</span></span>
-<span><span class="fu"><a href="../reference/save_cissvae_model.html">save_cissvae_model</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">model</span>, <span class="st">"trained_vae.pt"</span><span class="op">)</span></span>
+<span><span class="co"># by default, this writes two files: </span></span>
+<span><span class="co"># -  trained_vae.pt (the model weights)</span></span>
+<span><span class="co"># - trained_vae.pt.config.rds (the saved model configuration/architecture needed to rebuild the model when loading. )</span></span>
+<span><span class="fu"><a href="../reference/save_cissvae_model.html">save_cissvae_model</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">model</span>, <span class="st">"trained_vae.pt"</span>, method<span class="op">=</span><span class="st">"state_dict"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># IMPORTANT</span></span>
 <span><span class="co"># The Python environment must be active so 'torch' can be imported.</span></span></code></pre></div>
+<p>There is still the option to save the full model as a .pt file if
+desired by setting <code>method='full'</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="loading-a-saved-model-and-imputing-data">Loading a saved model and imputing data<a class="anchor" aria-label="anchor" href="#loading-a-saved-model-and-imputing-data"></a>
@@ -87,11 +99,14 @@
 <span></span>
 <span><span class="co">## Load full model object</span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_cissvae_model.html">load_cissvae_model</a></span><span class="op">(</span></span>
-<span>  file <span class="op">=</span> <span class="st">"trained_vae.pt"</span></span>
+<span>  file <span class="op">=</span> <span class="st">"trained_vae.pt"</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"state_dict"</span>, <span class="co">## (or 'full' if full was used when saving)</span></span>
+<span>  device <span class="op">=</span> <span class="st">"cpu"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## Perform imputation on new data</span></span>
-<span><span class="co"># Make sure your `data` has valid NAs and `clusters` vector is ready</span></span>
+<span><span class="co">## Make sure your `data` has valid NAs and `clusters` vector is ready</span></span>
+<span><span class="co">## `val_proportion`, `categorical_column_map` and `replacement_value` are not needed because we are just imputing</span></span>
 <span><span class="va">imputed_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/impute_with_cissvae.html">impute_with_cissvae</a></span><span class="op">(</span></span>
 <span>  model_py <span class="op">=</span> <span class="va">model</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">data</span>,</span>
@@ -100,16 +115,15 @@
 <span>  clusters <span class="op">=</span> <span class="va">clusters</span>,</span>
 <span>  imputable_matrix <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  binary_feature_mask <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  val_proportion <span class="op">=</span> <span class="fl">0.1</span>,</span>
-<span>  replacement_value <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  batch_size <span class="op">=</span> <span class="fl">4000L</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">42</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># `imputed_df` is returned to R as a data.frame</span></span></code></pre></div>
 <p>If you have binary variables in your dataset, make sure to define the
-binary_feature_mask and convert the probabilities for the binary
-variables into {0, 1} values using desired thresholding.</p>
+binary_feature_mask in your <code><a href="../reference/impute_with_cissvae.html">impute_with_cissvae()</a></code> call and
+convert the probabilities for the binary variables into {0, 1} values
+after imputation using desired thresholding.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

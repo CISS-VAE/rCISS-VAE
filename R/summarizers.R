@@ -171,7 +171,7 @@ cluster_summary <- function(
 #' @importFrom ComplexHeatmap HeatmapAnnotation anno_block Heatmap
 #' @export
 cluster_heatmap <- function(data, clusters, cols_ignore = NULL, show_row_names = TRUE,
-missing_color = "black", observed_color = "white", title = "Missingness Heatmap by Cluster") {
+missing_color = "yellow", observed_color = "purple4", title = "Missingness Heatmap by Cluster") {
 
   if (!requireNamespace("ComplexHeatmap", quietly = TRUE)) {
     stop(

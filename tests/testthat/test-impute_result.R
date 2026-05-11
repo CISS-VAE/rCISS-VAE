@@ -121,7 +121,7 @@ test_that(".cissvae_config extracts activation_groups", {
 })
 
 # -----------------------------------------------------------------------------
-# 🔴 NEW: activation_groups structure validation
+# NEW: activation_groups structure validation
 # -----------------------------------------------------------------------------
 
 test_that("activation_groups structure is valid", {

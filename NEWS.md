@@ -2,7 +2,7 @@
 ## NOTE
 - Major changes made to ensure correct handling of categorical variables
 - Cross-entropy loss now used for categorical variables
-- Please use update_cissvae_env() to upgrade your python ciss-vae package
+- Please use `update_cissvae_env()` to upgrade your python ciss-vae package
 ## Updates
 - Added `categorical_column_map` to fix the preparation of valdata for caegorical columns
 - Added `update_cissvae_env` to update the cissvae environment when needed

@@ -9,8 +9,8 @@ cluster_heatmap(
   clusters,
   cols_ignore = NULL,
   show_row_names = TRUE,
-  missing_color = "black",
-  observed_color = "white",
+  missing_color = "yellow",
+  observed_color = "purple4",
   title = "Missingness Heatmap by Cluster"
 )
 }

@@ -459,8 +459,11 @@ if (!is.null(imputable_matrix)) {
   study_py    <- out_list[[3]]
   results_py  <- out_list[[4]]
   
+
+
   # -- 8) Convert back to R -------------------------------------------------
-  imp_df <- as.data.frame(best_imp_py, stringsAsFactors = FALSE)
+  best_imp <- reticulate::py_to_r(best_imp_py)
+  imp_df <- as.data.frame(best_imp, stringsAsFactors = FALSE)
   if (ncol(imp_df) == ncol(mat)) {
     colnames(imp_df) <- colnames(mat)
   }
@@ -473,8 +476,10 @@ if (!is.null(imputable_matrix)) {
     imp_df[[index_col]] <- index_vals
     imp_df <- imp_df[, c(index_col, setdiff(names(imp_df), index_col))]
   }
+
+  results_df <- reticulate::py_to_r(results_py)
   
-  results_df <- as.data.frame(results_py, stringsAsFactors = FALSE)
+  results_df <- as.data.frame(results_df, stringsAsFactors = FALSE)
 
   if(debug){
     print("At results")
